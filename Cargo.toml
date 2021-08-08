@@ -1,0 +1,8 @@
+[package]
+name = "ppc750cl"
+version = "0.1.0"
+edition = "2018"
+authors = ["Richard Patel <me@terorie.dev>"]
+
+[dependencies]
+num-traits = "0.2.14"
