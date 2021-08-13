@@ -52,6 +52,7 @@ jobs:
           toolchain: ${{ matrix.rust }}
           profile: minimal
           override: true
+          components: rustfmt, clippy
       - name: Cache cargo registry
         uses: actions/cache@v2
         continue-on-error: false
