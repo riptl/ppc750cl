@@ -20,8 +20,8 @@ jobs:
             task: "check-clippy"
           - name: Unit tests
             task: "build-all-test run-all-unit-test"
-          - name: Doc tests
-            task: "run-all-doc-test"
+          #- name: Doc tests
+          #  task: "run-all-doc-test"
         include:
           - os: ubuntu-latest
             sccache-path: /home/runner/.cache/sccache
@@ -51,6 +51,7 @@ jobs:
           mkdir -p $HOME/.local/bin
           curl -L "$LINK/$SCCACHE_VERSION/$SCCACHE_FILE.tar.gz" | tar xz
           mv -f $SCCACHE_FILE/sccache $HOME/.local/bin/sccache
+          chmod +x $HOME/.local/bin/sccache
           echo "$HOME/.local/bin" >> $GITHUB_PATH
       - name: Install sccache (macos-latest)
         if: matrix.os == 'macos-latest'
