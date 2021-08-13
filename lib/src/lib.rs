@@ -1,3 +1,4 @@
+use std::fmt::Write;
 use std::ops::Range;
 
 use num_traits::AsPrimitive;
@@ -1309,7 +1310,7 @@ impl Ins {
         ins
     }
 
-    fn to_string_form_reg123(&self) -> String {
+    fn write_string_form_reg123(&self, out: &mut String) -> std::fmt::Result {
         let name = match self.op {
             Opcode::Eciwx => "eciwx",
             Opcode::Ecowx => "ecowx",
@@ -1337,10 +1338,10 @@ impl Ins {
             Opcode::Stwux => "stwux",
             _ => disasm_unreachable!(self.code),
         };
-        format!("{} r{}, r{}, r{}", name, self.d(), self.a(), self.b())
+        write!(out, "{} r{}, r{}, r{}", name, self.d(), self.a(), self.b())
     }
 
-    fn to_string_form_reg123_rc(&self) -> String {
+    fn write_string_form_reg123_rc(&self, out: &mut String) -> std::fmt::Result {
         let name_suffix = if self.rc() { "." } else { "" };
         let name = match self.op {
             Opcode::And => "and",
@@ -1350,7 +1351,8 @@ impl Ins {
             Opcode::Xor => "xor",
             _ => disasm_unreachable!(self.code),
         };
-        format!(
+        write!(
+            out,
             "{}{} r{}, r{}, r{}",
             name,
             name_suffix,
@@ -1360,7 +1362,7 @@ impl Ins {
         )
     }
 
-    fn to_string_form_reg123_oe_rc(&self) -> String {
+    fn write_string_form_reg123_oe_rc(&self, out: &mut String) -> std::fmt::Result {
         let name_suffix = match (self.oe(), self.rc()) {
             (false, false) => "",
             (false, true) => ".",
@@ -1379,7 +1381,8 @@ impl Ins {
             Opcode::Subfe => "subfe",
             _ => disasm_unreachable!(self.code),
         };
-        format!(
+        write!(
+            out,
             "{}{} r{}, r{}, r{}",
             name,
             name_suffix,
@@ -1389,8 +1392,8 @@ impl Ins {
         )
     }
 
-    fn to_string_noargs(&self) -> String {
-        match self.op {
+    fn write_string_noargs(&self, out: &mut String) -> std::fmt::Result {
+        *out = match self.op {
             Opcode::Eieio => "eieio",
             Opcode::Isync => "isync",
             Opcode::Rfi => "rfi",
@@ -1398,11 +1401,11 @@ impl Ins {
             Opcode::Sync => "sync",
             Opcode::Tlbsync => "tlbsync",
             _ => disasm_unreachable!(self.code),
-        }
-        .to_owned()
+        }.to_owned();
+        Ok(())
     }
 
-    fn to_string_form_reg12_simm(&self) -> String {
+    fn write_string_form_reg12_simm(&self, out: &mut String) -> std::fmt::Result {
         let name = match self.op {
             Opcode::Addi => "addi",
             Opcode::Addic => "addic",
@@ -1412,10 +1415,17 @@ impl Ins {
             Opcode::Subfic => "subfic",
             _ => disasm_unreachable!(self.code),
         };
-        format!("{} r{}, r{}, {}", name, self.d(), self.a(), self.simm())
+        write!(
+            out,
+            "{} r{}, r{}, {}",
+            name,
+            self.d(),
+            self.a(),
+            self.simm()
+        )
     }
 
-    fn to_string_form_reg12_uimm(&self) -> String {
+    fn write_string_form_reg12_uimm(&self, out: &mut String) -> std::fmt::Result {
         let name = match self.op {
             Opcode::Andi_ => "andi.",
             Opcode::Andis_ => "andis.",
@@ -1425,10 +1435,17 @@ impl Ins {
             Opcode::Xoris => "xoris",
             _ => disasm_unreachable!(self.code),
         };
-        format!("{} r{}, r{}, {}", name, self.d(), self.a(), self.uimm())
+        write!(
+            out,
+            "{} r{}, r{}, {}",
+            name,
+            self.d(),
+            self.a(),
+            self.uimm()
+        )
     }
 
-    fn to_string_form_reg12_offset(&self) -> String {
+    fn write_string_form_reg12_offset(&self, out: &mut String) -> std::fmt::Result {
         let name = match self.op {
             Opcode::Lha => "lha",
             Opcode::Lhau => "lhau",
@@ -1448,10 +1465,17 @@ impl Ins {
             Opcode::Stwu => "stwu",
             _ => disasm_unreachable!(self.code),
         };
-        format!("{} r{}, {}(r{})", name, self.d(), self.simm(), self.a())
+        write!(
+            out,
+            "{} r{}, {}(r{})",
+            name,
+            self.d(),
+            self.simm(),
+            self.a()
+        )
     }
 
-    fn to_string_form_fr1_reg2_offset(&self) -> String {
+    fn write_string_form_fr1_reg2_offset(&self, out: &mut String) -> std::fmt::Result {
         let name = match self.op {
             Opcode::Lfd => "lfd",
             Opcode::Lfdu => "lfdu",
@@ -1463,10 +1487,17 @@ impl Ins {
             Opcode::Stfsu => "stfsu",
             _ => disasm_unreachable!(self.code),
         };
-        format!("{} fr{}, {}(r{})", name, self.d(), self.simm(), self.a())
+        write!(
+            out,
+            "{} fr{}, {}(r{})",
+            name,
+            self.d(),
+            self.simm(),
+            self.a()
+        )
     }
 
-    fn to_string_form_fr1_reg23(&self) -> String {
+    fn write_string_form_fr1_reg23(&self, out: &mut String) -> std::fmt::Result {
         let name = match self.op {
             Opcode::Lfdux => "lfdux",
             Opcode::Lfdx => "lfdx",
@@ -1479,23 +1510,24 @@ impl Ins {
             Opcode::Stfsx => "stfsx",
             _ => disasm_unreachable!(self.code),
         };
-        format!("{} fr{}, r{}, r{}", name, self.d(), self.a(), self.b())
+        write!(out, "{} fr{}, r{}, r{}", name, self.d(), self.a(), self.b())
     }
 
-    fn to_string_mtfsf(&self) -> String {
+    fn write_string_mtfsf(&self, out: &mut String) -> std::fmt::Result {
         let name = match self.op {
             Opcode::Mtfsf => "mtfsf",
             _ => disasm_unreachable!(self.code),
         };
-        format!("{} {}, fr{}", name, self.fm(), self.b())
+        write!(out, "{} {}, fr{}", name, self.fm(), self.b())
     }
 
-    fn to_string_mtfsfi(&self) -> String {
+    fn write_string_mtfsfi(&self, out: &mut String) -> std::fmt::Result {
         let name = match self.op {
             Opcode::Mtfsfi => "mtfsfi",
             _ => disasm_unreachable!(self.code),
         };
-        format!(
+        write!(
+            out,
             "{} crf{}, {}",
             name,
             self.crf_d(),
@@ -1503,7 +1535,7 @@ impl Ins {
         )
     }
 
-    fn to_string_form_reg1(&self) -> String {
+    fn write_string_form_reg1(&self, out: &mut String) -> std::fmt::Result {
         let name = match self.op {
             Opcode::Mfcr => "mfcr",
             Opcode::Mfmsr => "mfmsr",
@@ -1511,10 +1543,10 @@ impl Ins {
             Opcode::Tlbie => "tblie",
             _ => disasm_unreachable!(self.code),
         };
-        format!("{} r{}", name, self.d())
+        write!(out, "{} r{}", name, self.d())
     }
 
-    fn to_string_form_reg12_oe_rc(&self) -> String {
+    fn write_string_form_reg12_oe_rc(&self, out: &mut String) -> std::fmt::Result {
         let name_suffix = match (self.oe(), self.rc()) {
             (false, false) => "",
             (false, true) => ".",
@@ -1529,19 +1561,19 @@ impl Ins {
             Opcode::Subfze => "subfze",
             _ => disasm_unreachable!(self.code),
         };
-        format!("{}{} r{}, r{}", name, name_suffix, self.d(), self.a())
+        write!(out, "{}{} r{}, r{}", name, name_suffix, self.d(), self.a())
     }
 
-    fn to_string_form_reg13(&self) -> String {
+    fn write_string_form_reg13(&self, out: &mut String) -> std::fmt::Result {
         let name = match self.op {
             Opcode::Mfsrin => "mfsrin",
             Opcode::Mtsrin => "mtsrin",
             _ => disasm_unreachable!(self.code),
         };
-        format!("{} r{}, r{}", name, self.d(), self.b())
+        write!(out, "{} r{}, r{}", name, self.d(), self.b())
     }
 
-    fn to_string_form_reg21_rc(&self) -> String {
+    fn write_string_form_reg21_rc(&self, out: &mut String) -> std::fmt::Result {
         let name_suffix = if self.rc() { "." } else { "" };
         let name = match self.op {
             Opcode::Cntlzw => "cntlzw",
@@ -1549,10 +1581,10 @@ impl Ins {
             Opcode::Extsh => "extsh",
             _ => disasm_unreachable!(self.code),
         };
-        format!("{}{} r{}, r{}", name, name_suffix, self.a(), self.s())
+        write!(out, "{}{} r{}, r{}", name, name_suffix, self.a(), self.s())
     }
 
-    fn to_string_form_fr1(&self) -> String {
+    fn write_string_form_fr1(&self, out: &mut String) -> std::fmt::Result {
         let name = match self.op {
             Opcode::Mffs => match self.rc() {
                 false => "mffs",
@@ -1560,10 +1592,10 @@ impl Ins {
             },
             _ => disasm_unreachable!(self.code),
         };
-        format!("{} fr{}", name, self.d())
+        write!(out, "{} fr{}", name, self.d())
     }
 
-    fn to_string_form_fr13(&self) -> String {
+    fn write_string_form_fr13(&self, out: &mut String) -> std::fmt::Result {
         let name_suffix = if self.rc() { "." } else { "" };
         let name = match self.op {
             Opcode::Fabs => "fabs",
@@ -1583,10 +1615,17 @@ impl Ins {
             Opcode::PsSum1 => "ps_sum1",
             _ => disasm_unreachable!(self.code),
         };
-        format!("{}{} fr{}, fr{}", name, name_suffix, self.d(), self.b())
+        write!(
+            out,
+            "{}{} fr{}, fr{}",
+            name,
+            name_suffix,
+            self.d(),
+            self.b()
+        )
     }
 
-    fn to_string_form_fr123(&self) -> String {
+    fn write_string_form_fr123(&self, out: &mut String) -> std::fmt::Result {
         let name_suffix = if self.rc() { "." } else { "" };
         let name = match self.op {
             Opcode::Fadd => "fadd",
@@ -1604,7 +1643,8 @@ impl Ins {
             Opcode::PsSub => "ps_sub",
             _ => disasm_unreachable!(self.code),
         };
-        format!(
+        write!(
+            out,
             "{}{} fr{}, fr{}, fr{}",
             name,
             name_suffix,
@@ -1614,7 +1654,7 @@ impl Ins {
         )
     }
 
-    fn to_string_form_fr1243(&self) -> String {
+    fn write_string_form_fr1243(&self, out: &mut String) -> std::fmt::Result {
         let name_suffix = if self.rc() { "." } else { "" };
         let name = match self.op {
             Opcode::Fmadd => "fmadd",
@@ -1637,7 +1677,8 @@ impl Ins {
             Opcode::PsSum1 => "ps_sum1",
             _ => disasm_unreachable!(self.code),
         };
-        format!(
+        write!(
+            out,
             "{}{} fr{}, fr{}, fr{}, fr{}",
             name,
             name_suffix,
@@ -1648,7 +1689,7 @@ impl Ins {
         )
     }
 
-    fn to_string_form_fr124(&self) -> String {
+    fn write_string_form_fr124(&self, out: &mut String) -> std::fmt::Result {
         let name_suffix = if self.rc() { "." } else { "" };
         let name = match self.op {
             Opcode::Fmul => "fmul",
@@ -1658,7 +1699,8 @@ impl Ins {
             Opcode::PsMuls1 => "ps_muls1",
             _ => disasm_unreachable!(self.code),
         };
-        format!(
+        write!(
+            out,
             "{}{} fr{}, fr{}, fr{}",
             name,
             name_suffix,
@@ -1668,7 +1710,7 @@ impl Ins {
         )
     }
 
-    fn to_string_form_condreg1_fr23(&self) -> String {
+    fn write_string_form_condreg1_fr23(&self, out: &mut String) -> std::fmt::Result {
         let name = match self.op {
             Opcode::Fcmpo => "fcmpo",
             Opcode::Fcmpu => "fcmpu",
@@ -1678,7 +1720,8 @@ impl Ins {
             Opcode::PsCmpu1 => "ps_cmpu1",
             _ => disasm_unreachable!(self.code),
         };
-        format!(
+        write!(
+            out,
             "{} crf{}, fr{}, fr{}",
             name,
             self.crf_d(),
@@ -1687,14 +1730,15 @@ impl Ins {
         )
     }
 
-    fn to_string_form_condreg1_fr13_rc(&self) -> String {
+    fn write_string_form_condreg1_fr13_rc(&self, out: &mut String) -> std::fmt::Result {
         let name_suffix = if self.rc() { "." } else { "" };
         let name = match self.op {
             Opcode::Fctiw => "fctiw",
             Opcode::Fctiwz => "fctiwz",
             _ => disasm_unreachable!(self.code),
         };
-        format!(
+        write!(
+            out,
             "{}{} crf{}, fr{}, fr{}",
             name,
             name_suffix,
@@ -1704,7 +1748,7 @@ impl Ins {
         )
     }
 
-    fn to_string_b(&self) -> String {
+    fn write_string_b(&self, out: &mut String) -> std::fmt::Result {
         let name = match (self.aa(), self.lk()) {
             (false, false) => "b",
             (false, true) => "bl",
@@ -1712,10 +1756,10 @@ impl Ins {
             (true, true) => "bla",
         };
         // TODO absolute address
-        format!("{} 0x{:x}", name, self.li())
+        write!(out, "{} 0x{:x}", name, self.li())
     }
 
-    fn to_string_bc(&self) -> String {
+    fn write_string_bc(&self, out: &mut String) -> std::fmt::Result {
         let name = match (self.aa(), self.lk()) {
             (false, false) => "bc",
             (false, true) => "bcl",
@@ -1723,7 +1767,8 @@ impl Ins {
             (true, true) => "bcla",
         };
         // TODO absolute address
-        format!(
+        write!(
+            out,
             "{} 0x{:x}, 0x{:x}, 0x{:x}",
             name,
             self.bo(),
@@ -1732,7 +1777,7 @@ impl Ins {
         )
     }
 
-    fn to_string_branch_cond_to_reg(&self) -> String {
+    fn write_string_branch_cond_to_reg(&self, out: &mut String) -> std::fmt::Result {
         let name = match self.op {
             Opcode::Bcctr => match self.lk() {
                 false => "bcctr",
@@ -1744,16 +1789,17 @@ impl Ins {
             },
             _ => disasm_unreachable!(self.code),
         };
-        format!("{} 0x{:x}, 0x{:x}", name, self.bo(), self.bi())
+        write!(out, "{} 0x{:x}, 0x{:x}", name, self.bo(), self.bi())
     }
 
-    fn to_string_cmp(&self) -> String {
+    fn write_string_cmp(&self, out: &mut String) -> std::fmt::Result {
         let name = match self.op {
             Opcode::Cmp => "cmp",
             Opcode::Cmpl => "cmpl",
             _ => disasm_unreachable!(self.code),
         };
-        format!(
+        write!(
+            out,
             "{} crf{}, {}, r{}, r{}",
             name,
             self.crf_d(),
@@ -1763,9 +1809,10 @@ impl Ins {
         )
     }
 
-    fn to_string_cmp_simm(&self) -> String {
+    fn write_string_cmp_simm(&self, out: &mut String) -> std::fmt::Result {
         let name = "cmpi";
-        format!(
+        write!(
+            out,
             "{} crf{}, {}, r{}, {}",
             name,
             self.crf_d(),
@@ -1775,9 +1822,10 @@ impl Ins {
         )
     }
 
-    fn to_string_cmp_uimm(&self) -> String {
+    fn write_string_cmp_uimm(&self, out: &mut String) -> std::fmt::Result {
         let name = "cmpli";
-        format!(
+        write!(
+            out,
             "{} crf{}, {}, r{}, {}",
             name,
             self.crf_d(),
@@ -1787,7 +1835,7 @@ impl Ins {
         )
     }
 
-    fn to_string_form_condreg1(&self) -> String {
+    fn write_string_form_condreg1(&self, out: &mut String) -> std::fmt::Result {
         let name = match self.op {
             Opcode::Mcrxr => "mcrxr",
             Opcode::Mtfsb0 => match self.rc() {
@@ -1800,19 +1848,19 @@ impl Ins {
             },
             _ => disasm_unreachable!(self.code),
         };
-        format!("{} crf{}", name, self.crf_d())
+        write!(out, "{} crf{}", name, self.crf_d())
     }
 
-    fn to_string_form_condreg12(&self) -> String {
+    fn write_string_form_condreg12(&self, out: &mut String) -> std::fmt::Result {
         let name = match self.op {
             Opcode::Mcrf => "mcrf",
             Opcode::Mcrfs => "mcrfs",
             _ => disasm_unreachable!(self.code),
         };
-        format!("{} crf{}, crf{}", name, self.crf_d(), self.crf_s())
+        write!(out, "{} crf{}, crf{}", name, self.crf_d(), self.crf_s())
     }
 
-    fn to_string_form_condreg123(&self) -> String {
+    fn write_string_form_condreg123(&self, out: &mut String) -> std::fmt::Result {
         let name = match self.op {
             Opcode::Crand => "crand",
             Opcode::Crandc => "crandc",
@@ -1824,7 +1872,8 @@ impl Ins {
             Opcode::Crxor => "crxor",
             _ => disasm_unreachable!(self.code),
         };
-        format!(
+        write!(
+            out,
             "{} crb{}, crb{}, crb{}",
             name,
             self.crb_d(),
@@ -1833,7 +1882,7 @@ impl Ins {
         )
     }
 
-    fn to_string_form_reg23(&self) -> String {
+    fn write_string_form_reg23(&self, out: &mut String) -> std::fmt::Result {
         let name = match self.op {
             Opcode::Dcbf => "dcbf",
             Opcode::Dcbi => "dcbi",
@@ -1845,10 +1894,10 @@ impl Ins {
             Opcode::Icbi => "icbi",
             _ => disasm_unreachable!(self.code),
         };
-        format!("{} r{}, r{}", name, self.a(), self.b())
+        write!(out, "{} r{}, r{}", name, self.a(), self.b())
     }
 
-    fn to_string_form_reg213(&self) -> String {
+    fn write_string_form_reg213(&self, out: &mut String) -> std::fmt::Result {
         let name_suffix = if self.rc() { "." } else { "" };
         let name = match self.op {
             Opcode::Eqv => "eqv",
@@ -1861,7 +1910,8 @@ impl Ins {
             Opcode::Srw => "srw",
             _ => disasm_unreachable!(self.code),
         };
-        format!(
+        write!(
+            out,
             "{}{} r{}, r{}, r{}",
             name,
             name_suffix,
@@ -1871,14 +1921,15 @@ impl Ins {
         )
     }
 
-    fn to_string_rlw_imm(&self) -> String {
+    fn write_string_rlw_imm(&self, out: &mut String) -> std::fmt::Result {
         let name_prefix = if self.rc() { "." } else { "" };
         let name = match self.op {
             Opcode::Rlwimi => "rlwimi",
             Opcode::Rlwinm => "rlwinm",
             _ => disasm_unreachable!(self.code),
         };
-        format!(
+        write!(
+            out,
             "{}{} r{}, r{}, {}, {}, {}",
             name,
             name_prefix,
@@ -1890,10 +1941,11 @@ impl Ins {
         )
     }
 
-    fn to_string_rlw_reg(&self) -> String {
+    fn write_string_rlw_reg(&self, out: &mut String) -> std::fmt::Result {
         assert_eq!(self.op, Opcode::Rlwnm);
         let name_prefix = if self.rc() { "." } else { "" };
-        format!(
+        write!(
+            out,
             "rlwnm{} r{}, r{}, r{}, {}, {}",
             name_prefix,
             self.a(),
@@ -1904,54 +1956,77 @@ impl Ins {
         )
     }
 
-    fn to_string_form_reg12_nb(&self) -> String {
+    fn write_string_form_reg12_nb(&self, out: &mut String) -> std::fmt::Result {
         let name = match self.op {
             Opcode::Lswi => "lswi",
             Opcode::Stswi => "stswi",
             _ => disasm_unreachable!(self.code),
         };
-        format!("{} r{}, r{}, {}", name, self.d(), self.a(), self.b())
+        write!(out, "{} r{}, r{}, {}", name, self.d(), self.a(), self.b())
     }
 
-    fn to_string_form_reg1_spr(&self) -> String {
+    fn write_string_form_reg1_spr(&self, out: &mut String) -> std::fmt::Result {
         let name = match self.op {
             Opcode::Mfspr => "mfspr",
             Opcode::Mftb => "mftb",
             _ => disasm_unreachable!(self.code),
         };
-        format!("{} r{}, {}", name, self.d(), self.spr())
+        write!(out, "{} r{}, {}", name, self.d(), self.spr())
     }
 
-    fn to_string_form_spr_reg1(&self) -> String {
+    fn write_string_form_spr_reg1(&self, out: &mut String) -> std::fmt::Result {
         let name = match self.op {
             Opcode::Mtspr => "mtspr",
             _ => disasm_unreachable!(self.code),
         };
-        format!("{} {}, r{}", name, self.spr(), self.s())
+        write!(out, "{} {}, r{}", name, self.spr(), self.s())
     }
 
-    fn to_string_form_reg1_sr(&self) -> String {
+    fn write_string_form_reg1_sr(&self, out: &mut String) -> std::fmt::Result {
         let name = match self.op {
             Opcode::Mfsr => "mfsr",
             _ => disasm_unreachable!(self.code),
         };
-        format!("{} r{}, {}", name, self.d(), self.sr())
+        write!(out, "{} r{}, {}", name, self.d(), self.sr())
     }
 
-    fn to_string_form_sr_reg1(&self) -> String {
+    fn write_string_form_sr_reg1(&self, out: &mut String) -> std::fmt::Result {
         let name = match self.op {
             Opcode::Mtsr => "mtsr",
             _ => disasm_unreachable!(self.code),
         };
-        format!("{} {}, r{}", name, self.sr(), self.s())
+        write!(out, "{} {}, r{}", name, self.sr(), self.s())
     }
 
-    fn to_string_mtcrf(&self) -> String {
+    fn write_string_mtcrf(&self, out: &mut String) -> std::fmt::Result {
         assert_eq!(self.op, Opcode::Mtcrf);
-        format!("mtcrf {} r{}", self.crm(), self.s())
+        write!(out, "mtcrf {} r{}", self.crm(), self.s())
     }
 
-    fn to_string_psq(&self) -> String {
+    fn write_string_srawi(&self, out: &mut String) -> std::fmt::Result {
+        assert_eq!(self.op, Opcode::Srawi);
+        let name_suffix = if self.rc() { "." } else { "" };
+        write!(
+            out,
+            "srawi{} r{}, r{}, {}",
+            name_suffix,
+            self.s(),
+            self.a(),
+            self.sh()
+        )
+    }
+
+    fn write_string_tw(&self, out: &mut String) -> std::fmt::Result {
+        assert_eq!(self.op, Opcode::Tw);
+        write!(out, "tw {}, r{}, r{}", self.to(), self.a(), self.b())
+    }
+
+    fn write_string_twi(&self, out: &mut String) -> std::fmt::Result {
+        assert_eq!(self.op, Opcode::Twi);
+        write!(out, "twi {}, r{}, {}", self.to(), self.a(), self.simm())
+    }
+
+    fn write_string_psq(&self, out: &mut String) -> std::fmt::Result {
         let name = match self.op {
             Opcode::PsqL => "psq_l",
             Opcode::PsqLu => "psq_lu",
@@ -1959,7 +2034,8 @@ impl Ins {
             Opcode::PsqStu => "psq_stu",
             _ => disasm_unreachable!(self.code),
         };
-        format!(
+        write!(
+            out,
             "{} fr{}, {}(r{}), {}, {}",
             name,
             self.d(),
@@ -1970,7 +2046,7 @@ impl Ins {
         )
     }
 
-    fn to_string_psq_x(&self) -> String {
+    fn write_string_psq_x(&self, out: &mut String) -> std::fmt::Result {
         let name = match self.op {
             Opcode::PsqLx => "psq_lx",
             Opcode::PsqLux => "psq_lux",
@@ -1978,7 +2054,8 @@ impl Ins {
             Opcode::PsqStux => "psq_stux",
             _ => disasm_unreachable!(self.code),
         };
-        format!(
+        write!(
+            out,
             "{} fr{}, r{}, r{}, {}, {}",
             name,
             self.d(),
@@ -1988,12 +2065,10 @@ impl Ins {
             self.ps_l()
         )
     }
-}
 
-impl ToString for Ins {
-    fn to_string(&self) -> String {
+    pub fn write_string(&self, out: &mut String) -> std::fmt::Result {
         match self.op {
-            Opcode::Illegal => "<illegal>".to_string(),
+            Opcode::Illegal => write!(out, "<illegal>"),
 
             // Standalone instructions
             Opcode::Eieio
@@ -2001,17 +2076,17 @@ impl ToString for Ins {
             | Opcode::Rfi
             | Opcode::Sc
             | Opcode::Sync
-            | Opcode::Tlbsync => self.to_string_noargs(),
+            | Opcode::Tlbsync => self.write_string_noargs(out),
 
             // General purpose register only
             Opcode::Mfcr | Opcode::Mfmsr | Opcode::Mtmsr | Opcode::Tlbie => {
-                self.to_string_form_reg1()
+                self.write_string_form_reg1(out)
             }
             Opcode::Addme | Opcode::Addze | Opcode::Neg | Opcode::Subfme | Opcode::Subfze => {
-                self.to_string_form_reg12_oe_rc()
+                self.write_string_form_reg12_oe_rc(out)
             }
-            Opcode::Mfsrin | Opcode::Mtsrin => self.to_string_form_reg13(),
-            Opcode::Cntlzw | Opcode::Extsb | Opcode::Extsh => self.to_string_form_reg21_rc(),
+            Opcode::Mfsrin | Opcode::Mtsrin => self.write_string_form_reg13(out),
+            Opcode::Cntlzw | Opcode::Extsb | Opcode::Extsh => self.write_string_form_reg21_rc(out),
             Opcode::Dcbf
             | Opcode::Dcbi
             | Opcode::Dcbst
@@ -2019,7 +2094,7 @@ impl ToString for Ins {
             | Opcode::Dcbtst
             | Opcode::Dcbz
             | Opcode::DcbzL
-            | Opcode::Icbi => self.to_string_form_reg23(),
+            | Opcode::Icbi => self.write_string_form_reg23(out),
             Opcode::Eciwx
             | Opcode::Ecowx
             | Opcode::Lhaux
@@ -2043,9 +2118,9 @@ impl ToString for Ins {
             | Opcode::Stwbrx
             | Opcode::Stwcx_
             | Opcode::Stwx
-            | Opcode::Stwux => self.to_string_form_reg123(),
+            | Opcode::Stwux => self.write_string_form_reg123(out),
             Opcode::And | Opcode::Andc | Opcode::Mulhw | Opcode::Mulhwu | Opcode::Xor => {
-                self.to_string_form_reg123_rc()
+                self.write_string_form_reg123_rc(out)
             }
             Opcode::Add
             | Opcode::Addc
@@ -2055,7 +2130,7 @@ impl ToString for Ins {
             | Opcode::Mullw
             | Opcode::Subf
             | Opcode::Subfc
-            | Opcode::Subfe => self.to_string_form_reg123_oe_rc(),
+            | Opcode::Subfe => self.write_string_form_reg123_oe_rc(out),
             Opcode::Eqv
             | Opcode::Nand
             | Opcode::Nor
@@ -2063,11 +2138,11 @@ impl ToString for Ins {
             | Opcode::Orc
             | Opcode::Slw
             | Opcode::Sraw
-            | Opcode::Srw => self.to_string_form_reg213(),
+            | Opcode::Srw => self.write_string_form_reg213(out),
 
             // General purpose shifts
-            Opcode::Rlwimi | Opcode::Rlwinm => self.to_string_rlw_imm(),
-            Opcode::Rlwnm => self.to_string_rlw_reg(),
+            Opcode::Rlwimi | Opcode::Rlwinm => self.write_string_rlw_imm(out),
+            Opcode::Rlwnm => self.write_string_rlw_reg(out),
 
             // General purpose register misc
             Opcode::Addi
@@ -2075,13 +2150,13 @@ impl ToString for Ins {
             | Opcode::Addic_
             | Opcode::Addis
             | Opcode::Mulli
-            | Opcode::Subfic => self.to_string_form_reg12_simm(),
+            | Opcode::Subfic => self.write_string_form_reg12_simm(out),
             Opcode::Andi_
             | Opcode::Andis_
             | Opcode::Ori
             | Opcode::Oris
             | Opcode::Xori
-            | Opcode::Xoris => self.to_string_form_reg12_uimm(),
+            | Opcode::Xoris => self.write_string_form_reg12_uimm(out),
             Opcode::Lbz
             | Opcode::Lbzu
             | Opcode::Lha
@@ -2097,42 +2172,29 @@ impl ToString for Ins {
             | Opcode::Sthu
             | Opcode::Stmw
             | Opcode::Stw
-            | Opcode::Stwu => self.to_string_form_reg12_offset(),
-            Opcode::Lswi | Opcode::Stswi => self.to_string_form_reg12_nb(),
-            Opcode::Mfspr | Opcode::Mftb => self.to_string_form_reg1_spr(),
-            Opcode::Mtspr => self.to_string_form_spr_reg1(),
-            Opcode::Mfsr => self.to_string_form_reg1_sr(),
-            Opcode::Mtsr => self.to_string_form_sr_reg1(),
-            Opcode::Mtcrf => self.to_string_mtcrf(),
-            Opcode::Srawi => {
-                let name_suffix = if self.rc() { "." } else { "" };
-                format!(
-                    "srawi{} r{}, r{}, {}",
-                    name_suffix,
-                    self.s(),
-                    self.a(),
-                    self.sh()
-                )
-            }
-            Opcode::Tw => {
-                format!("tw {}, r{}, r{}", self.to(), self.a(), self.b())
-            }
-            Opcode::Twi => {
-                format!("twi {}, r{}, {}", self.to(), self.a(), self.simm())
-            }
+            | Opcode::Stwu => self.write_string_form_reg12_offset(out),
+            Opcode::Lswi | Opcode::Stswi => self.write_string_form_reg12_nb(out),
+            Opcode::Mfspr | Opcode::Mftb => self.write_string_form_reg1_spr(out),
+            Opcode::Mtspr => self.write_string_form_spr_reg1(out),
+            Opcode::Mfsr => self.write_string_form_reg1_sr(out),
+            Opcode::Mtsr => self.write_string_form_sr_reg1(out),
+            Opcode::Mtcrf => self.write_string_mtcrf(out),
+            Opcode::Srawi => self.write_string_srawi(out),
+            Opcode::Tw => self.write_string_tw(out),
+            Opcode::Twi => self.write_string_twi(out),
 
             // Branch instructions
-            Opcode::B => self.to_string_b(),
-            Opcode::Bc => self.to_string_bc(),
-            Opcode::Bcctr | Opcode::Bclr => self.to_string_branch_cond_to_reg(),
+            Opcode::B => self.write_string_b(out),
+            Opcode::Bc => self.write_string_bc(out),
+            Opcode::Bcctr | Opcode::Bclr => self.write_string_branch_cond_to_reg(out),
 
             // Compare instructions
-            Opcode::Cmp | Opcode::Cmpl => self.to_string_cmp(),
-            Opcode::Cmpi => self.to_string_cmp_simm(),
-            Opcode::Cmpli => self.to_string_cmp_uimm(),
+            Opcode::Cmp | Opcode::Cmpl => self.write_string_cmp(out),
+            Opcode::Cmpi => self.write_string_cmp_simm(out),
+            Opcode::Cmpli => self.write_string_cmp_uimm(out),
 
             // Floating point register only instructions
-            Opcode::Mffs => self.to_string_form_fr1(),
+            Opcode::Mffs => self.write_string_form_fr1(out),
             Opcode::Fabs
             | Opcode::Fmr
             | Opcode::Fnabs
@@ -2145,7 +2207,7 @@ impl ToString for Ins {
             | Opcode::PsNabs
             | Opcode::PsNeg
             | Opcode::PsRes
-            | Opcode::PsRsqrte => self.to_string_form_fr13(),
+            | Opcode::PsRsqrte => self.write_string_form_fr13(out),
             Opcode::Fadd
             | Opcode::Fadds
             | Opcode::Fdiv
@@ -2158,9 +2220,9 @@ impl ToString for Ins {
             | Opcode::PsMerge01
             | Opcode::PsMerge10
             | Opcode::PsMerge11
-            | Opcode::PsSub => self.to_string_form_fr123(),
+            | Opcode::PsSub => self.write_string_form_fr123(out),
             Opcode::Fmul | Opcode::Fmuls | Opcode::PsMul | Opcode::PsMuls0 | Opcode::PsMuls1 => {
-                self.to_string_form_fr124()
+                self.write_string_form_fr124(out)
             }
             Opcode::Fmadd
             | Opcode::Fmadds
@@ -2179,16 +2241,16 @@ impl ToString for Ins {
             | Opcode::PsNmsub
             | Opcode::PsSel
             | Opcode::PsSum0
-            | Opcode::PsSum1 => self.to_string_form_fr1243(),
+            | Opcode::PsSum1 => self.write_string_form_fr1243(out),
 
             // Floating point register misc instructions
-            Opcode::Fctiw | Opcode::Fctiwz => self.to_string_form_condreg1_fr13_rc(),
+            Opcode::Fctiw | Opcode::Fctiwz => self.write_string_form_condreg1_fr13_rc(out),
             Opcode::Fcmpo
             | Opcode::Fcmpu
             | Opcode::PsCmpo0
             | Opcode::PsCmpo1
             | Opcode::PsCmpu0
-            | Opcode::PsCmpu1 => self.to_string_form_condreg1_fr23(),
+            | Opcode::PsCmpu1 => self.write_string_form_condreg1_fr23(out),
             Opcode::Lfd
             | Opcode::Lfdu
             | Opcode::Lfs
@@ -2196,7 +2258,7 @@ impl ToString for Ins {
             | Opcode::Stfd
             | Opcode::Stfdu
             | Opcode::Stfs
-            | Opcode::Stfsu => self.to_string_form_fr1_reg2_offset(),
+            | Opcode::Stfsu => self.write_string_form_fr1_reg2_offset(out),
             Opcode::Lfdux
             | Opcode::Lfdx
             | Opcode::Lfsux
@@ -2205,12 +2267,12 @@ impl ToString for Ins {
             | Opcode::Stfdx
             | Opcode::Stfiwx
             | Opcode::Stfsux
-            | Opcode::Stfsx => self.to_string_form_fr1_reg23(),
-            Opcode::Mtfsf => self.to_string_mtfsf(),
+            | Opcode::Stfsx => self.write_string_form_fr1_reg23(out),
+            Opcode::Mtfsf => self.write_string_mtfsf(out),
 
             // Condition register only
-            Opcode::Mcrxr | Opcode::Mtfsb0 | Opcode::Mtfsb1 => self.to_string_form_condreg1(),
-            Opcode::Mcrf | Opcode::Mcrfs => self.to_string_form_condreg12(),
+            Opcode::Mcrxr | Opcode::Mtfsb0 | Opcode::Mtfsb1 => self.write_string_form_condreg1(out),
+            Opcode::Mcrf | Opcode::Mcrfs => self.write_string_form_condreg12(out),
             Opcode::Crand
             | Opcode::Crandc
             | Opcode::Creqv
@@ -2218,17 +2280,27 @@ impl ToString for Ins {
             | Opcode::Crnor
             | Opcode::Cror
             | Opcode::Crorc
-            | Opcode::Crxor => self.to_string_form_condreg123(),
+            | Opcode::Crxor => self.write_string_form_condreg123(out),
 
             // Condition register misc
-            Opcode::Mtfsfi => self.to_string_mtfsfi(),
+            Opcode::Mtfsfi => self.write_string_mtfsfi(out),
 
             // Paired-single instructions
-            Opcode::PsqL | Opcode::PsqLu | Opcode::PsqSt | Opcode::PsqStu => self.to_string_psq(),
+            Opcode::PsqL | Opcode::PsqLu | Opcode::PsqSt | Opcode::PsqStu => {
+                self.write_string_psq(out)
+            }
             Opcode::PsqLx | Opcode::PsqLux | Opcode::PsqStx | Opcode::PsqStux => {
-                self.to_string_psq_x()
+                self.write_string_psq_x(out)
             }
         }
+    }
+}
+
+impl ToString for Ins {
+    fn to_string(&self) -> String {
+        let mut s = String::new();
+        self.write_string(&mut s).unwrap();
+        s
     }
 }
 
@@ -2290,7 +2362,10 @@ mod tests {
     fn test_to_string() {
         assert_eq!(Ins::disasm(0x4c000000).to_string(), "mcrf crf0, crf0");
         assert_eq!(Ins::disasm(0x7c000278).to_string(), "xor r0, r0, r0");
-        assert_eq!(Ins::disasm(0x10000014).to_string(), "ps_sum0 fr0, fr0, fr0, fr0");
+        assert_eq!(
+            Ins::disasm(0x10000014).to_string(),
+            "ps_sum0 fr0, fr0, fr0, fr0"
+        );
         assert_eq!(Ins::disasm(0x10000032).to_string(), "ps_mul fr0, fr0, fr0");
         assert_eq!(Ins::disasm(0x7c00052a).to_string(), "");
     }

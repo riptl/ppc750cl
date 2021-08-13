@@ -88,8 +88,11 @@ impl Fuzzer {
         let counter = Arc::clone(&self.counter);
         let range = self.range.clone();
         std::thread::spawn(move || {
+            let mut buf = String::with_capacity(1024);
             for x in range.clone() {
-                black_box(Ins::disasm(x).to_string());
+                let ins = Ins::disasm(x);
+                ins.write_string(&mut buf).unwrap();
+                black_box(&buf);
                 if x % (1 << 19) == 0 {
                     counter.store(x, Ordering::Relaxed);
                 }
