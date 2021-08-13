@@ -2302,57 +2302,40 @@ mod tests {
         );
         assert_eq!(bit(0b00000101100000000000000000000000u32, 5), true);
     }
-
     #[test]
     fn test_opcodes() {
+        macro_rules! assert_op {
+            ($code:expr, $op:expr) => {{
+                assert_eq!(Ins::disasm($code).op, $op)
+            }};
+        }
+
         // twi
-        assert_eq!(
-            Ins::disasm(0b000011_00000_00000_0000000000000000).op,
-            Opcode::Twi
-        );
+        assert_op!(0b000011_00000_00000_0000000000000000, Opcode::Twi);
         // ps_cmpu0
-        assert_eq!(
-            Ins::disasm(0b000100_00000_00000_00000_0000000000_0).op,
-            Opcode::PsCmpu0
-        );
-        assert_eq!(
-            Ins::disasm(0b000100_00000_00000_00000_0000000000_1).op,
-            Opcode::Illegal
-        );
-        assert_eq!(
-            Ins::disasm(0b000100_00001_00000_00000_0000000000_0).op,
-            Opcode::Illegal
-        );
+        assert_op!(0b000100_00000_00000_00000_0000000000_0, Opcode::PsCmpu0);
+        assert_op!(0b000100_00000_00000_00000_0000000000_1, Opcode::Illegal);
+        assert_op!(0b000100_00001_00000_00000_0000000000_0, Opcode::Illegal);
         // psq_lx
-        assert_eq!(
-            Ins::disasm(0b000100_00001_00000_00000_0000000110_0).op,
-            Opcode::PsqLx
-        );
-        assert_eq!(
-            Ins::disasm(0b000100_00001_00000_00000_0000000110_1).op,
-            Opcode::Illegal
-        );
-        assert_eq!(
-            Ins::disasm(0b000100_00001_00000_00000_0000000111_0).op,
-            Opcode::PsqStx
-        );
-        assert_eq!(
-            Ins::disasm(0b000100_00001_00000_00000_0000000111_1).op,
-            Opcode::Illegal
-        );
-        assert_eq!(Ins::disasm(0x7c000278).op, Opcode::Xor);
+        assert_op!(0b000100_00001_00000_00000_0000000110_0, Opcode::PsqLx);
+        assert_op!(0b000100_00001_00000_00000_0000000110_1, Opcode::Illegal);
+        assert_op!(0b000100_00001_00000_00000_0000000111_0, Opcode::PsqStx);
+        assert_op!(0b000100_00001_00000_00000_0000000111_1, Opcode::Illegal);
+        assert_op!(0x7c000278, Opcode::Xor);
         // TODO more tests
     }
 
     #[test]
     fn test_to_string() {
-        assert_eq!(Ins::disasm(0x4c000000).to_string(), "mcrf crf0, crf0");
-        assert_eq!(Ins::disasm(0x7c000278).to_string(), "xor r0, r0, r0");
-        assert_eq!(
-            Ins::disasm(0x10000014).to_string(),
-            "ps_sum0 fr0, fr0, fr0, fr0"
-        );
-        assert_eq!(Ins::disasm(0x10000032).to_string(), "ps_mul fr0, fr0, fr0");
-        assert_eq!(Ins::disasm(0x7c00052a).to_string(), "stswx r0, r0, r0");
+        macro_rules! assert_asm {
+            ($code:expr, $disasm:expr) => {{
+                assert_eq!(Ins::disasm($code).to_string(), $disasm)
+            }};
+        }
+        assert_asm!(0x4c000000, "mcrf crf0, crf0");
+        assert_asm!(0x7c000278, "xor r0, r0, r0");
+        assert_asm!(0x10000014, "ps_sum0 fr0, fr0, fr0, fr0");
+        assert_asm!(0x10000032, "ps_mul fr0, fr0, fr0");
+        assert_asm!(0x7c00052a, "stswx r0, r0, r0");
     }
 }
