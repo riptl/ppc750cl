@@ -240,15 +240,8 @@ impl Default for Opcode {
 
 #[derive(Default, Clone)]
 pub struct Ins {
-    pub code: u32, // 0..32
+    pub code: u32,
     pub op: Opcode,
-    // TODO move these struct members out to functions
-    bd: u16, // 16..30
-    p2: u8,  // 6..11: S, D, TO, crbD, BO
-    p3: u8,  // 11..16: A, crbA, BI
-    p4: u8,  // 16..21: B, crbB, SH
-    p5: u8,  // 21..26: C, MB
-    p6: u8,  // 26..31: ME
 }
 
 #[inline(always)]
@@ -359,7 +352,6 @@ impl Ins {
             0b000011 => {
                 let mut ins = Ins::new(x);
                 ins.op = Opcode::Twi;
-                ins.p2 = bits(x, 6..11);
                 ins
             }
             0b000100 => Self::disasm_cl_ext(x),
@@ -381,15 +373,11 @@ impl Ins {
 
     fn disasm_cl_ext(x: u32) -> Self {
         let mut ins = Ins::new(x);
-        ins.p2 = bits(x, 6..11);
-        ins.p3 = bits(x, 11..16);
-        ins.p4 = bits(x, 16..21);
-        ins.p5 = bits(x, 21..26);
         let key: u8 = bits(x, 26..31);
         match key {
             // AB cmp form
             0b00000 => {
-                ins.op = match ins.p5 {
+                ins.op = match bits(x, 26..31) {
                     0b00000 => Opcode::PsCmpu0,
                     0b00001 => Opcode::PsCmpo0,
                     0b00010 => Opcode::PsCmpu1,
@@ -442,7 +430,7 @@ impl Ins {
                     0b11001 => Opcode::PsMul,
                     _ => disasm_unreachable!(x),
                 };
-                if ins.p4 != 0 {
+                if bits::<u8>(x, 21..26) != 0 {
                     ins.op = Opcode::Illegal;
                 }
             }
@@ -454,7 +442,7 @@ impl Ins {
                     0b10101 => Opcode::PsAdd,
                     _ => disasm_unreachable!(x),
                 };
-                if ins.p5 != 0 {
+                if bits::<u8>(x, 26..31) != 0 {
                     ins.op = Opcode::Illegal;
                 }
             }
@@ -465,13 +453,13 @@ impl Ins {
                     0b11010 => Opcode::PsRsqrte,
                     _ => disasm_unreachable!(x),
                 };
-                if ins.p3 != 0 || ins.p5 != 0 {
+                if bits::<u8>(x, 16..21) != 0 || bits::<u8>(x, 26..31) != 0 {
                     ins.op = Opcode::Illegal;
                 }
             }
             // B alt form
             0b01000 => {
-                ins.op = match ins.p5 {
+                ins.op = match bits(x, 26..31) {
                     0b00001 => Opcode::PsNeg,
                     0b00010 => Opcode::PsMr,
                     0b00100 => Opcode::PsNabs,
@@ -481,7 +469,7 @@ impl Ins {
             }
             // AB alt form
             0b10000 => {
-                ins.op = match ins.p5 {
+                ins.op = match bits(x, 26..31) {
                     0b10000 => Opcode::PsMerge00,
                     0b10001 => Opcode::PsMerge01,
                     0b10010 => Opcode::PsMerge10, // violates IBM user guide
@@ -492,7 +480,7 @@ impl Ins {
             // dcbz_l
             0b10110 => {
                 ins.op = Opcode::DcbzL;
-                if ins.p2 != 0 {
+                if bits::<u8>(x, 11..16) != 0 {
                     ins.op = Opcode::Illegal; // reserved
                 }
             }
@@ -505,7 +493,6 @@ impl Ins {
     fn disasm_basic1(x: u32) -> Self {
         let mut ins = Ins::new(x);
         let key = bits(x, 0..6);
-        ins.p2 = bits(x, 6..11);
         ins.op = match key {
             0b000111 => Opcode::Mulli,
             0b001000 => Opcode::Subfic,
@@ -532,9 +519,6 @@ impl Ins {
     fn disasm_bc(x: u32) -> Self {
         let mut ins = Ins::new(x);
         ins.op = Opcode::Bc;
-        ins.p2 = bits(x, 6..11);
-        ins.p3 = bits(x, 11..16);
-        ins.bd = bits(x, 16..30);
         ins
     }
 
@@ -561,16 +545,11 @@ impl Ins {
             // mcrf
             0b000000 => {
                 ins.op = Opcode::Mcrf;
-                if ins.p2 & 0b11 != 0
-                    || ins.p3 & 0b11 != 0
-                    || ins.p4 != 0
-                    || key2 != 0
-                    || bit(x, 31)
+                if ins.code & 0b11111_000_11_000_11_11111_1111111111_1
+                    != 0b10011_000_00_000_00_00000_0000000000_0
                 {
                     ins.op = Opcode::Illegal;
                 }
-                ins.p2 >>= 2;
-                ins.p3 >>= 2;
             }
             // DA form
             0b000001 | 0b100001 => {
@@ -579,7 +558,7 @@ impl Ins {
                     0b100001 => Opcode::Bcctr,
                     _ => disasm_unreachable!(x),
                 };
-                if ins.p4 != 0 {
+                if ins.code & 0b00000000_00000000_11111_000_00000000 != 0 {
                     ins.op = Opcode::Illegal;
                 }
             }
@@ -620,11 +599,6 @@ impl Ins {
     fn disasm_basic2(x: u32) -> Self {
         let mut ins = Ins::new(x);
         let key = bits(x, 0..6);
-        ins.p2 = bits(x, 6..11);
-        ins.p3 = bits(x, 11..16);
-        ins.p4 = bits(x, 16..21);
-        ins.p5 = bits(x, 21..26);
-        ins.p6 = bits(x, 26..31);
         ins.op = match key {
             0b10100 => Opcode::Rlwimi,
             0b10101 => Opcode::Rlwinm,
@@ -652,7 +626,6 @@ impl Ins {
                     0b00_0010_0000 => Opcode::Cmpl,
                     _ => disasm_unreachable!(x),
                 };
-                ins.p2 >>= 2;
                 if bit(x, 31) {
                     ins.op = Opcode::Illegal;
                 }
@@ -668,7 +641,7 @@ impl Ins {
             0b00_0000_1011 => ins.op = Opcode::Mulhwu,
             0b00_0001_0011 => {
                 ins.op = Opcode::Mfcr;
-                if ins.p3 != 0 || ins.p4 != 0 || bit(x, 31) {
+                if bits::<u8>(x, 16..21) != 0 || bits::<u8>(x, 21..26) != 0 || bit(x, 31) {
                     ins.op = Opcode::Illegal;
                 }
             }
@@ -687,7 +660,7 @@ impl Ins {
             0b00_0001_1000 => ins.op = Opcode::Slw,
             0b00_0001_1010 => {
                 ins.op = Opcode::Cntlzw;
-                if ins.p4 != 0 {
+                if bits::<u8>(x, 21..26) != 0 {
                     ins.op = Opcode::Illegal;
                 }
             }
@@ -695,7 +668,7 @@ impl Ins {
             0b00_0010_1000 => ins.op = Opcode::Subf,
             0b00_0011_0110 => {
                 ins.op = Opcode::Dcbst;
-                if ins.p2 != 0 || bit(x, 31) {
+                if bits::<u8>(x, 11..16) != 0 || bit(x, 31) {
                     ins.op = Opcode::Illegal;
                 }
             }
@@ -709,13 +682,13 @@ impl Ins {
             0b00_0100_1101 => ins.op = Opcode::Mulhw,
             0b00_0101_0011 => {
                 ins.op = Opcode::Mfmsr;
-                if ins.p3 != 0 || ins.p4 != 0 || bit(x, 31) {
+                if bits::<u8>(x, 16..21) != 0 || bits::<u8>(x, 21..26) != 0 || bit(x, 31) {
                     ins.op = Opcode::Illegal;
                 }
             }
             0b00_0101_0110 => {
                 ins.op = Opcode::Dcbf;
-                if ins.p2 != 0 || bit(x, 31) {
+                if bits::<u8>(x, 11..16) != 0 || bit(x, 31) {
                     ins.op = Opcode::Illegal;
                 }
             }
@@ -727,7 +700,7 @@ impl Ins {
             }
             0b00_0110_1000 => {
                 ins.op = Opcode::Neg;
-                if ins.p4 != 0 {
+                if bits::<u8>(x, 21..26) != 0 {
                     ins.op = Opcode::Illegal;
                 }
             }
@@ -748,7 +721,7 @@ impl Ins {
             }
             0b00_1001_0010 => {
                 ins.op = Opcode::Mtmsr;
-                if ins.p3 != 0 || ins.p4 != 0 || bit(x, 31) {
+                if bits::<u8>(x, 16..21) != 0 || bits::<u8>(x, 21..26) != 0 || bit(x, 31) {
                     ins.op = Opcode::Illegal;
                 }
             }
@@ -772,19 +745,19 @@ impl Ins {
             }
             0b00_1100_1000 => {
                 ins.op = Opcode::Subfze;
-                if ins.p4 != 0 {
+                if bits::<u8>(x, 21..26) != 0 {
                     ins.op = Opcode::Illegal;
                 }
             }
             0b00_1100_1010 => {
                 ins.op = Opcode::Addze;
-                if ins.p4 != 0 {
+                if bits::<u8>(x, 21..26) != 0 {
                     ins.op = Opcode::Illegal;
                 }
             }
             0b00_1101_0010 => {
                 ins.op = Opcode::Mtsr;
-                if bit(x, 11) || ins.p4 != 0 || bit(x, 31) {
+                if bit(x, 11) || bits::<u8>(x, 21..26) != 0 || bit(x, 31) {
                     ins.op = Opcode::Illegal;
                 }
             }
@@ -796,26 +769,26 @@ impl Ins {
             }
             0b00_1110_1000 => {
                 ins.op = Opcode::Subfme;
-                if ins.p4 != 0 {
+                if bits::<u8>(x, 21..26) != 0 {
                     ins.op = Opcode::Illegal;
                 }
             }
             0b00_1110_1010 => {
                 ins.op = Opcode::Addme;
-                if ins.p4 != 0 {
+                if bits::<u8>(x, 21..26) != 0 {
                     ins.op = Opcode::Illegal;
                 }
             }
             0b00_1110_1011 => ins.op = Opcode::Mullw,
             0b00_1111_0010 => {
                 ins.op = Opcode::Mtsrin;
-                if ins.p3 != 0 || bit(x, 31) {
+                if bits::<u8>(x, 16..21) != 0 || bit(x, 31) {
                     ins.op = Opcode::Illegal;
                 }
             }
             0b00_1111_0110 => {
                 ins.op = Opcode::Dcbtst;
-                if ins.p2 != 0 || bit(x, 31) {
+                if bits::<u8>(x, 11..16) != 0 || bit(x, 31) {
                     ins.op = Opcode::Illegal;
                 }
             }
@@ -828,20 +801,20 @@ impl Ins {
             0b01_0000_1010 => ins.op = Opcode::Add,
             0b01_0000_0110 => {
                 ins.op = Opcode::Dcbt;
-                if ins.p2 != 0 || bit(x, 31) {
+                if bits::<u8>(x, 11..16) != 0 || bit(x, 31) {
                     ins.op = Opcode::Illegal;
                 }
             }
             0b01_0000_0111 => {
                 ins.op = Opcode::Lhzx;
-                if ins.p2 != 0 || bit(x, 31) {
+                if bits::<u8>(x, 11..16) != 0 || bit(x, 31) {
                     ins.op = Opcode::Illegal;
                 }
             }
             0b01_0001_1100 => ins.op = Opcode::Eqv,
             0b01_0011_0010 => {
                 ins.op = Opcode::Tlbie;
-                if ins.p2 != 0 || ins.p3 != 0 || bit(x, 31) {
+                if bits::<u8>(x, 11..16) != 0 || bits::<u8>(x, 16..21) != 0 || bit(x, 31) {
                     ins.op = Opcode::Illegal;
                 }
             }
@@ -919,7 +892,6 @@ impl Ins {
             0b01_1111_1011 => ins.op = Opcode::Divw,
             0b10_0000_0000 => {
                 ins.op = Opcode::Mcrxr;
-                ins.p3 >>= 2;
                 if !zero_bits(x, 9..21) || bit(x, 31) {
                     ins.op = Opcode::Illegal;
                 }
@@ -945,7 +917,11 @@ impl Ins {
             0b10_0001_1000 => ins.op = Opcode::Srw,
             0b10_0011_0110 => {
                 ins.op = Opcode::Tlbsync;
-                if ins.p2 != 0 || ins.p3 != 0 || ins.p4 != 0 || bit(x, 31) {
+                if bits::<u8>(x, 11..16) != 0
+                    || bits::<u8>(x, 16..21) != 0
+                    || bits::<u8>(x, 21..26) != 0
+                    || bit(x, 31)
+                {
                     ins.op = Opcode::Illegal;
                 }
             }
@@ -957,7 +933,7 @@ impl Ins {
             }
             0b10_0101_0011 => {
                 ins.op = Opcode::Mfsr;
-                if bit(x, 11) || ins.p4 != 0 || bit(x, 31) {
+                if bit(x, 11) || bits::<u8>(x, 21..26) != 0 || bit(x, 31) {
                     ins.op = Opcode::Illegal;
                 }
             }
@@ -969,7 +945,11 @@ impl Ins {
             }
             0b10_0101_0110 => {
                 ins.op = Opcode::Sync;
-                if ins.p2 != 0 || ins.p3 != 0 || ins.p4 != 0 || bit(x, 31) {
+                if bits::<u8>(x, 11..16) != 0
+                    || bits::<u8>(x, 16..21) != 0
+                    || bits::<u8>(x, 21..26) != 0
+                    || bit(x, 31)
+                {
                     ins.op = Opcode::Illegal;
                 }
             }
@@ -987,7 +967,7 @@ impl Ins {
             }
             0b10_1001_0011 => {
                 ins.op = Opcode::Mfsrin;
-                if ins.p3 != 0 || bit(x, 31) {
+                if bits::<u8>(x, 16..21) != 0 || bit(x, 31) {
                     ins.op = Opcode::Illegal;
                 }
             }
@@ -1043,7 +1023,11 @@ impl Ins {
             0b11_0011_1000 => ins.op = Opcode::Srawi,
             0b11_0101_0110 => {
                 ins.op = Opcode::Eieio;
-                if ins.p3 != 0 || ins.p4 != 0 || ins.p5 != 0 || bit(x, 31) {
+                if bits::<u8>(x, 16..21) != 0
+                    || bits::<u8>(x, 21..26) != 0
+                    || bits::<u8>(x, 26..31) != 0
+                    || bit(x, 31)
+                {
                     ins.op = Opcode::Illegal;
                 }
             }
@@ -1055,19 +1039,19 @@ impl Ins {
             }
             0b11_1001_1010 => {
                 ins.op = Opcode::Extsh;
-                if ins.p4 != 0 {
+                if bits::<u8>(x, 21..26) != 0 {
                     ins.op = Opcode::Illegal;
                 }
             }
             0b11_1011_1010 => {
                 ins.op = Opcode::Extsb;
-                if ins.p4 != 0 {
+                if bits::<u8>(x, 21..26) != 0 {
                     ins.op = Opcode::Illegal;
                 }
             }
             0b11_1101_0110 => {
                 ins.op = Opcode::Icbi;
-                if ins.p2 != 0 || bit(x, 31) {
+                if bits::<u8>(x, 11..16) != 0 || bit(x, 31) {
                     ins.op = Opcode::Illegal;
                 }
             }
@@ -1079,7 +1063,7 @@ impl Ins {
             }
             0b11_1111_0110 => {
                 ins.op = Opcode::Dcbz;
-                if ins.p2 != 0 || bit(x, 31) {
+                if bits::<u8>(x, 11..16) != 0 || bit(x, 31) {
                     ins.op = Opcode::Illegal;
                 }
             }
@@ -1140,31 +1124,31 @@ impl Ins {
         match key {
             0b10010 => {
                 ins.op = Opcode::Fdivs;
-                if ins.p5 != 0 {
+                if bits::<u8>(x, 26..31) != 0 {
                     ins.op = Opcode::Illegal;
                 }
             }
             0b10100 => {
                 ins.op = Opcode::Fsubs;
-                if ins.p5 != 0 {
+                if bits::<u8>(x, 26..31) != 0 {
                     ins.op = Opcode::Illegal;
                 }
             }
             0b10101 => {
                 ins.op = Opcode::Fadds;
-                if ins.p5 != 0 {
+                if bits::<u8>(x, 26..31) != 0 {
                     ins.op = Opcode::Illegal;
                 }
             }
             0b11000 => {
                 ins.op = Opcode::Fres;
-                if ins.p3 != 0 || ins.p5 != 0 {
+                if bits::<u8>(x, 16..21) != 0 || bits::<u8>(x, 26..31) != 0 {
                     ins.op = Opcode::Illegal;
                 }
             }
             0b11001 => {
                 ins.op = Opcode::Fmuls;
-                if ins.p4 != 0 {
+                if bits::<u8>(x, 21..26) != 0 {
                     ins.op = Opcode::Illegal;
                 }
             }
@@ -1181,7 +1165,7 @@ impl Ins {
         let mut ins = Ins::new(x);
         let key = bits::<u32>(x, 26..31);
         match key {
-            0b00000 => match ins.p5 {
+            0b00000 => match bits(x, 26..31) {
                 0b00 => {
                     ins.op = Opcode::Fcmpu;
                     if !zero_bits(x, 9..11) || bit(x, 31) {
@@ -1203,16 +1187,16 @@ impl Ins {
                 _ => (),
             },
             0b00110 => {
-                match ins.p5 {
+                match bits(x, 26..31) {
                     0b001 => {
                         ins.op = Opcode::Mtfsb1;
-                        if ins.p3 != 0 || ins.p4 != 0 {
+                        if bits::<u8>(x, 16..21) != 0 || bits::<u8>(x, 21..26) != 0 {
                             ins.op = Opcode::Illegal;
                         }
                     }
                     0b010 => {
                         ins.op = Opcode::Mtfsb0;
-                        if ins.p3 != 0 || ins.p4 != 0 {
+                        if bits::<u8>(x, 16..21) != 0 || bits::<u8>(x, 21..26) != 0 {
                             ins.op = Opcode::Illegal;
                         }
                     }
@@ -1225,10 +1209,10 @@ impl Ins {
                     _ => (),
                 };
             }
-            0b00111 => match ins.p5 {
+            0b00111 => match bits(x, 26..31) {
                 0b10010 => {
                     ins.op = Opcode::Mffs;
-                    if ins.p3 != 0 || ins.p4 != 0 {
+                    if bits::<u8>(x, 16..21) != 0 || bits::<u8>(x, 21..26) != 0 {
                         ins.op = Opcode::Illegal;
                     }
                 }
@@ -1241,63 +1225,63 @@ impl Ins {
                 _ => (),
             },
             0b01000 => {
-                ins.op = match ins.p5 {
+                ins.op = match bits(x, 26..31) {
                     0b0001 => Opcode::Fneg,
                     0b0010 => Opcode::Fmr,
                     0b0100 => Opcode::Fnabs,
                     0b1000 => Opcode::Fabs,
                     _ => Opcode::Illegal,
                 };
-                if ins.p3 != 0 {
+                if bits::<u8>(x, 16..21) != 0 {
                     ins.op = Opcode::Illegal
                 }
             }
             0b01100 => {
                 ins.op = Opcode::Frsp;
-                if ins.p3 != 0 {
+                if bits::<u8>(x, 16..21) != 0 {
                     ins.op = Opcode::Illegal;
                 }
             }
             0b01110 => {
                 ins.op = Opcode::Fctiw;
-                if ins.p3 != 0 {
+                if bits::<u8>(x, 16..21) != 0 {
                     ins.op = Opcode::Illegal;
                 }
             }
             0b01111 => {
                 ins.op = Opcode::Fctiwz;
-                if ins.p3 != 0 {
+                if bits::<u8>(x, 16..21) != 0 {
                     ins.op = Opcode::Illegal;
                 }
             }
             0b10010 => {
                 ins.op = Opcode::Fdiv;
-                if ins.p5 != 0 {
+                if bits::<u8>(x, 26..31) != 0 {
                     ins.op = Opcode::Illegal;
                 }
             }
             0b10100 => {
                 ins.op = Opcode::Fsub;
-                if ins.p5 != 0 {
+                if bits::<u8>(x, 26..31) != 0 {
                     ins.op = Opcode::Illegal;
                 }
             }
             0b10101 => {
                 ins.op = Opcode::Fadd;
-                if ins.p5 != 0 {
+                if bits::<u8>(x, 26..31) != 0 {
                     ins.op = Opcode::Illegal;
                 }
             }
             0b10111 => ins.op = Opcode::Fsel,
             0b11001 => {
                 ins.op = Opcode::Fmul;
-                if ins.p4 != 0 {
+                if bits::<u8>(x, 21..26) != 0 {
                     ins.op = Opcode::Illegal;
                 }
             }
             0b11010 => {
                 ins.op = Opcode::Frsqrte;
-                if ins.p3 != 0 || ins.p5 != 0 {
+                if bits::<u8>(x, 16..21) != 0 || bits::<u8>(x, 26..31) != 0 {
                     ins.op = Opcode::Illegal;
                 }
             }
@@ -2369,6 +2353,6 @@ mod tests {
             "ps_sum0 fr0, fr0, fr0, fr0"
         );
         assert_eq!(Ins::disasm(0x10000032).to_string(), "ps_mul fr0, fr0, fr0");
-        assert_eq!(Ins::disasm(0x7c00052a).to_string(), "");
+        assert_eq!(Ins::disasm(0x7c00052a).to_string(), "stswx r0, r0, r0");
     }
 }
