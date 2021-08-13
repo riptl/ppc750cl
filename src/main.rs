@@ -2305,7 +2305,7 @@ mod tests {
         );
         assert_eq!(
             Ins::disasm(0b1111100000000000000001001111000).op,
-            Opcode::Illegal,
+            Opcode::Xor,
         );
         // TODO more tests
     }
