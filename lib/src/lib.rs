@@ -1,15 +1,9 @@
-#![feature(bench_black_box)]
-
-use num_traits::cast::cast;
-use num_traits::PrimInt;
-use std::hint::black_box;
 use std::ops::Range;
-use std::sync::atomic::{AtomicU32, Ordering};
-use std::sync::Arc;
-use std::time::{Duration, Instant};
+
+use num_traits::AsPrimitive;
 
 #[derive(Debug, Copy, Clone, Eq, PartialEq)]
-enum Opcode {
+pub enum Opcode {
     Illegal = -1,
     // 750CL extensions
     Twi,
@@ -244,9 +238,9 @@ impl Default for Opcode {
 }
 
 #[derive(Default, Clone)]
-struct Ins {
-    code: u32, // 0..32
-    op: Opcode,
+pub struct Ins {
+    pub code: u32, // 0..32
+    pub op: Opcode,
     // TODO move these struct members out to functions
     bd: u16, // 16..30
     p2: u8,  // 6..11: S, D, TO, crbD, BO
@@ -264,9 +258,11 @@ fn bit(x: u32, idx: usize) -> bool {
 #[inline(always)]
 fn bits<F>(x: u32, range: Range<usize>) -> F
 where
-    F: PrimInt,
+    F: 'static + std::marker::Copy,
+    u32: AsPrimitive<F>,
 {
-    cast((x >> (32 - range.end)) & ((1 << range.len()) - 1)).expect("extracted bits do not fit")
+    let masked: u32 = (x >> (32 - range.end)) & ((1 << range.len()) - 1);
+    masked.as_()
 }
 
 #[inline(always)]
@@ -294,6 +290,12 @@ macro_rules! ins_bit {
 macro_rules! ins_field {
     ($func:ident, $return_type:tt, $range:expr) => {
         fn $func(&self) -> $return_type {
+            debug_assert!(
+                ($range).len() / 8 <= (std::mem::size_of::<$return_type>()),
+                "{:?} does not fit in {}",
+                $range,
+                stringify!($return_type)
+            );
             bits(self.code, $range)
         }
     };
@@ -350,7 +352,7 @@ impl Ins {
     ins_field!(ps_l, u8, 17..20);
     ins_field!(ps_d, u16, 20..32);
 
-    fn disasm(x: u32) -> Self {
+    pub fn disasm(x: u32) -> Self {
         let family = bits(x, 0..6);
         match family {
             0b000011 => {
@@ -1328,7 +1330,7 @@ impl Ins {
             Opcode::Sthux => "sthux",
             Opcode::Sthx => "sthx",
             Opcode::Sthbrx => "sthbrx",
-            Opcode::Stswi => "stswx",
+            Opcode::Stswx => "stswx",
             Opcode::Stwbrx => "stwbrx",
             Opcode::Stwcx_ => "stwcx.",
             Opcode::Stwx => "stwx",
@@ -1631,6 +1633,8 @@ impl Ins {
             Opcode::PsNmadd => "ps_nmadd",
             Opcode::PsNmsub => "ps_nmsub",
             Opcode::PsSel => "ps_sel",
+            Opcode::PsSum0 => "ps_sum0",
+            Opcode::PsSum1 => "ps_sum1",
             _ => disasm_unreachable!(self.code),
         };
         format!(
@@ -1649,7 +1653,7 @@ impl Ins {
         let name = match self.op {
             Opcode::Fmul => "fmul",
             Opcode::Fmuls => "fmuls",
-            Opcode::PsMadd => "ps_madd",
+            Opcode::PsMul => "ps_mul",
             Opcode::PsMuls0 => "ps_muls0",
             Opcode::PsMuls1 => "ps_muls1",
             _ => disasm_unreachable!(self.code),
@@ -2018,10 +2022,10 @@ impl ToString for Ins {
             | Opcode::Icbi => self.to_string_form_reg23(),
             Opcode::Eciwx
             | Opcode::Ecowx
-            | Opcode::Lbzux
-            | Opcode::Lbzx
             | Opcode::Lhaux
             | Opcode::Lhax
+            | Opcode::Lbzux
+            | Opcode::Lbzx
             | Opcode::Lhbrx
             | Opcode::Lhzux
             | Opcode::Lhzx
@@ -2228,31 +2232,6 @@ impl ToString for Ins {
     }
 }
 
-fn main() {
-    // We don't have much to do. For now, just run a dumb microbenchmark / fuzzer.
-    let start = Instant::now();
-    let counter = Arc::new(AtomicU32::new(0));
-    let counter_inner = Arc::clone(&counter);
-    std::thread::spawn(move || {
-        let mut last = 0u32;
-        loop {
-            std::thread::sleep(Duration::from_secs(1));
-            let now = counter_inner.load(Ordering::Relaxed);
-            let per_second = now - last;
-            last = now;
-            let progress = 100f32 * ((now as f32) / (0x1_0000_0000u64 as f32));
-            println!("{}/s\t{:05.2}%\tn=0x{:08x}", per_second, progress, now);
-        }
-    });
-    for x in 0x4800_0000u32..0xFFFF_FFFFu32 {
-        black_box(Ins::disasm(x).to_string());
-        if x % (1 << 19) == 0 {
-            counter.store(x, Ordering::Relaxed);
-        }
-    }
-    println!("Finished in {:.2}s", start.elapsed().as_secs_f32());
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -2303,15 +2282,16 @@ mod tests {
             Ins::disasm(0b000100_00001_00000_00000_0000000111_1).op,
             Opcode::Illegal
         );
-        assert_eq!(
-            Ins::disasm(0b1111100000000000000001001111000).op,
-            Opcode::Xor,
-        );
+        assert_eq!(Ins::disasm(0x7c000278).op, Opcode::Xor);
         // TODO more tests
     }
 
     #[test]
     fn test_to_string() {
         assert_eq!(Ins::disasm(0x4c000000).to_string(), "mcrf crf0, crf0");
+        assert_eq!(Ins::disasm(0x7c000278).to_string(), "xor r0, r0, r0");
+        assert_eq!(Ins::disasm(0x10000014).to_string(), "ps_sum0 fr0, fr0, fr0, fr0");
+        assert_eq!(Ins::disasm(0x10000032).to_string(), "ps_mul fr0, fr0, fr0");
+        assert_eq!(Ins::disasm(0x7c00052a).to_string(), "");
     }
 }
