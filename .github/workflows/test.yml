@@ -8,30 +8,18 @@ on:
 
 jobs:
   tests:
-    name: ${{ matrix.make.name }} (${{ matrix.os }})
+    name: Test (${{ matrix.os }})
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, macos-latest]
         rust: [stable]
-        make:
-          - name: Clippy
-            task: "check-clippy"
-          - name: Unit tests
-            task: "build-all-test run-all-unit-test"
-          #- name: Doc tests
-          #  task: "run-all-doc-test"
         include:
           - os: ubuntu-latest
             sccache-path: /home/runner/.cache/sccache
           - os: macos-latest
             sccache-path: /Users/runner/Library/Caches/Mozilla.sccache
-        exclude:
-          - os: macos-latest
-            rust: stable
-            make:
-              name: Clippy
     env:
       RUST_BACKTRACE: full
       RUSTC_WRAPPER: sccache
@@ -84,8 +72,14 @@ jobs:
             ${{ runner.os }}-sccache-
       - name: Start sccache server
         run: sccache --start-server
-      - name: ${{ matrix.make.name }}
-        run: make ${{ matrix.make.task }}
+      - name: cargo check
+        run: cargo check --all --all-features --tests
+      - name: cargo test
+        run: cargo test
+      - name: cargo clippy
+        run: cargo clippy --all --all-features --tests
+      - name: cargo fmt
+        run: cargo fmt -- --check
       - name: Print sccache stats
         run: sccache --show-stats
       - name: Stop sccache server
