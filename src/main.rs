@@ -319,6 +319,7 @@ impl Ins {
     ins_bit!(lk, 31);
     ins_bit!(l, 10);
     ins_bit!(oe, 21);
+    ins_bit!(w, 16);
 
     // Registers
     ins_field!(s, u8, 6..11);
@@ -341,8 +342,15 @@ impl Ins {
     ins_field!(uimm, u16, 16..32);
     ins_field!(bo, u8, 6..11);
     ins_field!(bi, u8, 11..16);
+    ins_field!(sh, u8, 16..21);
+    ins_field!(mb, u8, 21..26);
+    ins_field!(me, u8, 26..31);
     //ins_field!(bd, u16, 16..30);
     ins_field!(li, u32, 6..30);
+    ins_field!(to, u8, 6..11);
+    // Paired-single fields.
+    ins_field!(ps_l, u8, 17..20);
+    ins_field!(ps_d, u16, 20..32);
 
     fn disasm(x: u32) -> Self {
         let family = bits(x, 0..6);
@@ -1371,6 +1379,38 @@ impl Ins {
                 (true, false) => "mullwuo",
                 (true, true) => "mullwuo.",
             },
+            Opcode::Stbux => "stbux",
+            Opcode::Stbx => "stbx",
+            Opcode::Sthux => "sthux",
+            Opcode::Sthx => "sthx",
+            Opcode::Sthbrx => "sthbrx",
+            Opcode::Stswi => "stswx",
+            Opcode::Stwbrx => "stwbrx",
+            Opcode::Stwcx_ => "stwcx.",
+            Opcode::Stwx => "stwx",
+            Opcode::Stwux => "stwux",
+            Opcode::Subf => match (self.oe(), self.rc()) {
+                (false, false) => "subfu",
+                (false, true) => "subfu.",
+                (true, false) => "subfo",
+                (true, true) => "subfo.",
+            },
+            Opcode::Subfc => match (self.oe(), self.rc()) {
+                (false, false) => "subfcu",
+                (false, true) => "subfcu.",
+                (true, false) => "subfco",
+                (true, true) => "subfco.",
+            },
+            Opcode::Subfe => match (self.oe(), self.rc()) {
+                (false, false) => "subfeu",
+                (false, true) => "subfeu.",
+                (true, false) => "subfeo",
+                (true, true) => "subfeo.",
+            },
+            Opcode::Xor => match self.rc() {
+                false => "xor",
+                true => "xor.",
+            },
             _ => disasm_unreachable!(self.code),
         };
         format!("{} r{}, r{}, r{}", name, self.d(), self.a(), self.b())
@@ -1380,6 +1420,10 @@ impl Ins {
         match self.op {
             Opcode::Eieio => "eieio",
             Opcode::Isync => "isync",
+            Opcode::Rfi => "rfi",
+            Opcode::Sc => "sc",
+            Opcode::Sync => "sync",
+            Opcode::Tlbsync => "tlbsync",
             _ => disasm_unreachable!(self.code),
         }
         .to_owned()
@@ -1392,6 +1436,7 @@ impl Ins {
             Opcode::Addic_ => "addic.",
             Opcode::Addis => "addis",
             Opcode::Mulli => "mulli",
+            Opcode::Subfic => "subfic",
             _ => disasm_unreachable!(self.code),
         };
         format!("{} r{}, r{}, {}", name, self.d(), self.a(), self.simm())
@@ -1403,6 +1448,8 @@ impl Ins {
             Opcode::Andis_ => "andis.",
             Opcode::Ori => "ori",
             Opcode::Oris => "oris",
+            Opcode::Xori => "xori",
+            Opcode::Xoris => "xoris",
             _ => disasm_unreachable!(self.code),
         };
         format!("{} r{}, r{}, {}", name, self.d(), self.a(), self.uimm())
@@ -1419,6 +1466,13 @@ impl Ins {
             Opcode::Lmw => "lmw",
             Opcode::Lwz => "lwz",
             Opcode::Lwzu => "lwzu",
+            Opcode::Stb => "stb",
+            Opcode::Stbu => "stbu",
+            Opcode::Sth => "sth",
+            Opcode::Sthu => "sthu",
+            Opcode::Stmw => "stmw",
+            Opcode::Stw => "stw",
+            Opcode::Stwu => "stwu",
             _ => disasm_unreachable!(self.code),
         };
         format!("{} r{}, {}(r{})", name, self.d(), self.simm(), self.a())
@@ -1430,6 +1484,10 @@ impl Ins {
             Opcode::Lfdu => "lfdu",
             Opcode::Lfs => "lfs",
             Opcode::Lfsu => "lfsu",
+            Opcode::Stfd => "stfd",
+            Opcode::Stfdu => "stfdu",
+            Opcode::Stfs => "stfs",
+            Opcode::Stfsu => "stfsu",
             _ => disasm_unreachable!(self.code),
         };
         format!("{} fr{}, {}(r{})", name, self.d(), self.simm(), self.a())
@@ -1441,6 +1499,11 @@ impl Ins {
             Opcode::Lfdx => "lfdx",
             Opcode::Lfsux => "lfsux",
             Opcode::Lfsx => "lfsx",
+            Opcode::Stfdux => "stfdux",
+            Opcode::Stfdx => "stfdx",
+            Opcode::Stfiwx => "stfiwx",
+            Opcode::Stfsux => "stfsux",
+            Opcode::Stfsx => "stfsx",
             _ => disasm_unreachable!(self.code),
         };
         format!("{} fr{}, r{}, r{}", name, self.d(), self.a(), self.b())
@@ -1472,6 +1535,7 @@ impl Ins {
             Opcode::Mfcr => "mfcr",
             Opcode::Mfmsr => "mfmsr",
             Opcode::Mtmsr => "mtmsr",
+            Opcode::Tlbie => "tblie",
             _ => disasm_unreachable!(self.code),
         };
         format!("{} r{}", name, self.d())
@@ -1496,6 +1560,18 @@ impl Ins {
                 (false, true) => "neg.",
                 (true, false) => "nego",
                 (true, true) => "nego.",
+            },
+            Opcode::Subfme => match (self.oe(), self.rc()) {
+                (false, false) => "subfme",
+                (false, true) => "subfme.",
+                (true, false) => "subfmeo",
+                (true, true) => "subfmeo.",
+            },
+            Opcode::Subfze => match (self.oe(), self.rc()) {
+                (false, false) => "subfze",
+                (false, true) => "subfze.",
+                (true, false) => "subfzeo",
+                (true, true) => "subfzeo.",
             },
             _ => disasm_unreachable!(self.code),
         };
@@ -1542,114 +1618,81 @@ impl Ins {
     }
 
     fn to_string_form_fr13(&self) -> String {
+        let name_suffix = if self.rc() { "." } else { "" };
         let name = match self.op {
-            Opcode::Fabs => match self.rc() {
-                false => "fabs",
-                true => "fabs.",
-            },
-            Opcode::Fnabs => match self.rc() {
-                false => "fnabs",
-                true => "fnabs.",
-            },
-            Opcode::Fmr => match self.rc() {
-                false => "fmr",
-                true => "fmr.",
-            },
-            Opcode::Fneg => match self.rc() {
-                false => "fneg",
-                true => "fneg.",
-            },
-            Opcode::Fres => match self.rc() {
-                false => "fres",
-                true => "fres.",
-            },
-            Opcode::Frsp => match self.rc() {
-                false => "frsp",
-                true => "frsp.",
-            },
-            Opcode::Frsqrte => match self.rc() {
-                false => "frsqrte",
-                true => "frsqrte.",
-            },
+            Opcode::Fabs => "fabs",
+            Opcode::Fnabs => "fnabs",
+            Opcode::Fmr => "fmr",
+            Opcode::Fneg => "fneg",
+            Opcode::Fres => "fres",
+            Opcode::Frsp => "frsp",
+            Opcode::Frsqrte => "frsqrte",
+            Opcode::PsAbs => "ps_abs",
+            Opcode::PsMr => "ps_mr",
+            Opcode::PsNabs => "ps_nabs",
+            Opcode::PsNeg => "ps_neg",
+            Opcode::PsRes => "ps_res",
+            Opcode::PsRsqrte => "ps_rsqrte",
+            Opcode::PsSum0 => "ps_sum0",
+            Opcode::PsSum1 => "ps_sum1",
             _ => disasm_unreachable!(self.code),
         };
-        format!("{} fr{}, fr{}", name, self.d(), self.b())
+        format!("{}{} fr{}, fr{}", name, name_suffix, self.d(), self.b())
     }
 
     fn to_string_form_fr123(&self) -> String {
+        let name_suffix = if self.rc() { "." } else { "" };
         let name = match self.op {
-            Opcode::Fadd => match self.rc() {
-                false => "fadd",
-                true => "fadd.",
-            },
-            Opcode::Fadds => match self.rc() {
-                false => "fadds",
-                true => "fadds.",
-            },
-            Opcode::Fdiv => match self.rc() {
-                false => "fdiv",
-                true => "fdiv.",
-            },
-            Opcode::Fdivs => match self.rc() {
-                false => "fdivs",
-                true => "fdivs.",
-            },
-            Opcode::Fsub => match self.rc() {
-                false => "fsub",
-                true => "fsub.",
-            },
-            Opcode::Fsubs => match self.rc() {
-                false => "fsubs",
-                true => "fsubs.",
-            },
-            _ => disasm_unreachable!(self.code),
-        };
-        format!("{} fr{}, fr{}, fr{}", name, self.d(), self.a(), self.b())
-    }
-
-    fn to_string_form_fr1243(&self) -> String {
-        let name = match self.op {
-            Opcode::Fmadd => match self.rc() {
-                false => "fmadd",
-                true => "fmadd.",
-            },
-            Opcode::Fmadds => match self.rc() {
-                false => "fmadds",
-                true => "fmadds.",
-            },
-            Opcode::Fmsub => match self.rc() {
-                false => "fmsub",
-                true => "fmsub.",
-            },
-            Opcode::Fmsubs => match self.rc() {
-                false => "fmsubs",
-                true => "fmsubs.",
-            },
-            Opcode::Fnmadd => match self.rc() {
-                false => "fnmadd",
-                true => "fnmadd.",
-            },
-            Opcode::Fnmadds => match self.rc() {
-                false => "fnmadds",
-                true => "fnmadds.",
-            },
-            Opcode::Fnmsub => match self.rc() {
-                false => "fnmsub",
-                true => "fnmsub.",
-            },
-            Opcode::Fnmsubs => match self.rc() {
-                false => "fnmsubs",
-                true => "fnmsubs.",
-            },
-            Opcode::Fsel => match self.rc() {
-                false => "fsel",
-                true => "fsel.",
-            },
+            Opcode::Fadd => "fadd",
+            Opcode::Fadds => "fadds",
+            Opcode::Fdiv => "fdiv",
+            Opcode::Fdivs => "fdivs",
+            Opcode::Fsub => "fsub",
+            Opcode::Fsubs => "fsubs",
+            Opcode::PsAdd => "ps_add",
+            Opcode::PsDiv => "ps_div",
+            Opcode::PsMerge00 => "ps_merge00",
+            Opcode::PsMerge01 => "ps_merge01",
+            Opcode::PsMerge10 => "ps_merge10",
+            Opcode::PsMerge11 => "ps_merge11",
+            Opcode::PsSub => "ps_sub",
             _ => disasm_unreachable!(self.code),
         };
         format!(
-            "{} fr{}, fr{}, fr{}, fr{}",
+            "{}{} fr{}, fr{}, fr{}",
             name,
+            name_suffix,
+            self.d(),
+            self.a(),
+            self.b()
+        )
+    }
+
+    fn to_string_form_fr1243(&self) -> String {
+        let name_suffix = if self.rc() { "." } else { "" };
+        let name = match self.op {
+            Opcode::Fmadd => "fmadd",
+            Opcode::Fmadds => "fmadds",
+            Opcode::Fmsub => "fmsub",
+            Opcode::Fmsubs => "fmsubs",
+            Opcode::Fnmadd => "fnmadd",
+            Opcode::Fnmadds => "fnmadds",
+            Opcode::Fnmsub => "fnmsub",
+            Opcode::Fnmsubs => "fnmsubs",
+            Opcode::Fsel => "fsel",
+            Opcode::PsMadd => "ps_madd",
+            Opcode::PsMadds0 => "ps_madds0",
+            Opcode::PsMadds1 => "ps_madds1",
+            Opcode::PsMsub => "ps_msub",
+            Opcode::PsNmadd => "ps_nmadd",
+            Opcode::PsNmsub => "ps_nmsub",
+            Opcode::PsSel => "ps_sel",
+            _ => disasm_unreachable!(self.code),
+        };
+        format!(
+            "{}{} fr{}, fr{}, fr{}, fr{}",
+            name,
+            name_suffix,
             self.d(),
             self.a(),
             self.c(),
@@ -1658,24 +1701,33 @@ impl Ins {
     }
 
     fn to_string_form_fr124(&self) -> String {
+        let name_suffix = if self.rc() { "." } else { "" };
         let name = match self.op {
-            Opcode::Fmul => match self.rc() {
-                false => "fmul",
-                true => "fmul.",
-            },
-            Opcode::Fmuls => match self.rc() {
-                false => "fmuls",
-                true => "fmuls.",
-            },
+            Opcode::Fmul => "fmul",
+            Opcode::Fmuls => "fmuls",
+            Opcode::PsMadd => "ps_madd",
+            Opcode::PsMuls0 => "ps_muls0",
+            Opcode::PsMuls1 => "ps_muls1",
             _ => disasm_unreachable!(self.code),
         };
-        format!("{} fr{}, fr{}, fr{}", name, self.d(), self.a(), self.c())
+        format!(
+            "{}{} fr{}, fr{}, fr{}",
+            name,
+            name_suffix,
+            self.d(),
+            self.a(),
+            self.c()
+        )
     }
 
     fn to_string_form_condreg1_fr23(&self) -> String {
         let name = match self.op {
             Opcode::Fcmpo => "fcmpo",
             Opcode::Fcmpu => "fcmpu",
+            Opcode::PsCmpo0 => "ps_cmpo0",
+            Opcode::PsCmpo1 => "ps_cmpo1",
+            Opcode::PsCmpu0 => "ps_cmpu0",
+            Opcode::PsCmpu1 => "ps_cmpu1",
             _ => disasm_unreachable!(self.code),
         };
         format!(
@@ -1853,35 +1905,65 @@ impl Ins {
     }
 
     fn to_string_form_reg213(&self) -> String {
+        let name_suffix = if self.rc() { "." } else { "" };
         let name = match self.op {
-            Opcode::Eqv => match self.rc() {
-                false => "eqv",
-                true => "eqv.",
-            },
-            Opcode::Nand => match self.rc() {
-                false => "nand",
-                true => "nand.",
-            },
-            Opcode::Nor => match self.rc() {
-                false => "nor",
-                true => "nor.",
-            },
-            Opcode::Or => match self.rc() {
-                false => "or",
-                true => "or.",
-            },
-            Opcode::Orc => match self.rc() {
-                false => "orc",
-                true => "orc.",
-            },
+            Opcode::Eqv => "eqv",
+            Opcode::Nand => "nand",
+            Opcode::Nor => "nor",
+            Opcode::Or => "or",
+            Opcode::Orc => "orc",
+            Opcode::Slw => "slw",
+            Opcode::Sraw => "sraw",
+            Opcode::Srw => "srw",
             _ => disasm_unreachable!(self.code),
         };
-        format!("{} r{}, r{}, r{}", name, self.a(), self.s(), self.b())
+        format!(
+            "{}{} r{}, r{}, r{}",
+            name,
+            name_suffix,
+            self.a(),
+            self.s(),
+            self.b()
+        )
+    }
+
+    fn to_string_rlw_imm(&self) -> String {
+        let name_prefix = if self.rc() { "." } else { "" };
+        let name = match self.op {
+            Opcode::Rlwimi => "rlwimi",
+            Opcode::Rlwinm => "rlwinm",
+            _ => disasm_unreachable!(self.code),
+        };
+        format!(
+            "{}{} r{}, r{}, {}, {}, {}",
+            name,
+            name_prefix,
+            self.a(),
+            self.s(),
+            self.sh(),
+            self.mb(),
+            self.me()
+        )
+    }
+
+    fn to_string_rlw_reg(&self) -> String {
+        assert_eq!(self.op, Opcode::Rlwnm);
+        let name_prefix = if self.rc() { "." } else { "" };
+        format!(
+            "rlwnm{} r{}, r{}, r{}, {}, {}",
+            name_prefix,
+            self.a(),
+            self.s(),
+            self.b(),
+            self.mb(),
+            self.me()
+        )
     }
 
     fn to_string_form_reg12_nb(&self) -> String {
         let name = match self.op {
             Opcode::Lswi => "lswi",
+            Opcode::Stswi => "stswi",
             _ => disasm_unreachable!(self.code),
         };
         format!("{} r{}, r{}, {}", name, self.d(), self.a(), self.b())
@@ -1924,6 +2006,44 @@ impl Ins {
         assert_eq!(self.op, Opcode::Mtcrf);
         format!("mtcrf {} r{}", self.crm(), self.s())
     }
+
+    fn to_string_psq(&self) -> String {
+        let name = match self.op {
+            Opcode::PsqL => "psq_l",
+            Opcode::PsqLu => "psq_lu",
+            Opcode::PsqSt => "psq_st",
+            Opcode::PsqStu => "psq_stu",
+            _ => disasm_unreachable!(self.code),
+        };
+        format!(
+            "{} fr{}, {}(r{}), {}, {}",
+            name,
+            self.d(),
+            self.ps_d(),
+            self.a(),
+            self.w(),
+            self.ps_l()
+        )
+    }
+
+    fn to_string_psq_x(&self) -> String {
+        let name = match self.op {
+            Opcode::PsqLx => "psq_lx",
+            Opcode::PsqLux => "psq_lux",
+            Opcode::PsqStx => "psq_stx",
+            Opcode::PsqStux => "psq_stux",
+            _ => disasm_unreachable!(self.code),
+        };
+        format!(
+            "{} fr{}, r{}, r{}, {}, {}",
+            name,
+            self.d(),
+            self.a(),
+            self.b(),
+            self.w(),
+            self.ps_l()
+        )
+    }
 }
 
 impl ToString for Ins {
@@ -1932,11 +2052,20 @@ impl ToString for Ins {
             Opcode::Illegal => "<illegal>".to_string(),
 
             // Standalone instructions
-            Opcode::Eieio | Opcode::Isync => self.to_string_noargs(),
+            Opcode::Eieio
+            | Opcode::Isync
+            | Opcode::Rfi
+            | Opcode::Sc
+            | Opcode::Sync
+            | Opcode::Tlbsync => self.to_string_noargs(),
 
             // General purpose register only
-            Opcode::Mfcr | Opcode::Mfmsr | Opcode::Mtmsr => self.to_string_form_reg1(),
-            Opcode::Addme | Opcode::Addze | Opcode::Neg => self.to_string_form_reg12(),
+            Opcode::Mfcr | Opcode::Mfmsr | Opcode::Mtmsr | Opcode::Tlbie => {
+                self.to_string_form_reg1()
+            }
+            Opcode::Addme | Opcode::Addze | Opcode::Neg | Opcode::Subfme | Opcode::Subfze => {
+                self.to_string_form_reg12()
+            }
             Opcode::Mfsrin | Opcode::Mtsrin => self.to_string_form_reg13(),
             Opcode::Cntlzw | Opcode::Extsb | Opcode::Extsh => self.to_string_form_reg21(),
             Opcode::Dcbf
@@ -1970,18 +2099,47 @@ impl ToString for Ins {
             | Opcode::Lwzx
             | Opcode::Mulhw
             | Opcode::Mulhwu
-            | Opcode::Mullw => self.to_string_form_reg123(),
-            Opcode::Eqv | Opcode::Nand | Opcode::Nor | Opcode::Or | Opcode::Orc => {
-                self.to_string_form_reg213()
-            }
+            | Opcode::Mullw
+            | Opcode::Stbx
+            | Opcode::Stbux
+            | Opcode::Sthbrx
+            | Opcode::Sthx
+            | Opcode::Sthux
+            | Opcode::Stswx
+            | Opcode::Stwbrx
+            | Opcode::Stwcx_
+            | Opcode::Stwx
+            | Opcode::Stwux
+            | Opcode::Subf
+            | Opcode::Subfc
+            | Opcode::Subfe
+            | Opcode::Xor => self.to_string_form_reg123(),
+            Opcode::Eqv
+            | Opcode::Nand
+            | Opcode::Nor
+            | Opcode::Or
+            | Opcode::Orc
+            | Opcode::Slw
+            | Opcode::Sraw
+            | Opcode::Srw => self.to_string_form_reg213(),
+
+            // General purpose shifts
+            Opcode::Rlwimi | Opcode::Rlwinm => self.to_string_rlw_imm(),
+            Opcode::Rlwnm => self.to_string_rlw_reg(),
 
             // General purpose register misc
-            Opcode::Addi | Opcode::Addic | Opcode::Addic_ | Opcode::Addis | Opcode::Mulli => {
-                self.to_string_form_reg12_simm()
-            }
-            Opcode::Andi_ | Opcode::Andis_ | Opcode::Ori | Opcode::Oris => {
-                self.to_string_form_reg12_uimm()
-            }
+            Opcode::Addi
+            | Opcode::Addic
+            | Opcode::Addic_
+            | Opcode::Addis
+            | Opcode::Mulli
+            | Opcode::Subfic => self.to_string_form_reg12_simm(),
+            Opcode::Andi_
+            | Opcode::Andis_
+            | Opcode::Ori
+            | Opcode::Oris
+            | Opcode::Xori
+            | Opcode::Xoris => self.to_string_form_reg12_uimm(),
             Opcode::Lbz
             | Opcode::Lbzu
             | Opcode::Lha
@@ -1990,13 +2148,36 @@ impl ToString for Ins {
             | Opcode::Lhzu
             | Opcode::Lmw
             | Opcode::Lwz
-            | Opcode::Lwzu => self.to_string_form_reg12_offset(),
-            Opcode::Lswi => self.to_string_form_reg12_nb(),
+            | Opcode::Lwzu
+            | Opcode::Stb
+            | Opcode::Stbu
+            | Opcode::Sth
+            | Opcode::Sthu
+            | Opcode::Stmw
+            | Opcode::Stw
+            | Opcode::Stwu => self.to_string_form_reg12_offset(),
+            Opcode::Lswi | Opcode::Stswi => self.to_string_form_reg12_nb(),
             Opcode::Mfspr | Opcode::Mftb => self.to_string_form_reg1_spr(),
             Opcode::Mtspr => self.to_string_form_spr_reg1(),
             Opcode::Mfsr => self.to_string_form_reg1_sr(),
             Opcode::Mtsr => self.to_string_form_sr_reg1(),
             Opcode::Mtcrf => self.to_string_mtcrf(),
+            Opcode::Srawi => {
+                let name_suffix = if self.rc() { "." } else { "" };
+                format!(
+                    "srawi{} r{}, r{}, {}",
+                    name_suffix,
+                    self.s(),
+                    self.a(),
+                    self.sh()
+                )
+            }
+            Opcode::Tw => {
+                format!("tw {}, r{}, r{}", self.to(), self.a(), self.b())
+            }
+            Opcode::Twi => {
+                format!("twi {}, r{}, {}", self.to(), self.a(), self.simm())
+            }
 
             // Branch instructions
             Opcode::B => self.to_string_b(),
@@ -2016,14 +2197,29 @@ impl ToString for Ins {
             | Opcode::Fneg
             | Opcode::Fres
             | Opcode::Frsp
-            | Opcode::Frsqrte => self.to_string_form_fr13(),
+            | Opcode::Frsqrte
+            | Opcode::PsAbs
+            | Opcode::PsMr
+            | Opcode::PsNabs
+            | Opcode::PsNeg
+            | Opcode::PsRes
+            | Opcode::PsRsqrte => self.to_string_form_fr13(),
             Opcode::Fadd
             | Opcode::Fadds
             | Opcode::Fdiv
             | Opcode::Fdivs
             | Opcode::Fsub
-            | Opcode::Fsubs => self.to_string_form_fr123(),
-            Opcode::Fmul | Opcode::Fmuls => self.to_string_form_fr124(),
+            | Opcode::Fsubs
+            | Opcode::PsAdd
+            | Opcode::PsDiv
+            | Opcode::PsMerge00
+            | Opcode::PsMerge01
+            | Opcode::PsMerge10
+            | Opcode::PsMerge11
+            | Opcode::PsSub => self.to_string_form_fr123(),
+            Opcode::Fmul | Opcode::Fmuls | Opcode::PsMul | Opcode::PsMuls0 | Opcode::PsMuls1 => {
+                self.to_string_form_fr124()
+            }
             Opcode::Fmadd
             | Opcode::Fmadds
             | Opcode::Fmsub
@@ -2032,17 +2228,42 @@ impl ToString for Ins {
             | Opcode::Fnmadds
             | Opcode::Fnmsub
             | Opcode::Fnmsubs
-            | Opcode::Fsel => self.to_string_form_fr1243(),
+            | Opcode::Fsel
+            | Opcode::PsMadd
+            | Opcode::PsMadds0
+            | Opcode::PsMadds1
+            | Opcode::PsMsub
+            | Opcode::PsNmadd
+            | Opcode::PsNmsub
+            | Opcode::PsSel
+            | Opcode::PsSum0
+            | Opcode::PsSum1 => self.to_string_form_fr1243(),
 
             // Floating point register misc instructions
             Opcode::Fctiw | Opcode::Fctiwz => self.to_string_form_condreg1_fr13(),
-            Opcode::Fcmpo | Opcode::Fcmpu => self.to_string_form_condreg1_fr23(),
-            Opcode::Lfd | Opcode::Lfdu | Opcode::Lfs | Opcode::Lfsu => {
-                self.to_string_form_fr1_reg2_offset()
-            }
-            Opcode::Lfdux | Opcode::Lfdx | Opcode::Lfsux | Opcode::Lfsx => {
-                self.to_string_form_fr1_reg23()
-            }
+            Opcode::Fcmpo
+            | Opcode::Fcmpu
+            | Opcode::PsCmpo0
+            | Opcode::PsCmpo1
+            | Opcode::PsCmpu0
+            | Opcode::PsCmpu1 => self.to_string_form_condreg1_fr23(),
+            Opcode::Lfd
+            | Opcode::Lfdu
+            | Opcode::Lfs
+            | Opcode::Lfsu
+            | Opcode::Stfd
+            | Opcode::Stfdu
+            | Opcode::Stfs
+            | Opcode::Stfsu => self.to_string_form_fr1_reg2_offset(),
+            Opcode::Lfdux
+            | Opcode::Lfdx
+            | Opcode::Lfsux
+            | Opcode::Lfsx
+            | Opcode::Stfdux
+            | Opcode::Stfdx
+            | Opcode::Stfiwx
+            | Opcode::Stfsux
+            | Opcode::Stfsx => self.to_string_form_fr1_reg23(),
             Opcode::Mtfsf => self.to_string_mtfsf(),
 
             // Condition register only
@@ -2060,7 +2281,11 @@ impl ToString for Ins {
             // Condition register misc
             Opcode::Mtfsfi => self.to_string_mtfsfi(),
 
-            _ => todo!("can't format instruction 0x{:x}", self.code),
+            // Paired-single instructions
+            Opcode::PsqL | Opcode::PsqLu | Opcode::PsqSt | Opcode::PsqStu => self.to_string_psq(),
+            Opcode::PsqLx | Opcode::PsqLux | Opcode::PsqStx | Opcode::PsqStux => {
+                self.to_string_psq_x()
+            }
         }
     }
 }
@@ -2139,6 +2364,10 @@ mod tests {
         assert_eq!(
             Ins::disasm(0b000100_00001_00000_00000_0000000111_1).op,
             Opcode::Illegal
+        );
+        assert_eq!(
+            Ins::disasm(0b1111100000000000000001001111000).op,
+            Opcode::Illegal,
         );
         // TODO more tests
     }
