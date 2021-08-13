@@ -5,8 +5,6 @@ use std::sync::atomic::{AtomicU32, Ordering};
 use std::sync::Arc;
 use std::time::{Duration, Instant};
 
-use num_cpus;
-
 use ppc750cl::Ins;
 use std::ops::Range;
 

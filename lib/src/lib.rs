@@ -1401,7 +1401,8 @@ impl Ins {
             Opcode::Sync => "sync",
             Opcode::Tlbsync => "tlbsync",
             _ => disasm_unreachable!(self.code),
-        }.to_owned();
+        }
+        .to_owned();
         Ok(())
     }
 
@@ -2305,6 +2306,7 @@ impl ToString for Ins {
 }
 
 #[cfg(test)]
+#[allow(clippy::unusual_byte_groupings, clippy::bool_assert_comparison)]
 mod tests {
     use super::*;
 
