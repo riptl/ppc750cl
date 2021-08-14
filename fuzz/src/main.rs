@@ -2,6 +2,7 @@ use std::sync::atomic::{AtomicU32, Ordering};
 use std::sync::Arc;
 use std::time::{Duration, Instant};
 
+use ppc750cl::formatter::SimpleFormatter;
 use ppc750cl::Ins;
 use std::ops::Range;
 
@@ -95,9 +96,10 @@ impl Fuzzer {
 }
 
 fn disasm(x: u32) {
-    let mut devnull = DevNull;
+    let devnull = DevNull;
+    let mut formatter = SimpleFormatter { writer: devnull };
     let ins = Ins::disasm(x);
-    ins.write_string(&mut devnull).unwrap();
+    ins.write_string(&mut formatter).unwrap();
 }
 
 struct DevNull;
