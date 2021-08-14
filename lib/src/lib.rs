@@ -328,7 +328,9 @@ impl Ins {
 
     ins_field!(crm, u8, 12..20);
     ins_field!(sr, u8, 12..16);
-    ins_field!(spr, u16, 11..21);
+    fn spr(&self) -> u16 {
+        bits::<u16>(self.code, 11..16) | (bits::<u16>(self.code, 16..21) << 5)
+    }
     ins_field!(fm, u16, 7..15);
     ins_field!(crf_d, u8, 6..9);
     ins_field!(crf_s, u8, 11..14);
@@ -1769,7 +1771,13 @@ impl Ins {
                 true => "bcctrl",
             },
             Opcode::Bclr => match self.lk() != 0 {
-                false => "bclr",
+                false => match (self.bo(), self.bi()) {
+                    (0b01100, 0b00000) => return write!(out, "bltlr"),
+                    (0b00100, 0b01010) => return write!(out, "bnelr cr2"),
+                    (0b10000, 0b00000) => return write!(out, "bdnzlr"),
+                    (0b10100, 0b00000) => return write!(out, "blr"),
+                    _ => "bclr",
+                },
                 true => "bclrl",
             },
             _ => disasm_unreachable!(self.code),
@@ -1952,7 +1960,12 @@ impl Ins {
 
     fn write_string_form_reg1_spr(&self, out: &mut String) -> std::fmt::Result {
         let name = match self.op {
-            Opcode::Mfspr => "mfspr",
+            Opcode::Mfspr => match self.spr() {
+                1 => return write!(out, "mfxer r{}", self.s()),
+                8 => return write!(out, "mflr r{}", self.s()),
+                9 => return write!(out, "mfctr r{}", self.s()),
+                _ => "mfspr",
+            },
             Opcode::Mftb => "mftb",
             _ => disasm_unreachable!(self.code),
         };
@@ -1961,7 +1974,12 @@ impl Ins {
 
     fn write_string_form_spr_reg1(&self, out: &mut String) -> std::fmt::Result {
         let name = match self.op {
-            Opcode::Mtspr => "mtspr",
+            Opcode::Mtspr => match self.spr() {
+                1 => return write!(out, "mtxer r{}", self.s()),
+                8 => return write!(out, "mtlr r{}", self.s()),
+                9 => return write!(out, "mtctr r{}", self.s()),
+                _ => "mtspr",
+            },
             _ => disasm_unreachable!(self.code),
         };
         write!(out, "{} {}, r{}", name, self.spr(), self.s())
@@ -2368,8 +2386,8 @@ mod tests {
         assert_asm!(0xCBA10010, "lfd fr29, 16(r1)");
         assert_asm!(0x80010044, "lwz r0, 68(r1)");
         assert_asm!(0x83E1000C, "lwz r31, 12(r1)");
-        // assert_asm!(0x7C0803A6, "mtlr r0");
+        assert_asm!(0x7C0803A6, "mtlr r0");
         assert_asm!(0x38210040, "addi r1, r1, 64");
-        // assert_asm!(0x4E800020, "blr");
+        assert_asm!(0x4E800020, "blr");
     }
 }
