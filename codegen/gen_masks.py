@@ -1,3 +1,6 @@
+import sys
+
+
 def apply_pattern(pattern, mask, bits):
     start, stop, value = map(int, pattern.split(","))
     bit_count = stop - start + 1
@@ -19,9 +22,14 @@ def dump_mask(line):
 
 
 def main():
-    with open("patterns.txt", "r") as file:
+    with open("patterns.txt", "r") as patterns, open(
+        "../lib/src/isa.rs", "w"
+    ) as isa_file:
+        sys.stdout = isa_file
+        print("use ppc750cl_macros::isa;")
+        print()
         print("isa! {")
-        for line in file.readlines():
+        for line in patterns.readlines():
             dump_mask(line)
         print("}")
 

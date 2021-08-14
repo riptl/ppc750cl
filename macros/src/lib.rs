@@ -88,7 +88,7 @@ fn opcode_to_variant_name(opcode: &LitStr) -> syn::Result<String> {
 }
 
 fn gen_is_valid_fn(tokens: &mut Vec<TokenTree>, opcodes: &Opcodes) {
-    let header: TokenStream = "fn is_valid(&self, code: u32) -> bool".parse().unwrap();
+    let header: TokenStream = "pub fn is_valid(&self, code: u32) -> bool".parse().unwrap();
     tokens.append(&mut header.into_iter().collect());
     let mut parts = Vec::<TokenTree>::new();
     let match_header: TokenStream = "match self".parse().unwrap();
