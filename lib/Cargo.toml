@@ -6,3 +6,4 @@ authors = ["Richard Patel <me@terorie.dev>"]
 
 [dependencies]
 num-traits = "0.2.14"
+ppc750cl-macros = { path = "../macros" }

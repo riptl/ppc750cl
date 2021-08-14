@@ -1,6 +1,7 @@
 [workspace]
 members = [
     "lib",
+    "macros",
     "fuzz",
     "rand",
 ]
