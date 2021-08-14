@@ -88,13 +88,18 @@ fn opcode_to_variant_name(opcode: &LitStr) -> syn::Result<String> {
 }
 
 fn gen_is_valid_fn(tokens: &mut Vec<TokenTree>, opcodes: &Opcodes) {
-    let header: TokenStream = "pub fn is_valid(&self, code: u32) -> bool".parse().unwrap();
+    let header: TokenStream = "pub fn is_valid(self, code: u32) -> bool".parse().unwrap();
     tokens.append(&mut header.into_iter().collect());
     let mut parts = Vec::<TokenTree>::new();
     let match_header: TokenStream = "match self".parse().unwrap();
     parts.append(&mut match_header.into_iter().collect());
     let mut match_parts = Vec::<TokenTree>::new();
+    let illegal_match: TokenStream = "Opcode::Illegal => false,".parse().unwrap();
+    match_parts.append(&mut illegal_match.into_iter().collect());
     for opcode in &opcodes.opcodes {
+        match_parts.push(TokenTree::Ident(Ident::new("Opcode", Span::call_site())));
+        match_parts.push(TokenTree::Punct(Punct::new(':', Spacing::Joint)));
+        match_parts.push(TokenTree::Punct(Punct::new(':', Spacing::Alone)));
         match_parts.push(TokenTree::Ident(Ident::new(
             &opcode.variant_name,
             Span::call_site(),
