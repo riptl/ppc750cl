@@ -1,6 +1,3 @@
-#![feature(bench_black_box)]
-
-use std::hint::black_box;
 use std::sync::atomic::{AtomicU32, Ordering};
 use std::sync::Arc;
 use std::time::{Duration, Instant};
@@ -64,7 +61,7 @@ impl MultiFuzzer {
             //      for most of the time.
             handle.join().expect("thread panicked");
         }
-        black_box(Ins::disasm(0xFFFF_FFFF).to_string());
+        disasm(0xFFFF_FFFF);
     }
 }
 
@@ -86,16 +83,30 @@ impl Fuzzer {
         let counter = Arc::clone(&self.counter);
         let range = self.range.clone();
         std::thread::spawn(move || {
-            let mut buf = String::with_capacity(1024);
             for x in range.clone() {
-                let ins = Ins::disasm(x);
-                ins.write_string(&mut buf).unwrap();
-                black_box(&buf);
+                disasm(x);
                 if x % (1 << 19) == 0 {
                     counter.store(x, Ordering::Relaxed);
                 }
             }
             counter.store(range.end, Ordering::Relaxed);
         })
+    }
+}
+
+fn disasm(x: u32) {
+    let mut devnull = DevNull;
+    let ins = Ins::disasm(x);
+    ins.write_string(&mut devnull).unwrap();
+}
+
+struct DevNull;
+
+impl std::fmt::Write for DevNull {
+    fn write_str(&mut self, s: &str) -> std::fmt::Result {
+        s.as_bytes()
+            .iter()
+            .for_each(|b| unsafe { std::ptr::read_volatile(b); });
+        Ok(())
     }
 }

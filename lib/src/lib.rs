@@ -1,3 +1,5 @@
+#![allow(clippy::unusual_byte_groupings)]
+
 use std::fmt::Write;
 use std::ops::Range;
 
@@ -1296,7 +1298,7 @@ impl Ins {
         ins
     }
 
-    fn write_string_form_reg123(&self, out: &mut String) -> std::fmt::Result {
+    fn write_string_form_reg123<W: Write>(&self, out: &mut W) -> std::fmt::Result {
         let name = match self.op {
             Opcode::Eciwx => "eciwx",
             Opcode::Ecowx => "ecowx",
@@ -1327,7 +1329,7 @@ impl Ins {
         write!(out, "{} r{}, r{}, r{}", name, self.d(), self.a(), self.b())
     }
 
-    fn write_string_form_reg123_rc(&self, out: &mut String) -> std::fmt::Result {
+    fn write_string_form_reg123_rc<W: Write>(&self, out: &mut W) -> std::fmt::Result {
         let name_suffix = if self.rc() != 0 { "." } else { "" };
         let name = match self.op {
             Opcode::And => "and",
@@ -1348,7 +1350,7 @@ impl Ins {
         )
     }
 
-    fn write_string_form_reg123_oe_rc(&self, out: &mut String) -> std::fmt::Result {
+    fn write_string_form_reg123_oe_rc<W: Write>(&self, out: &mut W) -> std::fmt::Result {
         let name_suffix = match (self.oe() != 0, self.rc() != 0) {
             (false, false) => "",
             (false, true) => ".",
@@ -1378,8 +1380,8 @@ impl Ins {
         )
     }
 
-    fn write_string_noargs(&self, out: &mut String) -> std::fmt::Result {
-        *out = match self.op {
+    fn write_string_noargs<W: Write>(&self, out: &mut W) -> std::fmt::Result {
+        let name = match self.op {
             Opcode::Eieio => "eieio",
             Opcode::Isync => "isync",
             Opcode::Rfi => "rfi",
@@ -1387,12 +1389,11 @@ impl Ins {
             Opcode::Sync => "sync",
             Opcode::Tlbsync => "tlbsync",
             _ => disasm_unreachable!(self.code),
-        }
-        .to_owned();
-        Ok(())
+        };
+        write!(out, "{}", name)
     }
 
-    fn write_string_form_reg12_simm(&self, out: &mut String) -> std::fmt::Result {
+    fn write_string_form_reg12_simm<W: Write>(&self, out: &mut W) -> std::fmt::Result {
         let name = match self.op {
             Opcode::Addi => "addi",
             Opcode::Addic => "addic",
@@ -1412,7 +1413,7 @@ impl Ins {
         )
     }
 
-    fn write_string_form_reg12_uimm(&self, out: &mut String) -> std::fmt::Result {
+    fn write_string_form_reg12_uimm<W: Write>(&self, out: &mut W) -> std::fmt::Result {
         let name = match self.op {
             Opcode::Andi_ => "andi.",
             Opcode::Andis_ => "andis.",
@@ -1432,7 +1433,7 @@ impl Ins {
         )
     }
 
-    fn write_string_form_reg12_offset(&self, out: &mut String) -> std::fmt::Result {
+    fn write_string_form_reg12_offset<W: Write>(&self, out: &mut W) -> std::fmt::Result {
         let name = match self.op {
             Opcode::Lha => "lha",
             Opcode::Lhau => "lhau",
@@ -1462,7 +1463,7 @@ impl Ins {
         )
     }
 
-    fn write_string_form_fr1_reg2_offset(&self, out: &mut String) -> std::fmt::Result {
+    fn write_string_form_fr1_reg2_offset<W: Write>(&self, out: &mut W) -> std::fmt::Result {
         let name = match self.op {
             Opcode::Lfd => "lfd",
             Opcode::Lfdu => "lfdu",
@@ -1484,7 +1485,7 @@ impl Ins {
         )
     }
 
-    fn write_string_form_fr1_reg23(&self, out: &mut String) -> std::fmt::Result {
+    fn write_string_form_fr1_reg23<W: Write>(&self, out: &mut W) -> std::fmt::Result {
         let name = match self.op {
             Opcode::Lfdux => "lfdux",
             Opcode::Lfdx => "lfdx",
@@ -1500,7 +1501,7 @@ impl Ins {
         write!(out, "{} fr{}, r{}, r{}", name, self.d(), self.a(), self.b())
     }
 
-    fn write_string_mtfsf(&self, out: &mut String) -> std::fmt::Result {
+    fn write_string_mtfsf<W: Write>(&self, out: &mut W) -> std::fmt::Result {
         let name = match self.op {
             Opcode::Mtfsf => "mtfsf",
             _ => disasm_unreachable!(self.code),
@@ -1508,7 +1509,7 @@ impl Ins {
         write!(out, "{} {}, fr{}", name, self.fm(), self.b())
     }
 
-    fn write_string_mtfsfi(&self, out: &mut String) -> std::fmt::Result {
+    fn write_string_mtfsfi<W: Write>(&self, out: &mut W) -> std::fmt::Result {
         let name = match self.op {
             Opcode::Mtfsfi => "mtfsfi",
             _ => disasm_unreachable!(self.code),
@@ -1522,7 +1523,7 @@ impl Ins {
         )
     }
 
-    fn write_string_form_reg1(&self, out: &mut String) -> std::fmt::Result {
+    fn write_string_form_reg1<W: Write>(&self, out: &mut W) -> std::fmt::Result {
         let name = match self.op {
             Opcode::Mfcr => "mfcr",
             Opcode::Mfmsr => "mfmsr",
@@ -1533,7 +1534,7 @@ impl Ins {
         write!(out, "{} r{}", name, self.d())
     }
 
-    fn write_string_form_reg12_oe_rc(&self, out: &mut String) -> std::fmt::Result {
+    fn write_string_form_reg12_oe_rc<W: Write>(&self, out: &mut W) -> std::fmt::Result {
         let name_suffix = match (self.oe() != 0, self.rc() != 0) {
             (false, false) => "",
             (false, true) => ".",
@@ -1551,7 +1552,7 @@ impl Ins {
         write!(out, "{}{} r{}, r{}", name, name_suffix, self.d(), self.a())
     }
 
-    fn write_string_form_reg13(&self, out: &mut String) -> std::fmt::Result {
+    fn write_string_form_reg13<W: Write>(&self, out: &mut W) -> std::fmt::Result {
         let name = match self.op {
             Opcode::Mfsrin => "mfsrin",
             Opcode::Mtsrin => "mtsrin",
@@ -1560,7 +1561,7 @@ impl Ins {
         write!(out, "{} r{}, r{}", name, self.d(), self.b())
     }
 
-    fn write_string_form_reg21_rc(&self, out: &mut String) -> std::fmt::Result {
+    fn write_string_form_reg21_rc<W: Write>(&self, out: &mut W) -> std::fmt::Result {
         let name_suffix = if self.rc() != 0 { "." } else { "" };
         let name = match self.op {
             Opcode::Cntlzw => "cntlzw",
@@ -1571,7 +1572,7 @@ impl Ins {
         write!(out, "{}{} r{}, r{}", name, name_suffix, self.a(), self.s())
     }
 
-    fn write_string_form_fr1(&self, out: &mut String) -> std::fmt::Result {
+    fn write_string_form_fr1<W: Write>(&self, out: &mut W) -> std::fmt::Result {
         let name = match self.op {
             Opcode::Mffs => match self.rc() != 0 {
                 false => "mffs",
@@ -1582,7 +1583,7 @@ impl Ins {
         write!(out, "{} fr{}", name, self.d())
     }
 
-    fn write_string_form_fr13(&self, out: &mut String) -> std::fmt::Result {
+    fn write_string_form_fr13<W: Write>(&self, out: &mut W) -> std::fmt::Result {
         let name_suffix = if self.rc() != 0 { "." } else { "" };
         let name = match self.op {
             Opcode::Fabs => "fabs",
@@ -1612,7 +1613,7 @@ impl Ins {
         )
     }
 
-    fn write_string_form_fr123(&self, out: &mut String) -> std::fmt::Result {
+    fn write_string_form_fr123<W: Write>(&self, out: &mut W) -> std::fmt::Result {
         let name_suffix = if self.rc() != 0 { "." } else { "" };
         let name = match self.op {
             Opcode::Fadd => "fadd",
@@ -1641,7 +1642,7 @@ impl Ins {
         )
     }
 
-    fn write_string_form_fr1243(&self, out: &mut String) -> std::fmt::Result {
+    fn write_string_form_fr1243<W: Write>(&self, out: &mut W) -> std::fmt::Result {
         let name_suffix = if self.rc() != 0 { "." } else { "" };
         let name = match self.op {
             Opcode::Fmadd => "fmadd",
@@ -1676,7 +1677,7 @@ impl Ins {
         )
     }
 
-    fn write_string_form_fr124(&self, out: &mut String) -> std::fmt::Result {
+    fn write_string_form_fr124<W: Write>(&self, out: &mut W) -> std::fmt::Result {
         let name_suffix = if self.rc() != 0 { "." } else { "" };
         let name = match self.op {
             Opcode::Fmul => "fmul",
@@ -1697,7 +1698,7 @@ impl Ins {
         )
     }
 
-    fn write_string_form_condreg1_fr23(&self, out: &mut String) -> std::fmt::Result {
+    fn write_string_form_condreg1_fr23<W: Write>(&self, out: &mut W) -> std::fmt::Result {
         let name = match self.op {
             Opcode::Fcmpo => "fcmpo",
             Opcode::Fcmpu => "fcmpu",
@@ -1717,7 +1718,7 @@ impl Ins {
         )
     }
 
-    fn write_string_form_condreg1_fr13_rc(&self, out: &mut String) -> std::fmt::Result {
+    fn write_string_form_condreg1_fr13_rc<W: Write>(&self, out: &mut W) -> std::fmt::Result {
         let name_suffix = if self.rc() != 0 { "." } else { "" };
         let name = match self.op {
             Opcode::Fctiw => "fctiw",
@@ -1735,7 +1736,7 @@ impl Ins {
         )
     }
 
-    fn write_string_b(&self, out: &mut String) -> std::fmt::Result {
+    fn write_string_b<W: Write>(&self, out: &mut W) -> std::fmt::Result {
         let name = match (self.aa() != 0, self.lk() != 0) {
             (false, false) => "b",
             (false, true) => "bl",
@@ -1746,7 +1747,7 @@ impl Ins {
         write!(out, "{} 0x{:x}", name, self.li())
     }
 
-    fn write_string_bc(&self, out: &mut String) -> std::fmt::Result {
+    fn write_string_bc<W: Write>(&self, out: &mut W) -> std::fmt::Result {
         let name = match (self.aa() != 0, self.lk() != 0) {
             (false, false) => "bc",
             (false, true) => "bcl",
@@ -1764,7 +1765,7 @@ impl Ins {
         )
     }
 
-    fn write_string_branch_cond_to_reg(&self, out: &mut String) -> std::fmt::Result {
+    fn write_string_branch_cond_to_reg<W: Write>(&self, out: &mut W) -> std::fmt::Result {
         let name = match self.op {
             Opcode::Bcctr => match self.lk() != 0 {
                 false => "bcctr",
@@ -1785,7 +1786,7 @@ impl Ins {
         write!(out, "{} 0x{:x}, 0x{:x}", name, self.bo(), self.bi())
     }
 
-    fn write_string_cmp(&self, out: &mut String) -> std::fmt::Result {
+    fn write_string_cmp<W: Write>(&self, out: &mut W) -> std::fmt::Result {
         let name = match self.op {
             Opcode::Cmp => "cmp",
             Opcode::Cmpl => "cmpl",
@@ -1802,7 +1803,7 @@ impl Ins {
         )
     }
 
-    fn write_string_cmp_simm(&self, out: &mut String) -> std::fmt::Result {
+    fn write_string_cmp_simm<W: Write>(&self, out: &mut W) -> std::fmt::Result {
         let name = "cmpi";
         write!(
             out,
@@ -1815,7 +1816,7 @@ impl Ins {
         )
     }
 
-    fn write_string_cmp_uimm(&self, out: &mut String) -> std::fmt::Result {
+    fn write_string_cmp_uimm<W: Write>(&self, out: &mut W) -> std::fmt::Result {
         let name = "cmpli";
         write!(
             out,
@@ -1828,7 +1829,7 @@ impl Ins {
         )
     }
 
-    fn write_string_form_condreg1(&self, out: &mut String) -> std::fmt::Result {
+    fn write_string_form_condreg1<W: Write>(&self, out: &mut W) -> std::fmt::Result {
         let name = match self.op {
             Opcode::Mcrxr => "mcrxr",
             Opcode::Mtfsb0 => match self.rc() != 0 {
@@ -1844,7 +1845,7 @@ impl Ins {
         write!(out, "{} crf{}", name, self.crf_d())
     }
 
-    fn write_string_form_condreg12(&self, out: &mut String) -> std::fmt::Result {
+    fn write_string_form_condreg12<W: Write>(&self, out: &mut W) -> std::fmt::Result {
         let name = match self.op {
             Opcode::Mcrf => "mcrf",
             Opcode::Mcrfs => "mcrfs",
@@ -1853,7 +1854,7 @@ impl Ins {
         write!(out, "{} crf{}, crf{}", name, self.crf_d(), self.crf_s())
     }
 
-    fn write_string_form_condreg123(&self, out: &mut String) -> std::fmt::Result {
+    fn write_string_form_condreg123<W: Write>(&self, out: &mut W) -> std::fmt::Result {
         let name = match self.op {
             Opcode::Crand => "crand",
             Opcode::Crandc => "crandc",
@@ -1875,7 +1876,7 @@ impl Ins {
         )
     }
 
-    fn write_string_form_reg23(&self, out: &mut String) -> std::fmt::Result {
+    fn write_string_form_reg23<W: Write>(&self, out: &mut W) -> std::fmt::Result {
         let name = match self.op {
             Opcode::Dcbf => "dcbf",
             Opcode::Dcbi => "dcbi",
@@ -1890,7 +1891,7 @@ impl Ins {
         write!(out, "{} r{}, r{}", name, self.a(), self.b())
     }
 
-    fn write_string_form_reg213(&self, out: &mut String) -> std::fmt::Result {
+    fn write_string_form_reg213<W: Write>(&self, out: &mut W) -> std::fmt::Result {
         let name_suffix = if self.rc() != 0 { "." } else { "" };
         let name = match self.op {
             Opcode::Eqv => "eqv",
@@ -1920,7 +1921,7 @@ impl Ins {
         )
     }
 
-    fn write_string_rlw_imm(&self, out: &mut String) -> std::fmt::Result {
+    fn write_string_rlw_imm<W: Write>(&self, out: &mut W) -> std::fmt::Result {
         let name_prefix = if self.rc() != 0 { "." } else { "" };
         let name = match self.op {
             Opcode::Rlwimi => "rlwimi",
@@ -1940,7 +1941,7 @@ impl Ins {
         )
     }
 
-    fn write_string_rlw_reg(&self, out: &mut String) -> std::fmt::Result {
+    fn write_string_rlw_reg<W: Write>(&self, out: &mut W) -> std::fmt::Result {
         assert_eq!(self.op, Opcode::Rlwnm);
         let name_prefix = if self.rc() != 0 { "." } else { "" };
         write!(
@@ -1955,7 +1956,7 @@ impl Ins {
         )
     }
 
-    fn write_string_form_reg12_nb(&self, out: &mut String) -> std::fmt::Result {
+    fn write_string_form_reg12_nb<W: Write>(&self, out: &mut W) -> std::fmt::Result {
         let name = match self.op {
             Opcode::Lswi => "lswi",
             Opcode::Stswi => "stswi",
@@ -1964,7 +1965,7 @@ impl Ins {
         write!(out, "{} r{}, r{}, {}", name, self.d(), self.a(), self.b())
     }
 
-    fn write_string_form_reg1_spr(&self, out: &mut String) -> std::fmt::Result {
+    fn write_string_form_reg1_spr<W: Write>(&self, out: &mut W) -> std::fmt::Result {
         let name = match self.op {
             Opcode::Mfspr => match self.spr() {
                 1 => return write!(out, "mfxer r{}", self.s()),
@@ -1978,7 +1979,7 @@ impl Ins {
         write!(out, "{} r{}, {}", name, self.d(), self.spr())
     }
 
-    fn write_string_form_spr_reg1(&self, out: &mut String) -> std::fmt::Result {
+    fn write_string_form_spr_reg1<W: Write>(&self, out: &mut W) -> std::fmt::Result {
         let name = match self.op {
             Opcode::Mtspr => match self.spr() {
                 1 => return write!(out, "mtxer r{}", self.s()),
@@ -1991,7 +1992,7 @@ impl Ins {
         write!(out, "{} {}, r{}", name, self.spr(), self.s())
     }
 
-    fn write_string_form_reg1_sr(&self, out: &mut String) -> std::fmt::Result {
+    fn write_string_form_reg1_sr<W: Write>(&self, out: &mut W) -> std::fmt::Result {
         let name = match self.op {
             Opcode::Mfsr => "mfsr",
             _ => disasm_unreachable!(self.code),
@@ -1999,7 +2000,7 @@ impl Ins {
         write!(out, "{} r{}, {}", name, self.d(), self.sr())
     }
 
-    fn write_string_form_sr_reg1(&self, out: &mut String) -> std::fmt::Result {
+    fn write_string_form_sr_reg1<W: Write>(&self, out: &mut W) -> std::fmt::Result {
         let name = match self.op {
             Opcode::Mtsr => "mtsr",
             _ => disasm_unreachable!(self.code),
@@ -2007,12 +2008,12 @@ impl Ins {
         write!(out, "{} {}, r{}", name, self.sr(), self.s())
     }
 
-    fn write_string_mtcrf(&self, out: &mut String) -> std::fmt::Result {
+    fn write_string_mtcrf<W: Write>(&self, out: &mut W) -> std::fmt::Result {
         assert_eq!(self.op, Opcode::Mtcrf);
         write!(out, "mtcrf {} r{}", self.crm(), self.s())
     }
 
-    fn write_string_srawi(&self, out: &mut String) -> std::fmt::Result {
+    fn write_string_srawi<W: Write>(&self, out: &mut W) -> std::fmt::Result {
         assert_eq!(self.op, Opcode::Srawi);
         let name_suffix = if self.rc() != 0 { "." } else { "" };
         write!(
@@ -2025,17 +2026,17 @@ impl Ins {
         )
     }
 
-    fn write_string_tw(&self, out: &mut String) -> std::fmt::Result {
+    fn write_string_tw<W: Write>(&self, out: &mut W) -> std::fmt::Result {
         assert_eq!(self.op, Opcode::Tw);
         write!(out, "tw {}, r{}, r{}", self.to(), self.a(), self.b())
     }
 
-    fn write_string_twi(&self, out: &mut String) -> std::fmt::Result {
+    fn write_string_twi<W: Write>(&self, out: &mut W) -> std::fmt::Result {
         assert_eq!(self.op, Opcode::Twi);
         write!(out, "twi {}, r{}, {}", self.to(), self.a(), self.simm())
     }
 
-    fn write_string_psq(&self, out: &mut String) -> std::fmt::Result {
+    fn write_string_psq<W: Write>(&self, out: &mut W) -> std::fmt::Result {
         let name = match self.op {
             Opcode::PsqL => "psq_l",
             Opcode::PsqLu => "psq_lu",
@@ -2055,7 +2056,7 @@ impl Ins {
         )
     }
 
-    fn write_string_psq_x(&self, out: &mut String) -> std::fmt::Result {
+    fn write_string_psq_x<W: Write>(&self, out: &mut W) -> std::fmt::Result {
         let name = match self.op {
             Opcode::PsqLx => "psq_lx",
             Opcode::PsqLux => "psq_lux",
@@ -2075,7 +2076,7 @@ impl Ins {
         )
     }
 
-    pub fn write_string(&self, out: &mut String) -> std::fmt::Result {
+    pub fn write_string<W: Write>(&self, out: &mut W) -> std::fmt::Result {
         match self.op {
             Opcode::Illegal => write!(out, "<illegal>"),
 
@@ -2314,7 +2315,6 @@ impl ToString for Ins {
 }
 
 #[cfg(test)]
-#[allow(clippy::unusual_byte_groupings, clippy::bool_assert_comparison)]
 mod tests {
     use super::*;
 
