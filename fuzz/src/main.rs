@@ -102,11 +102,14 @@ fn disasm(x: u32) {
 
 struct DevNull;
 
-impl std::fmt::Write for DevNull {
-    fn write_str(&mut self, s: &str) -> std::fmt::Result {
-        s.as_bytes()
-            .iter()
-            .for_each(|b| unsafe { std::ptr::read_volatile(b); });
+impl std::io::Write for DevNull {
+    fn write(&mut self, buf: &[u8]) -> std::io::Result<usize> {
+        buf.iter().for_each(|b| unsafe {
+            std::ptr::read_volatile(b);
+        });
+        Ok(buf.len())
+    }
+    fn flush(&mut self) -> std::io::Result<()> {
         Ok(())
     }
 }

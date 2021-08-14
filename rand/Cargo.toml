@@ -1,0 +1,9 @@
+[package]
+name = "ppc750cl-rand"
+version = "0.1.0"
+edition = "2018"
+
+[dependencies]
+ppc750cl = { path = "../lib" }
+rand_core = "0.5"
+sfmt = "0.6"
