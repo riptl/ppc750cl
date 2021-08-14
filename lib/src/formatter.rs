@@ -1,5 +1,7 @@
 use crate::Ins;
 use std::io::Write;
+use num_traits::PrimInt;
+use std::fmt::{LowerHex, UpperHex};
 
 type IOResult = std::io::Result<()>;
 
@@ -40,6 +42,10 @@ where
         write!(self.writer(), "cr{}", reg)
     }
 
+    fn write_qr(&mut self, reg: u8) -> IOResult {
+        write!(self.writer(), "qr{}", reg)
+    }
+
     fn write_oe(&mut self, oe: u8) -> IOResult {
         if oe != 0 {
             write!(self.writer(), "o")?;
@@ -69,19 +75,23 @@ where
     }
 
     fn write_uimm(&mut self, uimm: u16) -> IOResult {
-        write!(self.writer(), "0x{:x}", uimm)
+        write!(self.writer(), "{:#x}", uimm)
     }
 
     fn write_simm(&mut self, simm: i16) -> IOResult {
-        write!(self.writer(), "0x{:x}", simm)
+        write!(self.writer(), "{:#x}", ReallySigned(simm))
     }
 
     fn write_fm(&mut self, fm: u16) -> IOResult {
         write!(self.writer(), "{}", fm)
     }
 
+    fn write_offset_unsigned_open(&mut self, offset: u16) -> IOResult {
+        write!(self.writer(), "{:#x}(", offset)
+    }
+
     fn write_offset_open(&mut self, offset: i16) -> IOResult {
-        write!(self.writer(), "0x{:x}(", offset)
+        write!(self.writer(), "{:#x}(", ReallySigned(offset))
     }
 
     fn write_offset_close(&mut self) -> IOResult {
@@ -117,5 +127,26 @@ impl<W: Write> AsmFormatter<W> for DoldecompFormatter<W> {
             (ins.code >> 8) as u8,
             ins.code as u8
         )
+    }
+}
+
+// https://stackoverflow.com/questions/44711012/how-do-i-format-a-signed-integer-to-a-sign-aware-hexadecimal-representation
+struct ReallySigned<N: PrimInt>(N);
+
+impl<N: PrimInt> LowerHex for ReallySigned<N> {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        let num = self.0.to_i32().unwrap();
+        let prefix = if f.alternate() { "0x" } else { "" };
+        let bare_hex = format!("{:x}", num.abs());
+        f.pad_integral(num >= 0, prefix, &bare_hex)
+    }
+}
+
+impl<N: PrimInt> UpperHex for ReallySigned<N> {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        let num = self.0.to_i32().unwrap();
+        let prefix = if f.alternate() { "0x" } else { "" };
+        let bare_hex = format!("{:X}", num.abs());
+        f.pad_integral(num >= 0, prefix, &bare_hex)
     }
 }

@@ -1154,16 +1154,18 @@ impl Ins {
         F: AsmFormatter<W>,
         W: Write,
     {
-        write!(
-            out.writer(),
-            "{} fr{}, {}(r{}), {}, qr{}",
-            self.op.mnemonic(),
-            self.d(),
-            self.ps_d(),
-            self.a(),
-            self.w(),
-            self.ps_l()
-        )
+        out.write_mnemonic(self.op.mnemonic())?;
+        out.write_opcode_separator()?;
+        out.write_fpr(self.d())?;
+        out.write_operand_separator()?;
+        out.write_offset_unsigned_open(self.ps_d())?;
+        out.write_gpr(self.a())?;
+        out.write_offset_close()?;
+        out.write_operand_separator()?;
+        write!(out.writer(), "{}", self.w())?;
+        out.write_operand_separator()?;
+        out.write_qr(self.ps_l())?;
+        Ok(())
     }
 
     fn write_asm_psq_x<F, W>(&self, out: &mut F) -> std::io::Result<()>
@@ -1171,16 +1173,18 @@ impl Ins {
         F: AsmFormatter<W>,
         W: Write,
     {
-        write!(
-            out.writer(),
-            "{} fr{}, r{}, r{}, {}, {}",
-            self.op.mnemonic(),
-            self.d(),
-            self.a(),
-            self.b(),
-            self.w(),
-            self.ps_l()
-        )
+        out.write_mnemonic(self.op.mnemonic())?;
+        out.write_opcode_separator()?;
+        out.write_fpr(self.d())?;
+        out.write_operand_separator()?;
+        out.write_gpr(self.a())?;
+        out.write_operand_separator()?;
+        out.write_gpr(self.b())?;
+        out.write_operand_separator()?;
+        write!(out.writer(), "{}", self.w())?;
+        out.write_operand_separator()?;
+        out.write_qr(self.ps_l())?;
+        Ok(())
     }
 
     pub fn write_string<F, W>(&self, out: &mut F) -> std::io::Result<()>
@@ -1470,41 +1474,41 @@ mod tests {
         }
         assert_asm!(0x4c000000, "mcrf crf0, crf0");
         assert_asm!(0x7c000278, "xor r0, r0, r0");
-        assert_asm!(0x10000014, "ps_sum0 fr0, fr0, fr0, fr0");
-        assert_asm!(0x10000032, "ps_mul fr0, fr0, fr0");
+        assert_asm!(0x10000014, "ps_sum0 f0, f0, f0, f0");
+        assert_asm!(0x10000032, "ps_mul f0, f0, f0");
         assert_asm!(0x7c00052a, "stswx r0, r0, r0");
-        assert_asm!(0x9421ffc0, "stwu r1, -64(r1)");
+        assert_asm!(0x9421ffc0, "stwu r1, -0x40(r1)");
         assert_asm!(0x7C0802A6, "mflr r0");
-        assert_asm!(0x90010044, "stw r0, 68(r1)");
-        assert_asm!(0xDBE10030, "stfd fr31, 48(r1)");
-        assert_asm!(0xF3E10038, "psq_st fr31, 56(r1), 0, qr0");
-        assert_asm!(0xDBC10020, "stfd fr30, 32(r1)");
-        assert_asm!(0xF3C10028, "psq_st fr30, 40(r1), 0, qr0");
-        assert_asm!(0xDBA10010, "stfd fr29, 16(r1)");
-        assert_asm!(0xF3A10018, "psq_st fr29, 24(r1), 0, qr0");
-        assert_asm!(0x93E1000C, "stw r31, 12(r1)");
-        assert_asm!(0xFFE01890, "fmr fr31, fr3");
+        assert_asm!(0x90010044, "stw r0, 0x44(r1)");
+        assert_asm!(0xDBE10030, "stfd f31, 0x30(r1)");
+        assert_asm!(0xF3E10038, "psq_st f31, 0x38(r1), 0, qr0");
+        assert_asm!(0xDBC10020, "stfd f30, 0x20(r1)");
+        assert_asm!(0xF3C10028, "psq_st f30, 0x28(r1), 0, qr0");
+        assert_asm!(0xDBA10010, "stfd f29, 0x10(r1)");
+        assert_asm!(0xF3A10018, "psq_st f29, 0x18(r1), 0, qr0");
+        assert_asm!(0x93E1000C, "stw r31, 0xc(r1)");
+        assert_asm!(0xFFE01890, "fmr f31, f3");
         assert_asm!(0x7C7F1B78, "mr r31, r3");
-        assert_asm!(0xFFA00890, "fmr fr29, fr1");
-        assert_asm!(0xFFC01090, "fmr fr30, fr2");
-        assert_asm!(0xFC20F890, "fmr fr1, fr31");
-        assert_asm!(0xEC3D0072, "fmuls fr1, fr29, fr1");
-        assert_asm!(0xEC1D0772, "fmuls fr0, fr29, fr29");
-        assert_asm!(0xEC5E0828, "fsubs fr2, fr30, fr1");
-        assert_asm!(0xEC21007A, "fmadds fr1, fr1, fr1, fr0");
-        assert_asm!(0xD05F0000, "stfs fr2, 0(r31)");
-        assert_asm!(0xD03F0004, "stfs fr1, 4(r31)");
-        assert_asm!(0xD3FF0008, "stfs fr31, 8(r31)");
-        assert_asm!(0xE3E10038, "psq_l fr31, 56(r1), 0, qr0");
-        assert_asm!(0xCBE10030, "lfd fr31, 48(r1)");
-        assert_asm!(0xE3C10028, "psq_l fr30, 40(r1), 0, qr0");
-        assert_asm!(0xCBC10020, "lfd fr30, 32(r1)");
-        assert_asm!(0xE3A10018, "psq_l fr29, 24(r1), 0, qr0");
-        assert_asm!(0xCBA10010, "lfd fr29, 16(r1)");
-        assert_asm!(0x80010044, "lwz r0, 68(r1)");
-        assert_asm!(0x83E1000C, "lwz r31, 12(r1)");
+        assert_asm!(0xFFA00890, "fmr f29, f1");
+        assert_asm!(0xFFC01090, "fmr f30, f2");
+        assert_asm!(0xFC20F890, "fmr f1, f31");
+        assert_asm!(0xEC3D0072, "fmuls f1, f29, f1");
+        assert_asm!(0xEC1D0772, "fmuls f0, f29, f29");
+        assert_asm!(0xEC5E0828, "fsubs f2, f30, f1");
+        assert_asm!(0xEC21007A, "fmadds f1, f1, f1, f0");
+        assert_asm!(0xD05F0000, "stfs f2, 0x0(r31)");
+        assert_asm!(0xD03F0004, "stfs f1, 0x4(r31)");
+        assert_asm!(0xD3FF0008, "stfs f31, 0x8(r31)");
+        assert_asm!(0xE3E10038, "psq_l f31, 0x38(r1), 0, qr0");
+        assert_asm!(0xCBE10030, "lfd f31, 0x30(r1)");
+        assert_asm!(0xE3C10028, "psq_l f30, 0x28(r1), 0, qr0");
+        assert_asm!(0xCBC10020, "lfd f30, 0x20(r1)");
+        assert_asm!(0xE3A10018, "psq_l f29, 0x18(r1), 0, qr0");
+        assert_asm!(0xCBA10010, "lfd f29, 0x10(r1)");
+        assert_asm!(0x80010044, "lwz r0, 0x44(r1)");
+        assert_asm!(0x83E1000C, "lwz r31, 0xc(r1)");
         assert_asm!(0x7C0803A6, "mtlr r0");
-        assert_asm!(0x38210040, "addi r1, r1, 64");
+        assert_asm!(0x38210040, "addi r1, r1, 0x40");
         assert_asm!(0x4E800020, "blr");
     }
 }
