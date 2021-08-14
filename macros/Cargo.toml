@@ -3,6 +3,9 @@ name = "ppc750cl-macros"
 version = "0.1.0"
 edition = "2018"
 authors = ["Richard Patel <me@terorie.dev>"]
+license = "GPL-3.0-or-later"
+description = "Procedural macros for powerpc750cl"
+repository = "https://github.com/terorie/ppc750cl"
 
 [lib]
 proc-macro = true
