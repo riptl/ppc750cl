@@ -1126,31 +1126,31 @@ impl Ins {
         match key {
             0b10010 => {
                 ins.op = Opcode::Fdivs;
-                if bits::<u8>(x, 26..31) != 0 {
+                if bits::<u8>(x, 21..26) != 0 {
                     ins.op = Opcode::Illegal;
                 }
             }
             0b10100 => {
                 ins.op = Opcode::Fsubs;
-                if bits::<u8>(x, 26..31) != 0 {
+                if bits::<u8>(x, 21..26) != 0 {
                     ins.op = Opcode::Illegal;
                 }
             }
             0b10101 => {
                 ins.op = Opcode::Fadds;
-                if bits::<u8>(x, 26..31) != 0 {
+                if bits::<u8>(x, 21..26) != 0 {
                     ins.op = Opcode::Illegal;
                 }
             }
             0b11000 => {
                 ins.op = Opcode::Fres;
-                if bits::<u8>(x, 16..21) != 0 || bits::<u8>(x, 26..31) != 0 {
+                if bits::<u16>(x, 16..26) != 0 {
                     ins.op = Opcode::Illegal;
                 }
             }
             0b11001 => {
                 ins.op = Opcode::Fmuls;
-                if bits::<u8>(x, 21..26) != 0 {
+                if bits::<u8>(x, 16..21) != 0 {
                     ins.op = Opcode::Illegal;
                 }
             }
@@ -1229,30 +1229,30 @@ impl Ins {
             0b01000 => {
                 ins.op = match bits(x, 26..31) {
                     0b0001 => Opcode::Fneg,
-                    0b0010 => Opcode::Fmr,
+                    0b0010 => Opcode::Fabs,
                     0b0100 => Opcode::Fnabs,
-                    0b1000 => Opcode::Fabs,
+                    0b1000 => Opcode::Fmr,
                     _ => Opcode::Illegal,
                 };
-                if bits::<u8>(x, 16..21) != 0 {
+                if bits::<u8>(x, 11..16) != 0 {
                     ins.op = Opcode::Illegal
                 }
             }
             0b01100 => {
                 ins.op = Opcode::Frsp;
-                if bits::<u8>(x, 16..21) != 0 {
+                if bits::<u8>(x, 11..16) != 0 {
                     ins.op = Opcode::Illegal;
                 }
             }
             0b01110 => {
                 ins.op = Opcode::Fctiw;
-                if bits::<u8>(x, 16..21) != 0 {
+                if bits::<u8>(x, 11..16) != 0 {
                     ins.op = Opcode::Illegal;
                 }
             }
             0b01111 => {
                 ins.op = Opcode::Fctiwz;
-                if bits::<u8>(x, 16..21) != 0 {
+                if bits::<u8>(x, 11..16) != 0 {
                     ins.op = Opcode::Illegal;
                 }
             }
@@ -1896,7 +1896,13 @@ impl Ins {
             Opcode::Eqv => "eqv",
             Opcode::Nand => "nand",
             Opcode::Nor => "nor",
-            Opcode::Or => "or",
+            Opcode::Or => {
+                if self.s() == self.b() {
+                    return write!(out, "mr r{}, r{}", self.a(), self.s());
+                } else {
+                    "or"
+                }
+            }
             Opcode::Orc => "orc",
             Opcode::Slw => "slw",
             Opcode::Sraw => "sraw",
@@ -2356,7 +2362,7 @@ mod tests {
         assert_asm!(0x10000032, "ps_mul fr0, fr0, fr0");
         assert_asm!(0x7c00052a, "stswx r0, r0, r0");
         assert_asm!(0x9421ffc0, "stwu r1, -64(r1)");
-        // assert_asm!(0x7C0802A6, "mflr r0");
+        assert_asm!(0x7C0802A6, "mflr r0");
         assert_asm!(0x90010044, "stw r0, 68(r1)");
         assert_asm!(0xDBE10030, "stfd fr31, 48(r1)");
         assert_asm!(0xF3E10038, "psq_st fr31, 56(r1), 0, qr0");
@@ -2365,15 +2371,14 @@ mod tests {
         assert_asm!(0xDBA10010, "stfd fr29, 16(r1)");
         assert_asm!(0xF3A10018, "psq_st fr29, 24(r1), 0, qr0");
         assert_asm!(0x93E1000C, "stw r31, 12(r1)");
-        // assert_asm!(0xFFE01890, "fmr fr31, fr3");
-        // assert_asm!(0x7C7F1B78, "mr r31, r3");
-        assert_asm!(0x7C7F1B78, "or r31, r3, r3");
-        // assert_asm!(0xFFA00890, "fmr fr29, fr1");
-        // assert_asm!(0xFFC01090, "fmr fr30, fr2");
-        // assert_asm!(0xFC20F890, "fmr fr1, fr31");
-        // assert_asm!(0xEC3D0072, "fmuls fr1, f29, fr1");
-        // assert_asm!(0xEC1D0772, "fmuls fr0, fr29, fr29");
-        // assert_asm!(0xEC5E0828, "fsubs fr2, fr30, fr1");
+        assert_asm!(0xFFE01890, "fmr fr31, fr3");
+        assert_asm!(0x7C7F1B78, "mr r31, r3");
+        assert_asm!(0xFFA00890, "fmr fr29, fr1");
+        assert_asm!(0xFFC01090, "fmr fr30, fr2");
+        assert_asm!(0xFC20F890, "fmr fr1, fr31");
+        assert_asm!(0xEC3D0072, "fmuls fr1, fr29, fr1");
+        assert_asm!(0xEC1D0772, "fmuls fr0, fr29, fr29");
+        assert_asm!(0xEC5E0828, "fsubs fr2, fr30, fr1");
         assert_asm!(0xEC21007A, "fmadds fr1, fr1, fr1, fr0");
         assert_asm!(0xD05F0000, "stfs fr2, 0(r31)");
         assert_asm!(0xD03F0004, "stfs fr1, 4(r31)");
