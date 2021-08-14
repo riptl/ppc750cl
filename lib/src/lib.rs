@@ -449,50 +449,22 @@ impl Ins {
     }
 
     fn write_string_form_reg123<W: Write>(&self, out: &mut W) -> std::io::Result<()> {
-        let name = match self.op {
-            Opcode::Eciwx => "eciwx",
-            Opcode::Ecowx => "ecowx",
-            Opcode::Lhaux => "lhaux",
-            Opcode::Lhax => "lhax",
-            Opcode::Lbzux => "lbzux",
-            Opcode::Lbzx => "lbzx",
-            Opcode::Lhbrx => "lhbrx",
-            Opcode::Lhzux => "lhzux",
-            Opcode::Lhzx => "lhzx",
-            Opcode::Lswx => "lswx",
-            Opcode::Lwarx => "lwarx",
-            Opcode::Lwbrx => "lwbrx",
-            Opcode::Lwzx => "lwzx",
-            Opcode::Lwzux => "lwzux",
-            Opcode::Stbux => "stbux",
-            Opcode::Stbx => "stbx",
-            Opcode::Sthux => "sthux",
-            Opcode::Sthx => "sthx",
-            Opcode::Sthbrx => "sthbrx",
-            Opcode::Stswx => "stswx",
-            Opcode::Stwbrx => "stwbrx",
-            Opcode::Stwcx_ => "stwcx.",
-            Opcode::Stwx => "stwx",
-            Opcode::Stwux => "stwux",
-            _ => disasm_unreachable!(self.code),
-        };
-        write!(out, "{} r{}, r{}, r{}", name, self.d(), self.a(), self.b())
+        write!(
+            out,
+            "{} r{}, r{}, r{}",
+            self.op.mnemonic(),
+            self.d(),
+            self.a(),
+            self.b()
+        )
     }
 
     fn write_string_form_reg123_rc<W: Write>(&self, out: &mut W) -> std::io::Result<()> {
         let name_suffix = if self.rc() != 0 { "." } else { "" };
-        let name = match self.op {
-            Opcode::And => "and",
-            Opcode::Andc => "andc",
-            Opcode::Mulhw => "mulhw",
-            Opcode::Mulhwu => "mulhwu",
-            Opcode::Xor => "xor",
-            _ => disasm_unreachable!(self.code),
-        };
         write!(
             out,
             "{}{} r{}, r{}, r{}",
-            name,
+            self.op.mnemonic(),
             name_suffix,
             self.d(),
             self.a(),
@@ -507,22 +479,10 @@ impl Ins {
             (true, false) => "o",
             (true, true) => "o.",
         };
-        let name = match self.op {
-            Opcode::Add => "add",
-            Opcode::Addc => "addc",
-            Opcode::Adde => "adde",
-            Opcode::Divw => "divw",
-            Opcode::Divwu => "divwu",
-            Opcode::Mullw => "mullw",
-            Opcode::Subf => "subf",
-            Opcode::Subfc => "subfc",
-            Opcode::Subfe => "subfe",
-            _ => disasm_unreachable!(self.code),
-        };
         write!(
             out,
             "{}{} r{}, r{}, r{}",
-            name,
+            self.op.mnemonic(),
             name_suffix,
             self.d(),
             self.a(),
@@ -531,32 +491,14 @@ impl Ins {
     }
 
     fn write_string_noargs<W: Write>(&self, out: &mut W) -> std::io::Result<()> {
-        let name = match self.op {
-            Opcode::Eieio => "eieio",
-            Opcode::Isync => "isync",
-            Opcode::Rfi => "rfi",
-            Opcode::Sc => "sc",
-            Opcode::Sync => "sync",
-            Opcode::Tlbsync => "tlbsync",
-            _ => disasm_unreachable!(self.code),
-        };
-        write!(out, "{}", name)
+        write!(out, "{}", self.op.mnemonic())
     }
 
     fn write_string_form_reg12_simm<W: Write>(&self, out: &mut W) -> std::io::Result<()> {
-        let name = match self.op {
-            Opcode::Addi => "addi",
-            Opcode::Addic => "addic",
-            Opcode::Addic_ => "addic.",
-            Opcode::Addis => "addis",
-            Opcode::Mulli => "mulli",
-            Opcode::Subfic => "subfic",
-            _ => disasm_unreachable!(self.code),
-        };
         write!(
             out,
             "{} r{}, r{}, {}",
-            name,
+            self.op.mnemonic(),
             self.d(),
             self.a(),
             self.simm()
@@ -564,19 +506,10 @@ impl Ins {
     }
 
     fn write_string_form_reg12_uimm<W: Write>(&self, out: &mut W) -> std::io::Result<()> {
-        let name = match self.op {
-            Opcode::Andi_ => "andi.",
-            Opcode::Andis_ => "andis.",
-            Opcode::Ori => "ori",
-            Opcode::Oris => "oris",
-            Opcode::Xori => "xori",
-            Opcode::Xoris => "xoris",
-            _ => disasm_unreachable!(self.code),
-        };
         write!(
             out,
             "{} r{}, r{}, {}",
-            name,
+            self.op.mnemonic(),
             self.d(),
             self.a(),
             self.uimm()
@@ -584,29 +517,10 @@ impl Ins {
     }
 
     fn write_string_form_reg12_offset<W: Write>(&self, out: &mut W) -> std::io::Result<()> {
-        let name = match self.op {
-            Opcode::Lha => "lha",
-            Opcode::Lhau => "lhau",
-            Opcode::Lbz => "lbz",
-            Opcode::Lbzu => "lbzu",
-            Opcode::Lhz => "lhz",
-            Opcode::Lhzu => "lhzu",
-            Opcode::Lmw => "lmw",
-            Opcode::Lwz => "lwz",
-            Opcode::Lwzu => "lwzu",
-            Opcode::Stb => "stb",
-            Opcode::Stbu => "stbu",
-            Opcode::Sth => "sth",
-            Opcode::Sthu => "sthu",
-            Opcode::Stmw => "stmw",
-            Opcode::Stw => "stw",
-            Opcode::Stwu => "stwu",
-            _ => disasm_unreachable!(self.code),
-        };
         write!(
             out,
             "{} r{}, {}(r{})",
-            name,
+            self.op.mnemonic(),
             self.d(),
             self.simm(),
             self.a()
@@ -614,21 +528,10 @@ impl Ins {
     }
 
     fn write_string_form_fr1_reg2_offset<W: Write>(&self, out: &mut W) -> std::io::Result<()> {
-        let name = match self.op {
-            Opcode::Lfd => "lfd",
-            Opcode::Lfdu => "lfdu",
-            Opcode::Lfs => "lfs",
-            Opcode::Lfsu => "lfsu",
-            Opcode::Stfd => "stfd",
-            Opcode::Stfdu => "stfdu",
-            Opcode::Stfs => "stfs",
-            Opcode::Stfsu => "stfsu",
-            _ => disasm_unreachable!(self.code),
-        };
         write!(
             out,
             "{} fr{}, {}(r{})",
-            name,
+            self.op.mnemonic(),
             self.d(),
             self.simm(),
             self.a()
@@ -636,27 +539,18 @@ impl Ins {
     }
 
     fn write_string_form_fr1_reg23<W: Write>(&self, out: &mut W) -> std::io::Result<()> {
-        let name = match self.op {
-            Opcode::Lfdux => "lfdux",
-            Opcode::Lfdx => "lfdx",
-            Opcode::Lfsux => "lfsux",
-            Opcode::Lfsx => "lfsx",
-            Opcode::Stfdux => "stfdux",
-            Opcode::Stfdx => "stfdx",
-            Opcode::Stfiwx => "stfiwx",
-            Opcode::Stfsux => "stfsux",
-            Opcode::Stfsx => "stfsx",
-            _ => disasm_unreachable!(self.code),
-        };
-        write!(out, "{} fr{}, r{}, r{}", name, self.d(), self.a(), self.b())
+        write!(
+            out,
+            "{} fr{}, r{}, r{}",
+            self.op.mnemonic(),
+            self.d(),
+            self.a(),
+            self.b()
+        )
     }
 
     fn write_string_mtfsf<W: Write>(&self, out: &mut W) -> std::io::Result<()> {
-        let name = match self.op {
-            Opcode::Mtfsf => "mtfsf",
-            _ => disasm_unreachable!(self.code),
-        };
-        write!(out, "{} {}, fr{}", name, self.fm(), self.b())
+        write!(out, "{} {}, fr{}", self.op.mnemonic(), self.fm(), self.b())
     }
 
     fn write_string_mtfsfi<W: Write>(&self, out: &mut W) -> std::io::Result<()> {
@@ -691,72 +585,43 @@ impl Ins {
             (true, false) => "o",
             (true, true) => "o.",
         };
-        let name = match self.op {
-            Opcode::Addme => "addme",
-            Opcode::Addze => "addze",
-            Opcode::Neg => "neg",
-            Opcode::Subfme => "subfme",
-            Opcode::Subfze => "subfze",
-            _ => disasm_unreachable!(self.code),
-        };
-        write!(out, "{}{} r{}, r{}", name, name_suffix, self.d(), self.a())
+        write!(
+            out,
+            "{}{} r{}, r{}",
+            self.op.mnemonic(),
+            name_suffix,
+            self.d(),
+            self.a()
+        )
     }
 
     fn write_string_form_reg13<W: Write>(&self, out: &mut W) -> std::io::Result<()> {
-        let name = match self.op {
-            Opcode::Mfsrin => "mfsrin",
-            Opcode::Mtsrin => "mtsrin",
-            _ => disasm_unreachable!(self.code),
-        };
-        write!(out, "{} r{}, r{}", name, self.d(), self.b())
+        write!(out, "{} r{}, r{}", self.op.mnemonic(), self.d(), self.b())
     }
 
     fn write_string_form_reg21_rc<W: Write>(&self, out: &mut W) -> std::io::Result<()> {
         let name_suffix = if self.rc() != 0 { "." } else { "" };
-        let name = match self.op {
-            Opcode::Cntlzw => "cntlzw",
-            Opcode::Extsb => "extsb",
-            Opcode::Extsh => "extsh",
-            _ => disasm_unreachable!(self.code),
-        };
-        write!(out, "{}{} r{}, r{}", name, name_suffix, self.a(), self.s())
+        write!(
+            out,
+            "{}{} r{}, r{}",
+            self.op.mnemonic(),
+            name_suffix,
+            self.a(),
+            self.s()
+        )
     }
 
     fn write_string_form_fr1<W: Write>(&self, out: &mut W) -> std::io::Result<()> {
-        let name = match self.op {
-            Opcode::Mffs => match self.rc() != 0 {
-                false => "mffs",
-                true => "mffs.",
-            },
-            _ => disasm_unreachable!(self.code),
-        };
-        write!(out, "{} fr{}", name, self.d())
+        let name_suffix = if self.rc() != 0 { "." } else { "" };
+        write!(out, "{}{} fr{}", self.op.mnemonic(), name_suffix, self.d())
     }
 
     fn write_string_form_fr13<W: Write>(&self, out: &mut W) -> std::io::Result<()> {
         let name_suffix = if self.rc() != 0 { "." } else { "" };
-        let name = match self.op {
-            Opcode::Fabs => "fabs",
-            Opcode::Fnabs => "fnabs",
-            Opcode::Fmr => "fmr",
-            Opcode::Fneg => "fneg",
-            Opcode::Fres => "fres",
-            Opcode::Frsp => "frsp",
-            Opcode::Frsqrte => "frsqrte",
-            Opcode::PsAbs => "ps_abs",
-            Opcode::PsMr => "ps_mr",
-            Opcode::PsNabs => "ps_nabs",
-            Opcode::PsNeg => "ps_neg",
-            Opcode::PsRes => "ps_res",
-            Opcode::PsRsqrte => "ps_rsqrte",
-            Opcode::PsSum0 => "ps_sum0",
-            Opcode::PsSum1 => "ps_sum1",
-            _ => disasm_unreachable!(self.code),
-        };
         write!(
             out,
             "{}{} fr{}, fr{}",
-            name,
+            self.op.mnemonic(),
             name_suffix,
             self.d(),
             self.b()
@@ -765,26 +630,10 @@ impl Ins {
 
     fn write_string_form_fr123<W: Write>(&self, out: &mut W) -> std::io::Result<()> {
         let name_suffix = if self.rc() != 0 { "." } else { "" };
-        let name = match self.op {
-            Opcode::Fadd => "fadd",
-            Opcode::Fadds => "fadds",
-            Opcode::Fdiv => "fdiv",
-            Opcode::Fdivs => "fdivs",
-            Opcode::Fsub => "fsub",
-            Opcode::Fsubs => "fsubs",
-            Opcode::PsAdd => "ps_add",
-            Opcode::PsDiv => "ps_div",
-            Opcode::PsMerge00 => "ps_merge00",
-            Opcode::PsMerge01 => "ps_merge01",
-            Opcode::PsMerge10 => "ps_merge10",
-            Opcode::PsMerge11 => "ps_merge11",
-            Opcode::PsSub => "ps_sub",
-            _ => disasm_unreachable!(self.code),
-        };
         write!(
             out,
             "{}{} fr{}, fr{}, fr{}",
-            name,
+            self.op.mnemonic(),
             name_suffix,
             self.d(),
             self.a(),
@@ -794,31 +643,10 @@ impl Ins {
 
     fn write_string_form_fr1243<W: Write>(&self, out: &mut W) -> std::io::Result<()> {
         let name_suffix = if self.rc() != 0 { "." } else { "" };
-        let name = match self.op {
-            Opcode::Fmadd => "fmadd",
-            Opcode::Fmadds => "fmadds",
-            Opcode::Fmsub => "fmsub",
-            Opcode::Fmsubs => "fmsubs",
-            Opcode::Fnmadd => "fnmadd",
-            Opcode::Fnmadds => "fnmadds",
-            Opcode::Fnmsub => "fnmsub",
-            Opcode::Fnmsubs => "fnmsubs",
-            Opcode::Fsel => "fsel",
-            Opcode::PsMadd => "ps_madd",
-            Opcode::PsMadds0 => "ps_madds0",
-            Opcode::PsMadds1 => "ps_madds1",
-            Opcode::PsMsub => "ps_msub",
-            Opcode::PsNmadd => "ps_nmadd",
-            Opcode::PsNmsub => "ps_nmsub",
-            Opcode::PsSel => "ps_sel",
-            Opcode::PsSum0 => "ps_sum0",
-            Opcode::PsSum1 => "ps_sum1",
-            _ => disasm_unreachable!(self.code),
-        };
         write!(
             out,
             "{}{} fr{}, fr{}, fr{}, fr{}",
-            name,
+            self.op.mnemonic(),
             name_suffix,
             self.d(),
             self.a(),
@@ -829,18 +657,10 @@ impl Ins {
 
     fn write_string_form_fr124<W: Write>(&self, out: &mut W) -> std::io::Result<()> {
         let name_suffix = if self.rc() != 0 { "." } else { "" };
-        let name = match self.op {
-            Opcode::Fmul => "fmul",
-            Opcode::Fmuls => "fmuls",
-            Opcode::PsMul => "ps_mul",
-            Opcode::PsMuls0 => "ps_muls0",
-            Opcode::PsMuls1 => "ps_muls1",
-            _ => disasm_unreachable!(self.code),
-        };
         write!(
             out,
             "{}{} fr{}, fr{}, fr{}",
-            name,
+            self.op.mnemonic(),
             name_suffix,
             self.d(),
             self.a(),
@@ -849,19 +669,10 @@ impl Ins {
     }
 
     fn write_string_form_condreg1_fr23<W: Write>(&self, out: &mut W) -> std::io::Result<()> {
-        let name = match self.op {
-            Opcode::Fcmpo => "fcmpo",
-            Opcode::Fcmpu => "fcmpu",
-            Opcode::PsCmpo0 => "ps_cmpo0",
-            Opcode::PsCmpo1 => "ps_cmpo1",
-            Opcode::PsCmpu0 => "ps_cmpu0",
-            Opcode::PsCmpu1 => "ps_cmpu1",
-            _ => disasm_unreachable!(self.code),
-        };
         write!(
             out,
             "{} crf{}, fr{}, fr{}",
-            name,
+            self.op.mnemonic(),
             self.crf_d(),
             self.a(),
             self.b()
@@ -870,15 +681,10 @@ impl Ins {
 
     fn write_string_form_condreg1_fr13_rc<W: Write>(&self, out: &mut W) -> std::io::Result<()> {
         let name_suffix = if self.rc() != 0 { "." } else { "" };
-        let name = match self.op {
-            Opcode::Fctiw => "fctiw",
-            Opcode::Fctiwz => "fctiwz",
-            _ => disasm_unreachable!(self.code),
-        };
         write!(
             out,
             "{}{} crf{}, fr{}, fr{}",
-            name,
+            self.op.mnemonic(),
             name_suffix,
             self.crf_d(),
             self.d(),
@@ -937,15 +743,10 @@ impl Ins {
     }
 
     fn write_string_cmp<W: Write>(&self, out: &mut W) -> std::io::Result<()> {
-        let name = match self.op {
-            Opcode::Cmp => "cmp",
-            Opcode::Cmpl => "cmpl",
-            _ => disasm_unreachable!(self.code),
-        };
         write!(
             out,
             "{} crf{}, {}, r{}, r{}",
-            name,
+            self.op.mnemonic(),
             self.crf_d(),
             self.l() as u8,
             self.a(),
@@ -954,11 +755,10 @@ impl Ins {
     }
 
     fn write_string_cmp_simm<W: Write>(&self, out: &mut W) -> std::io::Result<()> {
-        let name = "cmpi";
         write!(
             out,
             "{} crf{}, {}, r{}, {}",
-            name,
+            self.op.mnemonic(),
             self.crf_d(),
             self.l() as u8,
             self.a(),
@@ -967,11 +767,10 @@ impl Ins {
     }
 
     fn write_string_cmp_uimm<W: Write>(&self, out: &mut W) -> std::io::Result<()> {
-        let name = "cmpli";
         write!(
             out,
             "{} crf{}, {}, r{}, {}",
-            name,
+            self.op.mnemonic(),
             self.crf_d(),
             self.l() as u8,
             self.a(),
@@ -1005,21 +804,10 @@ impl Ins {
     }
 
     fn write_string_form_condreg123<W: Write>(&self, out: &mut W) -> std::io::Result<()> {
-        let name = match self.op {
-            Opcode::Crand => "crand",
-            Opcode::Crandc => "crandc",
-            Opcode::Creqv => "creqv",
-            Opcode::Crnand => "crnand",
-            Opcode::Crnor => "crnor",
-            Opcode::Cror => "cror",
-            Opcode::Crorc => "crorc",
-            Opcode::Crxor => "crxor",
-            _ => disasm_unreachable!(self.code),
-        };
         write!(
             out,
             "{} crb{}, crb{}, crb{}",
-            name,
+            self.op.mnemonic(),
             self.crb_d(),
             self.crb_a(),
             self.crb_b()
@@ -1027,18 +815,7 @@ impl Ins {
     }
 
     fn write_string_form_reg23<W: Write>(&self, out: &mut W) -> std::io::Result<()> {
-        let name = match self.op {
-            Opcode::Dcbf => "dcbf",
-            Opcode::Dcbi => "dcbi",
-            Opcode::Dcbst => "dcbst",
-            Opcode::Dcbt => "dcbt",
-            Opcode::Dcbtst => "dcbtst",
-            Opcode::Dcbz => "dcbz",
-            Opcode::DcbzL => "dcbz_l",
-            Opcode::Icbi => "icbi",
-            _ => disasm_unreachable!(self.code),
-        };
-        write!(out, "{} r{}, r{}", name, self.a(), self.b())
+        write!(out, "{} r{}, r{}", self.op.mnemonic(), self.a(), self.b())
     }
 
     fn write_string_form_reg213<W: Write>(&self, out: &mut W) -> std::io::Result<()> {
@@ -1073,15 +850,10 @@ impl Ins {
 
     fn write_string_rlw_imm<W: Write>(&self, out: &mut W) -> std::io::Result<()> {
         let name_prefix = if self.rc() != 0 { "." } else { "" };
-        let name = match self.op {
-            Opcode::Rlwimi => "rlwimi",
-            Opcode::Rlwinm => "rlwinm",
-            _ => disasm_unreachable!(self.code),
-        };
         write!(
             out,
             "{}{} r{}, r{}, {}, {}, {}",
-            name,
+            self.op.mnemonic(),
             name_prefix,
             self.a(),
             self.s(),
@@ -1107,12 +879,14 @@ impl Ins {
     }
 
     fn write_string_form_reg12_nb<W: Write>(&self, out: &mut W) -> std::io::Result<()> {
-        let name = match self.op {
-            Opcode::Lswi => "lswi",
-            Opcode::Stswi => "stswi",
-            _ => disasm_unreachable!(self.code),
-        };
-        write!(out, "{} r{}, r{}, {}", name, self.d(), self.a(), self.b())
+        write!(
+            out,
+            "{} r{}, r{}, {}",
+            self.op.mnemonic(),
+            self.d(),
+            self.a(),
+            self.b()
+        )
     }
 
     fn write_string_form_reg1_spr<W: Write>(&self, out: &mut W) -> std::io::Result<()> {
@@ -1143,32 +917,23 @@ impl Ins {
     }
 
     fn write_string_form_reg1_sr<W: Write>(&self, out: &mut W) -> std::io::Result<()> {
-        let name = match self.op {
-            Opcode::Mfsr => "mfsr",
-            _ => disasm_unreachable!(self.code),
-        };
-        write!(out, "{} r{}, {}", name, self.d(), self.sr())
+        write!(out, "{} r{}, {}", self.op.mnemonic(), self.d(), self.sr())
     }
 
     fn write_string_form_sr_reg1<W: Write>(&self, out: &mut W) -> std::io::Result<()> {
-        let name = match self.op {
-            Opcode::Mtsr => "mtsr",
-            _ => disasm_unreachable!(self.code),
-        };
-        write!(out, "{} {}, r{}", name, self.sr(), self.s())
+        write!(out, "{} {}, r{}", self.op.mnemonic(), self.sr(), self.s())
     }
 
     fn write_string_mtcrf<W: Write>(&self, out: &mut W) -> std::io::Result<()> {
-        assert_eq!(self.op, Opcode::Mtcrf);
-        write!(out, "mtcrf {} r{}", self.crm(), self.s())
+        write!(out, "{} {}, r{}", self.op.mnemonic(), self.crm(), self.s())
     }
 
     fn write_string_srawi<W: Write>(&self, out: &mut W) -> std::io::Result<()> {
-        assert_eq!(self.op, Opcode::Srawi);
         let name_suffix = if self.rc() != 0 { "." } else { "" };
         write!(
             out,
-            "srawi{} r{}, r{}, {}",
+            "{}{} r{}, r{}, {}",
+            self.op.mnemonic(),
             name_suffix,
             self.s(),
             self.a(),
@@ -1177,27 +942,32 @@ impl Ins {
     }
 
     fn write_string_tw<W: Write>(&self, out: &mut W) -> std::io::Result<()> {
-        assert_eq!(self.op, Opcode::Tw);
-        write!(out, "tw {}, r{}, r{}", self.to(), self.a(), self.b())
+        write!(
+            out,
+            "{} {}, r{}, r{}",
+            self.op.mnemonic(),
+            self.to(),
+            self.a(),
+            self.b()
+        )
     }
 
     fn write_string_twi<W: Write>(&self, out: &mut W) -> std::io::Result<()> {
-        assert_eq!(self.op, Opcode::Twi);
-        write!(out, "twi {}, r{}, {}", self.to(), self.a(), self.simm())
+        write!(
+            out,
+            "{} {}, r{}, {}",
+            self.op.mnemonic(),
+            self.to(),
+            self.a(),
+            self.simm()
+        )
     }
 
     fn write_string_psq<W: Write>(&self, out: &mut W) -> std::io::Result<()> {
-        let name = match self.op {
-            Opcode::PsqL => "psq_l",
-            Opcode::PsqLu => "psq_lu",
-            Opcode::PsqSt => "psq_st",
-            Opcode::PsqStu => "psq_stu",
-            _ => disasm_unreachable!(self.code),
-        };
         write!(
             out,
             "{} fr{}, {}(r{}), {}, qr{}",
-            name,
+            self.op.mnemonic(),
             self.d(),
             self.ps_d(),
             self.a(),
@@ -1207,17 +977,10 @@ impl Ins {
     }
 
     fn write_string_psq_x<W: Write>(&self, out: &mut W) -> std::io::Result<()> {
-        let name = match self.op {
-            Opcode::PsqLx => "psq_lx",
-            Opcode::PsqLux => "psq_lux",
-            Opcode::PsqStx => "psq_stx",
-            Opcode::PsqStux => "psq_stux",
-            _ => disasm_unreachable!(self.code),
-        };
         write!(
             out,
             "{} fr{}, r{}, r{}, {}, {}",
-            name,
+            self.op.mnemonic(),
             self.d(),
             self.a(),
             self.b(),

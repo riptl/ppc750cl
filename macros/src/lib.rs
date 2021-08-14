@@ -120,6 +120,34 @@ fn gen_is_valid_fn(tokens: &mut Vec<TokenTree>, opcodes: &Opcodes) {
     tokens.push(TokenTree::Group(body));
 }
 
+fn gen_mnemonic_fn(tokens: &mut Vec<TokenTree>, opcodes: &Opcodes) {
+    let header: TokenStream = "pub fn mnemonic(self) -> &'static str".parse().unwrap();
+    tokens.append(&mut header.into_iter().collect());
+    let mut parts = Vec::<TokenTree>::new();
+    let match_header: TokenStream = "match self".parse().unwrap();
+    parts.append(&mut match_header.into_iter().collect());
+    let mut match_parts = Vec::<TokenTree>::new();
+    let illegal_match: TokenStream = "Opcode::Illegal => \"<illegal>\",".parse().unwrap();
+    match_parts.append(&mut illegal_match.into_iter().collect());
+    for opcode in &opcodes.opcodes {
+        match_parts.push(TokenTree::Ident(Ident::new("Opcode", Span::call_site())));
+        match_parts.push(TokenTree::Punct(Punct::new(':', Spacing::Joint)));
+        match_parts.push(TokenTree::Punct(Punct::new(':', Spacing::Alone)));
+        match_parts.push(TokenTree::Ident(Ident::new(
+            &opcode.variant_name,
+            Span::call_site(),
+        )));
+        match_parts.push(TokenTree::Punct(Punct::new('=', Spacing::Joint)));
+        match_parts.push(TokenTree::Punct(Punct::new('>', Spacing::Alone)));
+        match_parts.push(TokenTree::Literal(Literal::string(&opcode.name)));
+        match_parts.push(TokenTree::Punct(Punct::new(',', Spacing::Alone)));
+    }
+    let match_body = Group::new(Delimiter::Brace, TokenStream::from_iter(match_parts));
+    parts.push(TokenTree::Group(match_body));
+    let body = Group::new(Delimiter::Brace, TokenStream::from_iter(parts));
+    tokens.push(TokenTree::Group(body));
+}
+
 #[proc_macro]
 pub fn isa(input: TokenStream) -> TokenStream {
     let opcodes = syn::parse_macro_input!(input as Opcodes);
@@ -178,11 +206,26 @@ impl Default for Opcode {
     root.append(&mut impl_opcode_header.into_iter().collect());
     let mut impl_opcode_body_parts = Vec::<TokenTree>::new();
     gen_is_valid_fn(&mut impl_opcode_body_parts, &opcodes);
+    gen_mnemonic_fn(&mut impl_opcode_body_parts, &opcodes);
     let impl_opcode_body = Group::new(
         Delimiter::Brace,
         TokenStream::from_iter(impl_opcode_body_parts),
     );
     root.push(TokenTree::Group(impl_opcode_body));
+
+    // impl ToString block.
+    let to_string_trait_impl: TokenStream = "
+impl std::string::ToString for Opcode {
+    fn to_string(&self) -> String {
+        let mnemonic = self.mnemonic();
+        mnemonic.to_owned()
+    }
+}
+"
+    .parse()
+    .unwrap();
+    root.append(&mut to_string_trait_impl.into_iter().collect());
+
     TokenStream::from_iter(root)
 }
 
