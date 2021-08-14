@@ -1,4 +1,4 @@
-use proc_macro::{Delimiter, Group, Ident, Punct, Spacing, Span, TokenStream, TokenTree};
+use proc_macro::{Delimiter, Group, Ident, Punct, Spacing, Span, TokenStream, TokenTree, Literal};
 use std::iter::FromIterator;
 use syn::parse::{Parse, ParseStream};
 use syn::punctuated::Punctuated;
@@ -87,6 +87,37 @@ fn opcode_to_variant_name(opcode: &LitStr) -> syn::Result<String> {
     }
 }
 
+fn gen_is_valid_fn(tokens: &mut Vec<TokenTree>, opcodes: &Opcodes) {
+    let header: TokenStream = "fn is_valid(&self, code: u32) -> bool".parse().unwrap();
+    tokens.append(&mut header.into_iter().collect());
+    let mut parts = Vec::<TokenTree>::new();
+    let match_header: TokenStream = "match self".parse().unwrap();
+    parts.append(&mut match_header.into_iter().collect());
+    let mut match_parts = Vec::<TokenTree>::new();
+    for opcode in &opcodes.opcodes {
+        match_parts.push(TokenTree::Ident(Ident::new(&opcode.variant_name, Span::call_site())));
+        match_parts.push(TokenTree::Punct(Punct::new('=', Spacing::Joint)));
+        match_parts.push(TokenTree::Punct(Punct::new('>', Spacing::Alone)));
+        match_parts.push(TokenTree::Ident(Ident::new("code", Span::call_site())));
+        match_parts.push(TokenTree::Punct(Punct::new('&', Spacing::Alone)));
+        match_parts.push(TokenTree::Literal(Literal::u32_suffixed(opcode.mask)));
+        match_parts.push(TokenTree::Punct(Punct::new('=', Spacing::Joint)));
+        match_parts.push(TokenTree::Punct(Punct::new('=', Spacing::Alone)));
+        match_parts.push(TokenTree::Literal(Literal::u32_suffixed(opcode.bits)));
+        match_parts.push(TokenTree::Punct(Punct::new(',', Spacing::Alone)));
+    }
+    let match_body = Group::new(
+        Delimiter::Brace,
+        TokenStream::from_iter(match_parts),
+    );
+    parts.push(TokenTree::Group(match_body));
+    let body = Group::new(
+        Delimiter::Brace,
+        TokenStream::from_iter(parts),
+    );
+    tokens.push(TokenTree::Group(body));
+}
+
 #[proc_macro]
 pub fn isa(input: TokenStream) -> TokenStream {
     let opcodes = syn::parse_macro_input!(input as Opcodes);
@@ -113,7 +144,7 @@ pub fn isa(input: TokenStream) -> TokenStream {
             .collect(),
     );
     // Append the actual opcodes.
-    for opcode in opcodes.opcodes {
+    for opcode in &opcodes.opcodes {
         enum_entries.push(TokenTree::Ident(Ident::new(
             &opcode.variant_name,
             Span::call_site(),
@@ -125,6 +156,31 @@ pub fn isa(input: TokenStream) -> TokenStream {
     let enum_body = Group::new(Delimiter::Brace, TokenStream::from_iter(enum_entries));
     root.push(TokenTree::Group(enum_body));
 
+    // Default implementation.
+    let opcode_default = "
+impl Default for Opcode {
+    fn default() -> Self {
+        Opcode::Illegal
+    }
+}";
+    root.append(
+        &mut opcode_default
+            .parse::<TokenStream>()
+            .unwrap()
+            .into_iter()
+            .collect(),
+    );
+
+    // impl Opcode block.
+    let impl_opcode_header: TokenStream = "impl Opcode".parse().unwrap();
+    root.append(&mut impl_opcode_header.into_iter().collect());
+    let mut impl_opcode_body_parts = Vec::<TokenTree>::new();
+    gen_is_valid_fn(&mut impl_opcode_body_parts, &opcodes);
+    let impl_opcode_body = Group::new(
+        Delimiter::Brace,
+        TokenStream::from_iter(impl_opcode_body_parts),
+    );
+    root.push(TokenTree::Group(impl_opcode_body));
     TokenStream::from_iter(root)
 }
 

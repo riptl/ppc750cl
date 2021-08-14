@@ -232,12 +232,6 @@ isa! {
     "xoris" & 0xfc000000 == 0x6c000000;
 }
 
-impl Default for Opcode {
-    fn default() -> Self {
-        Opcode::Illegal
-    }
-}
-
 #[derive(Default, Clone)]
 pub struct Ins {
     pub code: u32,
