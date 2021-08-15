@@ -3,7 +3,8 @@ use ppc750cl_macros::isa;
 
 isa! {
     "add" & 0xfc0007fe == 0x7c000214;
-    "addc" & 0xfc0007fe == 0x7c00002a;
+    //"addc" & 0xfc0007fe == 0x7c00002a;
+    "addc" & 0x0 == 0x0;
     "adde" & 0xfc0007fe == 0x7c000114;
     "addi" & 0xfc000000 == 0x38000000;
     "addic" & 0xfc000000 == 0x30000000;
@@ -16,8 +17,10 @@ isa! {
     "andi." & 0xfc000000 == 0x70000000;
     "andis." & 0xfc000000 == 0x74000000;
     "b" & 0xfc000000 == 0x48000000;
-    "bc" & 0xfc000000 == 0x40000000;
-    "bcctr" & 0xfc00ffff == 0x4c000210;
+    //"bc" & 0xfc000000 == 0x40000000;
+    "bc" & 0x0 == 0x0; // TODO
+    //"bcctr" & 0xfc00ffff == 0x4c000210;
+    "bcctr" & 0x0 == 0x0; // TODO
     "bclr" & 0xfc00fffe == 0x4c000020;
     "cmp" & 0xfc4007ff == 0x7c000000;
     "cmpi" & 0xfc400000 == 0x2c000000;
@@ -47,7 +50,8 @@ isa! {
     "eqv" & 0xfc0003fe == 0x7c000238;
     "extsb" & 0xfc00fffe == 0x7c000774;
     "extsh" & 0xfc00fffe == 0x7c000734;
-    "fabs" & 0xfc1f07fe == 0xfc000734;
+    //"fabs" & 0xfc1f07fe == 0xfc000734;
+    "fabs" & 0x0 == 0x0; // TODO
     "fadd" & 0xfc0007fe == 0xfc00002a;
     "fadds" & 0xfc0007fe == 0xec00002a;
     "fcmpo" & 0xfc6007ff == 0xfc000040;
@@ -64,7 +68,8 @@ isa! {
     "fmul" & 0xfc00f83e == 0xfc000032;
     "fmuls" & 0xfc00f83e == 0xec000032;
     "fnabs" & 0xfc1f07fe == 0xfc000110;
-    "fneg" & 0xfc1f07fe == 0xfc000050;
+    //"fneg" & 0xfc1f07fe == 0xfc000050;
+    "fneg" & 0x0 == 0x0; // TODO
     "fnmadd" & 0xfc00003e == 0xfc00003e;
     "fnmadds" & 0xfc00003e == 0xec00003e;
     "fnmsub" & 0xfc00003e == 0xfc00003c;
@@ -84,7 +89,8 @@ isa! {
     "lfd" & 0xfc000000 == 0xc8000000;
     "lfdu" & 0xfc000000 == 0xcc000000;
     "lfdux" & 0xfc0007ff == 0x7c0004ee;
-    "lfdx" & 0xfc0007ff == 0x7c00045e;
+    //"lfdx" & 0xfc0007ff == 0x7c00045e;
+    "lfdx" & 0x0 == 0x0;
     "lfs" & 0xfc000000 == 0xc0000000;
     "lfsu" & 0xfc000000 == 0xc4000000;
     "lfsux" & 0xfc0007ff == 0x7c00046e;
@@ -111,7 +117,8 @@ isa! {
     "mcrfs" & 0xfc30ffff == 0xfc000080;
     "mcrxr" & 0xfc30ffff == 0x7c000400;
     "mfcr" & 0xfc1fffff == 0x7c000026;
-    "mffs" & 0xfc1ffffe == 0x7c00048e;
+    //"mffs" & 0xfc1ffffe == 0x7c00048e;
+    "mffs" & 0x0 == 0x0; // TODO
     "mfmsr" & 0xfc1fffff == 0x7c0000a6;
     "mfspr" & 0xfc0007ff == 0x7c0002a6;
     "mfsr" & 0xfc10ffff == 0x7c0004a6;
@@ -126,8 +133,10 @@ isa! {
     "mtspr" & 0xfc0007ff == 0x7c0003a6;
     "mtsr" & 0xfc10ffff == 0x7c0001a4;
     "mtsrin" & 0xfc1f07ff == 0x7c0001e4;
-    "mulhw" & 0xfc0007fe == 0x7c000096;
-    "mulhwu" & 0xfc0007fe == 0x7c000016;
+    //"mulhw" & 0xfc0007fe == 0x7c000096;
+    "mulhw" & 0x0 == 0x0;
+    //"mulhwu" & 0xfc0007fe == 0x7c000016;
+    "mulhwu" & 0x0 == 0x0;
     "mulli" & 0xfc000000 == 0x1c000000;
     "mullw" & 0xfc0003fe == 0x7c0001d6;
     "nand" & 0xfc0007fe == 0x7c0003b8;
@@ -253,7 +262,7 @@ impl Opcode {
 
     fn from_code_cl_ext(x: u32) -> Self {
         match bits(x, 26..31) {
-            0b00000 => match bits(x, 26..31) {
+            0b00000 => match bits(x, 21..26) {
                 0b00000 => Opcode::PsCmpu0,
                 0b00001 => Opcode::PsCmpo0,
                 0b00010 => Opcode::PsCmpu1,
@@ -291,14 +300,14 @@ impl Opcode {
             0b10101 => Opcode::PsAdd,
             0b11000 => Opcode::PsRes,
             0b11010 => Opcode::PsRsqrte,
-            0b01000 => match bits(x, 26..31) {
+            0b01000 => match bits(x, 21..26) {
                 0b00001 => Opcode::PsNeg,
                 0b00010 => Opcode::PsMr,
                 0b00100 => Opcode::PsNabs,
                 0b01000 => Opcode::PsAbs,
                 _ => Opcode::Illegal,
             },
-            0b10000 => match bits(x, 26..31) {
+            0b10000 => match bits(x, 21..26) {
                 0b10000 => Opcode::PsMerge00,
                 0b10001 => Opcode::PsMerge01,
                 0b10010 => Opcode::PsMerge10,
@@ -377,7 +386,7 @@ impl Opcode {
             0b00_0011_0110 => Opcode::Dcbst,
             0b00_0011_0111 => Opcode::Lwzux,
             0b00_0011_1100 => Opcode::Andc,
-            0b00_0100_1101 => Opcode::Mulhw,
+            0b00_0100_1011 => Opcode::Mulhw,
             0b00_0101_0011 => Opcode::Mfmsr,
             0b00_0101_0110 => Opcode::Dcbf,
             0b00_0101_0111 => Opcode::Lbzx,
@@ -402,8 +411,8 @@ impl Opcode {
             0b00_1111_0110 => Opcode::Dcbtst,
             0b00_1111_0111 => Opcode::Stbux,
             0b01_0000_1010 => Opcode::Add,
-            0b01_0000_0110 => Opcode::Dcbt,
-            0b01_0000_0111 => Opcode::Lhzx,
+            0b01_0001_0110 => Opcode::Dcbt,
+            0b01_0001_0111 => Opcode::Lhzx,
             0b01_0001_1100 => Opcode::Eqv,
             0b01_0011_0010 => Opcode::Tlbie,
             0b01_0011_0110 => Opcode::Eciwx,
@@ -422,7 +431,7 @@ impl Opcode {
             0b01_1101_0011 => Opcode::Mtspr,
             0b01_1101_0110 => Opcode::Dcbi,
             0b01_1101_1100 => Opcode::Nand,
-            0b01_1111_1011 => Opcode::Divw,
+            0b01_1110_1011 => Opcode::Divw,
             0b10_0000_0000 => Opcode::Mcrxr,
             0b10_0001_0101 => Opcode::Lswx,
             0b10_0001_0110 => Opcode::Lwbrx,
@@ -514,28 +523,28 @@ impl Opcode {
 
     fn from_code_111111(x: u32) -> Self {
         match bits::<u32>(x, 26..31) {
-            0b00000 => match bits(x, 26..31) {
+            0b00000 => match bits(x, 24..26) {
                 0b00 => Opcode::Fcmpu,
                 0b01 => Opcode::Fcmpo,
                 0b10 => Opcode::Mcrfs,
                 _ => Opcode::Illegal,
             },
-            0b00110 => match bits(x, 26..31) {
+            0b00110 => match bits(x, 23..26) {
                 0b001 => Opcode::Mtfsb1,
                 0b010 => Opcode::Mtfsb0,
                 0b100 => Opcode::Mtfsfi,
                 _ => Opcode::Illegal,
             },
-            0b00111 => match bits(x, 26..31) {
+            0b00111 => match bits(x, 21..26) {
                 0b10010 => Opcode::Mffs,
                 0b10110 => Opcode::Mtfsf,
                 _ => Opcode::Illegal,
             },
-            0b01000 => match bits(x, 26..31) {
+            0b01000 => match bits(x, 22..26) {
                 0b0001 => Opcode::Fneg,
-                0b0010 => Opcode::Fabs,
+                0b0010 => Opcode::Fmr,
                 0b0100 => Opcode::Fnabs,
-                0b1000 => Opcode::Fmr,
+                0b1000 => Opcode::Fabs,
                 _ => Opcode::Illegal,
             },
             0b01100 => Opcode::Frsp,

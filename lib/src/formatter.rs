@@ -43,6 +43,15 @@ where
         write!(self.writer(), "r{}", reg)
     }
 
+    /// Writes a nullable general-purpose register argument.
+    fn write_gpr0(&mut self, reg: u8) -> IOResult {
+        if reg != 0 {
+            self.write_gpr(reg)
+        } else {
+            write!(self.writer(), "0")
+        }
+    }
+
     /// Writes a floating point register argument.
     fn write_fpr(&mut self, reg: u8) -> IOResult {
         write!(self.writer(), "f{}", reg)
@@ -95,13 +104,23 @@ where
     }
 
     /// Writes an unsigned immediate.
-    fn write_uimm(&mut self, uimm: u16) -> IOResult {
-        write!(self.writer(), "{:#x}", uimm)
+    fn write_uimm<T: Into<u16>>(&mut self, uimm: T) -> IOResult {
+        let uimm = uimm.into();
+        if uimm < 16 {
+            write!(self.writer(), "{}", uimm)
+        } else {
+            write!(self.writer(), "{:#x}", uimm)
+        }
     }
 
     /// Writes a signed immediate.
-    fn write_simm(&mut self, simm: i16) -> IOResult {
-        write!(self.writer(), "{:#x}", ReallySigned(simm))
+    fn write_simm<T: PrimInt + Into<i32> + Display>(&mut self, simm: T) -> IOResult {
+        let simm: i32 = simm.into();
+        if simm < 8 {
+            write!(self.writer(), "{}", simm)
+        } else {
+            write!(self.writer(), "{:#x}", ReallySigned(simm))
+        }
     }
 
     /// Writes an instruction-specific field like the compare mode.
@@ -113,8 +132,13 @@ where
         write!(self.writer(), "{}", fm)
     }
 
-    fn write_offset_unsigned_open(&mut self, offset: u16) -> IOResult {
-        write!(self.writer(), "{:#x}(", offset)
+    fn write_offset_unsigned_open<T: Into<u32>>(&mut self, offset: T) -> IOResult {
+        let offset = offset.into();
+        if offset < 15 {
+            write!(self.writer(), "{}(", offset)
+        } else {
+            write!(self.writer(), "{:#x}(", offset)
+        }
     }
 
     /// Writes an offset prefix.
@@ -122,8 +146,13 @@ where
     /// The next write calls that follow should be:
     ///   - An operand (almost always a general-purpose register)
     ///   - `write_offset_close()`
-    fn write_offset_open(&mut self, offset: i16) -> IOResult {
-        write!(self.writer(), "{:#x}(", ReallySigned(offset))
+    fn write_offset_open<T: Into<i32>>(&mut self, offset: T) -> IOResult {
+        let offset = offset.into();
+        if -9 < offset && offset < 10 {
+            write!(self.writer(), "{}(", offset)
+        } else {
+            write!(self.writer(), "{:#x}(", ReallySigned(offset))
+        }
     }
 
     /// Closes an offset prefix.
@@ -132,13 +161,19 @@ where
     }
 
     /// Writes a branch target given the jump offset and current program counter.
-    fn write_branch_target(&mut self, offset: u32, pc: u32) -> IOResult {
-        write!(self.writer(), "{:#x}", offset + pc)
+    fn write_branch_target(&mut self, offset: i32, _: u32) -> IOResult {
+        write!(self.writer(), "{:#x}", ReallySigned(offset))
     }
 }
 
 pub struct SimpleFormatter<W: Write> {
     pub writer: W,
+}
+
+impl<W: Write> SimpleFormatter<W> {
+    pub fn new(writer: W) -> Self {
+        Self { writer }
+    }
 }
 
 impl<W: Write> AsmFormatter<W> for SimpleFormatter<W> {
