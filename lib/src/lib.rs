@@ -5,7 +5,11 @@ use std::ops::Range;
 
 use num_traits::AsPrimitive;
 
+pub mod formatter;
 mod isa;
+
+pub use crate::formatter::AsmFormatter;
+use crate::formatter::SimpleFormatter;
 pub use crate::isa::Opcode;
 
 #[derive(Default, Clone)]
@@ -448,280 +452,350 @@ impl Ins {
         Ins::new(x, op)
     }
 
-    fn write_string_form_reg123<W: Write>(&self, out: &mut W) -> std::io::Result<()> {
-        write!(
-            out,
-            "{} r{}, r{}, r{}",
-            self.op.mnemonic(),
-            self.d(),
-            self.a(),
-            self.b()
-        )
+    fn write_asm_form_reg123<F, W>(&self, out: &mut F) -> std::io::Result<()>
+    where
+        F: AsmFormatter<W>,
+        W: Write,
+    {
+        out.write_mnemonic(self.op.mnemonic())?;
+        out.write_opcode_separator()?;
+        out.write_gpr(self.d())?;
+        out.write_operand_separator()?;
+        out.write_gpr(self.a())?;
+        out.write_operand_separator()?;
+        out.write_gpr(self.b())?;
+        Ok(())
     }
 
-    fn write_string_form_reg123_rc<W: Write>(&self, out: &mut W) -> std::io::Result<()> {
-        let name_suffix = if self.rc() != 0 { "." } else { "" };
-        write!(
-            out,
-            "{}{} r{}, r{}, r{}",
-            self.op.mnemonic(),
-            name_suffix,
-            self.d(),
-            self.a(),
-            self.b()
-        )
+    fn write_asm_form_reg123_rc<F, W>(&self, out: &mut F) -> std::io::Result<()>
+    where
+        F: AsmFormatter<W>,
+        W: Write,
+    {
+        out.write_mnemonic(self.op.mnemonic())?;
+        out.write_rc(self.rc())?;
+        out.write_opcode_separator()?;
+        out.write_gpr(self.d())?;
+        out.write_operand_separator()?;
+        out.write_gpr(self.a())?;
+        out.write_operand_separator()?;
+        out.write_gpr(self.b())?;
+        Ok(())
     }
 
-    fn write_string_form_reg123_oe_rc<W: Write>(&self, out: &mut W) -> std::io::Result<()> {
-        let name_suffix = match (self.oe() != 0, self.rc() != 0) {
-            (false, false) => "",
-            (false, true) => ".",
-            (true, false) => "o",
-            (true, true) => "o.",
-        };
-        write!(
-            out,
-            "{}{} r{}, r{}, r{}",
-            self.op.mnemonic(),
-            name_suffix,
-            self.d(),
-            self.a(),
-            self.b()
-        )
+    fn write_asm_form_reg123_oe_rc<F, W>(&self, out: &mut F) -> std::io::Result<()>
+    where
+        F: AsmFormatter<W>,
+        W: Write,
+    {
+        out.write_mnemonic(self.op.mnemonic())?;
+        out.write_oe(self.oe())?;
+        out.write_rc(self.rc())?;
+        out.write_opcode_separator()?;
+        out.write_gpr(self.d())?;
+        out.write_operand_separator()?;
+        out.write_gpr(self.a())?;
+        out.write_operand_separator()?;
+        out.write_gpr(self.b())?;
+        Ok(())
     }
 
-    fn write_string_noargs<W: Write>(&self, out: &mut W) -> std::io::Result<()> {
-        write!(out, "{}", self.op.mnemonic())
+    fn write_asm_form_reg12_simm<F, W>(&self, out: &mut F) -> std::io::Result<()>
+    where
+        F: AsmFormatter<W>,
+        W: Write,
+    {
+        out.write_mnemonic(self.op.mnemonic())?;
+        out.write_opcode_separator()?;
+        out.write_gpr(self.d())?;
+        out.write_operand_separator()?;
+        out.write_gpr(self.a())?;
+        out.write_operand_separator()?;
+        out.write_simm(self.simm())?;
+        Ok(())
     }
 
-    fn write_string_form_reg12_simm<W: Write>(&self, out: &mut W) -> std::io::Result<()> {
-        write!(
-            out,
-            "{} r{}, r{}, {}",
-            self.op.mnemonic(),
-            self.d(),
-            self.a(),
-            self.simm()
-        )
+    fn write_asm_form_reg12_uimm<F, W>(&self, out: &mut F) -> std::io::Result<()>
+    where
+        F: AsmFormatter<W>,
+        W: Write,
+    {
+        out.write_mnemonic(self.op.mnemonic())?;
+        out.write_opcode_separator()?;
+        out.write_gpr(self.d())?;
+        out.write_operand_separator()?;
+        out.write_gpr(self.a())?;
+        out.write_operand_separator()?;
+        out.write_uimm(self.uimm())?;
+        Ok(())
     }
 
-    fn write_string_form_reg12_uimm<W: Write>(&self, out: &mut W) -> std::io::Result<()> {
-        write!(
-            out,
-            "{} r{}, r{}, {}",
-            self.op.mnemonic(),
-            self.d(),
-            self.a(),
-            self.uimm()
-        )
+    fn write_asm_form_reg12_offset<F, W>(&self, out: &mut F) -> std::io::Result<()>
+    where
+        F: AsmFormatter<W>,
+        W: Write,
+    {
+        out.write_mnemonic(self.op.mnemonic())?;
+        out.write_opcode_separator()?;
+        out.write_gpr(self.d())?;
+        out.write_operand_separator()?;
+        out.write_offset_open(self.simm())?;
+        out.write_gpr(self.a())?;
+        out.write_offset_close()?;
+        Ok(())
     }
 
-    fn write_string_form_reg12_offset<W: Write>(&self, out: &mut W) -> std::io::Result<()> {
-        write!(
-            out,
-            "{} r{}, {}(r{})",
-            self.op.mnemonic(),
-            self.d(),
-            self.simm(),
-            self.a()
-        )
+    fn write_asm_form_fr1_reg2_offset<F, W>(&self, out: &mut F) -> std::io::Result<()>
+    where
+        F: AsmFormatter<W>,
+        W: Write,
+    {
+        out.write_mnemonic(self.op.mnemonic())?;
+        out.write_opcode_separator()?;
+        out.write_fpr(self.d())?;
+        out.write_operand_separator()?;
+        out.write_offset_open(self.simm())?;
+        out.write_gpr(self.a())?;
+        out.write_offset_close()?;
+        Ok(())
     }
 
-    fn write_string_form_fr1_reg2_offset<W: Write>(&self, out: &mut W) -> std::io::Result<()> {
-        write!(
-            out,
-            "{} fr{}, {}(r{})",
-            self.op.mnemonic(),
-            self.d(),
-            self.simm(),
-            self.a()
-        )
+    fn write_asm_form_fr1_reg23<F, W>(&self, out: &mut F) -> std::io::Result<()>
+    where
+        F: AsmFormatter<W>,
+        W: Write,
+    {
+        out.write_mnemonic(self.op.mnemonic())?;
+        out.write_opcode_separator()?;
+        out.write_fpr(self.d())?;
+        out.write_operand_separator()?;
+        out.write_gpr(self.a())?;
+        out.write_operand_separator()?;
+        out.write_gpr(self.b())?;
+        Ok(())
     }
 
-    fn write_string_form_fr1_reg23<W: Write>(&self, out: &mut W) -> std::io::Result<()> {
-        write!(
-            out,
-            "{} fr{}, r{}, r{}",
-            self.op.mnemonic(),
-            self.d(),
-            self.a(),
-            self.b()
-        )
+    fn write_asm_mtfsf<F, W>(&self, out: &mut F) -> std::io::Result<()>
+    where
+        F: AsmFormatter<W>,
+        W: Write,
+    {
+        out.write_mnemonic(self.op.mnemonic())?;
+        out.write_opcode_separator()?;
+        out.write_fm(self.fm())?;
+        out.write_operand_separator()?;
+        out.write_fpr(self.b())?;
+        Ok(())
     }
 
-    fn write_string_mtfsf<W: Write>(&self, out: &mut W) -> std::io::Result<()> {
-        write!(out, "{} {}, fr{}", self.op.mnemonic(), self.fm(), self.b())
+    fn write_asm_mtfsfi<F, W>(&self, out: &mut F) -> std::io::Result<()>
+    where
+        F: AsmFormatter<W>,
+        W: Write,
+    {
+        out.write_mnemonic(self.op.mnemonic())?;
+        out.write_opcode_separator()?;
+        out.write_cr(self.crf_d())?;
+        out.write_operand_separator()?;
+        write!(out.writer(), "{}", bits::<u8>(self.code, 16..20))?;
+        Ok(())
     }
 
-    fn write_string_mtfsfi<W: Write>(&self, out: &mut W) -> std::io::Result<()> {
-        let name = match self.op {
-            Opcode::Mtfsfi => "mtfsfi",
-            _ => disasm_unreachable!(self.code),
-        };
-        write!(
-            out,
-            "{} crf{}, {}",
-            name,
-            self.crf_d(),
-            bits::<u8>(self.code, 16..20)
-        )
+    fn write_asm_form_reg1<F, W>(&self, out: &mut F) -> std::io::Result<()>
+    where
+        F: AsmFormatter<W>,
+        W: Write,
+    {
+        out.write_mnemonic(self.op.mnemonic())?;
+        out.write_opcode_separator()?;
+        out.write_gpr(self.d())?;
+        Ok(())
     }
 
-    fn write_string_form_reg1<W: Write>(&self, out: &mut W) -> std::io::Result<()> {
-        let name = match self.op {
-            Opcode::Mfcr => "mfcr",
-            Opcode::Mfmsr => "mfmsr",
-            Opcode::Mtmsr => "mtmsr",
-            Opcode::Tlbie => "tblie",
-            _ => disasm_unreachable!(self.code),
-        };
-        write!(out, "{} r{}", name, self.d())
+    fn write_asm_form_reg12_oe_rc<F, W>(&self, out: &mut F) -> std::io::Result<()>
+    where
+        F: AsmFormatter<W>,
+        W: Write,
+    {
+        out.write_mnemonic(self.op.mnemonic())?;
+        out.write_oe(self.oe())?;
+        out.write_lk(self.lk())?;
+        out.write_opcode_separator()?;
+        out.write_gpr(self.d())?;
+        out.write_operand_separator()?;
+        out.write_gpr(self.a())?;
+        Ok(())
     }
 
-    fn write_string_form_reg12_oe_rc<W: Write>(&self, out: &mut W) -> std::io::Result<()> {
-        let name_suffix = match (self.oe() != 0, self.rc() != 0) {
-            (false, false) => "",
-            (false, true) => ".",
-            (true, false) => "o",
-            (true, true) => "o.",
-        };
-        write!(
-            out,
-            "{}{} r{}, r{}",
-            self.op.mnemonic(),
-            name_suffix,
-            self.d(),
-            self.a()
-        )
+    fn write_asm_form_reg13<F, W>(&self, out: &mut F) -> std::io::Result<()>
+    where
+        F: AsmFormatter<W>,
+        W: Write,
+    {
+        out.write_mnemonic(self.op.mnemonic())?;
+        out.write_opcode_separator()?;
+        out.write_gpr(self.d())?;
+        out.write_operand_separator()?;
+        out.write_gpr(self.b())?;
+        Ok(())
     }
 
-    fn write_string_form_reg13<W: Write>(&self, out: &mut W) -> std::io::Result<()> {
-        write!(out, "{} r{}, r{}", self.op.mnemonic(), self.d(), self.b())
+    fn write_asm_form_reg21_rc<F, W>(&self, out: &mut F) -> std::io::Result<()>
+    where
+        F: AsmFormatter<W>,
+        W: Write,
+    {
+        out.write_mnemonic(self.op.mnemonic())?;
+        out.write_rc(self.rc())?;
+        out.write_opcode_separator()?;
+        out.write_gpr(self.a())?;
+        out.write_operand_separator()?;
+        out.write_gpr(self.s())?;
+        Ok(())
     }
 
-    fn write_string_form_reg21_rc<W: Write>(&self, out: &mut W) -> std::io::Result<()> {
-        let name_suffix = if self.rc() != 0 { "." } else { "" };
-        write!(
-            out,
-            "{}{} r{}, r{}",
-            self.op.mnemonic(),
-            name_suffix,
-            self.a(),
-            self.s()
-        )
+    fn write_asm_form_fr1<F, W>(&self, out: &mut F) -> std::io::Result<()>
+    where
+        F: AsmFormatter<W>,
+        W: Write,
+    {
+        out.write_mnemonic(self.op.mnemonic())?;
+        out.write_rc(self.rc())?;
+        out.write_opcode_separator()?;
+        out.write_fpr(self.d())?;
+        Ok(())
     }
 
-    fn write_string_form_fr1<W: Write>(&self, out: &mut W) -> std::io::Result<()> {
-        let name_suffix = if self.rc() != 0 { "." } else { "" };
-        write!(out, "{}{} fr{}", self.op.mnemonic(), name_suffix, self.d())
+    fn write_asm_form_fr13<F, W>(&self, out: &mut F) -> std::io::Result<()>
+    where
+        F: AsmFormatter<W>,
+        W: Write,
+    {
+        out.write_mnemonic(self.op.mnemonic())?;
+        out.write_rc(self.rc())?;
+        out.write_opcode_separator()?;
+        out.write_fpr(self.d())?;
+        out.write_operand_separator()?;
+        out.write_fpr(self.b())?;
+        Ok(())
     }
 
-    fn write_string_form_fr13<W: Write>(&self, out: &mut W) -> std::io::Result<()> {
-        let name_suffix = if self.rc() != 0 { "." } else { "" };
-        write!(
-            out,
-            "{}{} fr{}, fr{}",
-            self.op.mnemonic(),
-            name_suffix,
-            self.d(),
-            self.b()
-        )
+    fn write_asm_form_fr123<F, W>(&self, out: &mut F) -> std::io::Result<()>
+    where
+        F: AsmFormatter<W>,
+        W: Write,
+    {
+        out.write_mnemonic(self.op.mnemonic())?;
+        out.write_rc(self.rc())?;
+        out.write_opcode_separator()?;
+        out.write_fpr(self.d())?;
+        out.write_operand_separator()?;
+        out.write_fpr(self.a())?;
+        out.write_operand_separator()?;
+        out.write_fpr(self.b())?;
+        Ok(())
     }
 
-    fn write_string_form_fr123<W: Write>(&self, out: &mut W) -> std::io::Result<()> {
-        let name_suffix = if self.rc() != 0 { "." } else { "" };
-        write!(
-            out,
-            "{}{} fr{}, fr{}, fr{}",
-            self.op.mnemonic(),
-            name_suffix,
-            self.d(),
-            self.a(),
-            self.b()
-        )
+    fn write_asm_form_fr1243<F, W>(&self, out: &mut F) -> std::io::Result<()>
+    where
+        F: AsmFormatter<W>,
+        W: Write,
+    {
+        out.write_mnemonic(self.op.mnemonic())?;
+        out.write_rc(self.rc())?;
+        out.write_opcode_separator()?;
+        out.write_fpr(self.d())?;
+        out.write_operand_separator()?;
+        out.write_fpr(self.a())?;
+        out.write_operand_separator()?;
+        out.write_fpr(self.c())?;
+        out.write_operand_separator()?;
+        out.write_fpr(self.b())?;
+        Ok(())
     }
 
-    fn write_string_form_fr1243<W: Write>(&self, out: &mut W) -> std::io::Result<()> {
-        let name_suffix = if self.rc() != 0 { "." } else { "" };
-        write!(
-            out,
-            "{}{} fr{}, fr{}, fr{}, fr{}",
-            self.op.mnemonic(),
-            name_suffix,
-            self.d(),
-            self.a(),
-            self.c(),
-            self.b()
-        )
+    fn write_asm_form_fr124<F, W>(&self, out: &mut F) -> std::io::Result<()>
+    where
+        F: AsmFormatter<W>,
+        W: Write,
+    {
+        out.write_mnemonic(self.op.mnemonic())?;
+        out.write_rc(self.rc())?;
+        out.write_opcode_separator()?;
+        out.write_fpr(self.d())?;
+        out.write_operand_separator()?;
+        out.write_fpr(self.a())?;
+        out.write_operand_separator()?;
+        out.write_fpr(self.c())?;
+        Ok(())
     }
 
-    fn write_string_form_fr124<W: Write>(&self, out: &mut W) -> std::io::Result<()> {
-        let name_suffix = if self.rc() != 0 { "." } else { "" };
-        write!(
-            out,
-            "{}{} fr{}, fr{}, fr{}",
-            self.op.mnemonic(),
-            name_suffix,
-            self.d(),
-            self.a(),
-            self.c()
-        )
+    fn write_asm_form_condreg1_fr23<F, W>(&self, out: &mut F) -> std::io::Result<()>
+    where
+        F: AsmFormatter<W>,
+        W: Write,
+    {
+        out.write_mnemonic(self.op.mnemonic())?;
+        out.write_opcode_separator()?;
+        out.write_cr(self.crf_d())?;
+        out.write_operand_separator()?;
+        out.write_fpr(self.a())?;
+        out.write_operand_separator()?;
+        out.write_fpr(self.b())?;
+        Ok(())
     }
 
-    fn write_string_form_condreg1_fr23<W: Write>(&self, out: &mut W) -> std::io::Result<()> {
-        write!(
-            out,
-            "{} crf{}, fr{}, fr{}",
-            self.op.mnemonic(),
-            self.crf_d(),
-            self.a(),
-            self.b()
-        )
+    fn write_asm_form_condreg1_fr13_rc<F, W>(&self, out: &mut F) -> std::io::Result<()>
+    where
+        F: AsmFormatter<W>,
+        W: Write,
+    {
+        out.write_mnemonic(self.op.mnemonic())?;
+        out.write_rc(self.rc())?;
+        out.write_opcode_separator()?;
+        out.write_cr(self.crf_d())?;
+        out.write_operand_separator()?;
+        out.write_fpr(self.d())?;
+        out.write_operand_separator()?;
+        out.write_fpr(self.b())?;
+        Ok(())
     }
 
-    fn write_string_form_condreg1_fr13_rc<W: Write>(&self, out: &mut W) -> std::io::Result<()> {
-        let name_suffix = if self.rc() != 0 { "." } else { "" };
-        write!(
-            out,
-            "{}{} crf{}, fr{}, fr{}",
-            self.op.mnemonic(),
-            name_suffix,
-            self.crf_d(),
-            self.d(),
-            self.b()
-        )
-    }
-
-    fn write_string_b<W: Write>(&self, out: &mut W) -> std::io::Result<()> {
-        let name = match (self.aa() != 0, self.lk() != 0) {
-            (false, false) => "b",
-            (false, true) => "bl",
-            (true, false) => "ba",
-            (true, true) => "bla",
-        };
+    fn write_asm_b<F, W>(&self, out: &mut F) -> std::io::Result<()>
+    where
+        F: AsmFormatter<W>,
+        W: Write,
+    {
+        out.write_mnemonic(self.op.mnemonic())?;
+        out.write_lk(self.lk())?;
+        out.write_aa(self.aa())?;
         // TODO absolute address
-        write!(out, "{} 0x{:x}", name, self.li())
+        write!(out.writer(), "0x{:x}", self.li())
     }
 
-    fn write_string_bc<W: Write>(&self, out: &mut W) -> std::io::Result<()> {
-        let name = match (self.aa() != 0, self.lk() != 0) {
-            (false, false) => "bc",
-            (false, true) => "bcl",
-            (true, false) => "bca",
-            (true, true) => "bcla",
-        };
+    fn write_asm_bc<F, W>(&self, out: &mut F) -> std::io::Result<()>
+    where
+        F: AsmFormatter<W>,
+        W: Write,
+    {
+        out.write_mnemonic(self.op.mnemonic())?;
+        out.write_lk(self.lk())?;
+        out.write_aa(self.aa())?;
         // TODO absolute address
         write!(
-            out,
-            "{} 0x{:x}, 0x{:x}, 0x{:x}",
-            name,
+            out.writer(),
+            "0x{:x}, 0x{:x}, 0x{:x}",
             self.bo(),
             self.bi(),
             self.li()
         )
     }
 
-    fn write_string_branch_cond_to_reg<W: Write>(&self, out: &mut W) -> std::io::Result<()> {
+    fn write_asm_branch_cond_to_reg<F, W>(&self, out: &mut F) -> std::io::Result<()>
+    where
+        F: AsmFormatter<W>,
+        W: Write,
+    {
         let name = match self.op {
             Opcode::Bcctr => match self.lk() != 0 {
                 false => "bcctr",
@@ -729,22 +803,32 @@ impl Ins {
             },
             Opcode::Bclr => match self.lk() != 0 {
                 false => match (self.bo(), self.bi()) {
-                    (0b01100, 0b00000) => return write!(out, "bltlr"),
-                    (0b00100, 0b01010) => return write!(out, "bnelr cr2"),
-                    (0b10000, 0b00000) => return write!(out, "bdnzlr"),
-                    (0b10100, 0b00000) => return write!(out, "blr"),
+                    (0b01100, 0b00000) => return write!(out.writer(), "bltlr"),
+                    (0b00100, 0b01010) => return write!(out.writer(), "bnelr cr2"),
+                    (0b10000, 0b00000) => return write!(out.writer(), "bdnzlr"),
+                    (0b10100, 0b00000) => return write!(out.writer(), "blr"),
                     _ => "bclr",
                 },
                 true => "bclrl",
             },
             _ => disasm_unreachable!(self.code),
         };
-        write!(out, "{} 0x{:x}, 0x{:x}", name, self.bo(), self.bi())
+        write!(
+            out.writer(),
+            "{} 0x{:x}, 0x{:x}",
+            name,
+            self.bo(),
+            self.bi()
+        )
     }
 
-    fn write_string_cmp<W: Write>(&self, out: &mut W) -> std::io::Result<()> {
+    fn write_asm_cmp<F, W>(&self, out: &mut F) -> std::io::Result<()>
+    where
+        F: AsmFormatter<W>,
+        W: Write,
+    {
         write!(
-            out,
+            out.writer(),
             "{} crf{}, {}, r{}, r{}",
             self.op.mnemonic(),
             self.crf_d(),
@@ -754,9 +838,13 @@ impl Ins {
         )
     }
 
-    fn write_string_cmp_simm<W: Write>(&self, out: &mut W) -> std::io::Result<()> {
+    fn write_asm_cmp_simm<F, W>(&self, out: &mut F) -> std::io::Result<()>
+    where
+        F: AsmFormatter<W>,
+        W: Write,
+    {
         write!(
-            out,
+            out.writer(),
             "{} crf{}, {}, r{}, {}",
             self.op.mnemonic(),
             self.crf_d(),
@@ -766,9 +854,13 @@ impl Ins {
         )
     }
 
-    fn write_string_cmp_uimm<W: Write>(&self, out: &mut W) -> std::io::Result<()> {
+    fn write_asm_cmp_uimm<F, W>(&self, out: &mut F) -> std::io::Result<()>
+    where
+        F: AsmFormatter<W>,
+        W: Write,
+    {
         write!(
-            out,
+            out.writer(),
             "{} crf{}, {}, r{}, {}",
             self.op.mnemonic(),
             self.crf_d(),
@@ -778,7 +870,11 @@ impl Ins {
         )
     }
 
-    fn write_string_form_condreg1<W: Write>(&self, out: &mut W) -> std::io::Result<()> {
+    fn write_asm_form_condreg1<F, W>(&self, out: &mut F) -> std::io::Result<()>
+    where
+        F: AsmFormatter<W>,
+        W: Write,
+    {
         let name = match self.op {
             Opcode::Mcrxr => "mcrxr",
             Opcode::Mtfsb0 => match self.rc() != 0 {
@@ -791,21 +887,35 @@ impl Ins {
             },
             _ => disasm_unreachable!(self.code),
         };
-        write!(out, "{} crf{}", name, self.crf_d())
+        write!(out.writer(), "{} crf{}", name, self.crf_d())
     }
 
-    fn write_string_form_condreg12<W: Write>(&self, out: &mut W) -> std::io::Result<()> {
+    fn write_asm_form_condreg12<F, W>(&self, out: &mut F) -> std::io::Result<()>
+    where
+        F: AsmFormatter<W>,
+        W: Write,
+    {
         let name = match self.op {
             Opcode::Mcrf => "mcrf",
             Opcode::Mcrfs => "mcrfs",
             _ => disasm_unreachable!(self.code),
         };
-        write!(out, "{} crf{}, crf{}", name, self.crf_d(), self.crf_s())
+        write!(
+            out.writer(),
+            "{} crf{}, crf{}",
+            name,
+            self.crf_d(),
+            self.crf_s()
+        )
     }
 
-    fn write_string_form_condreg123<W: Write>(&self, out: &mut W) -> std::io::Result<()> {
+    fn write_asm_form_condreg123<F, W>(&self, out: &mut F) -> std::io::Result<()>
+    where
+        F: AsmFormatter<W>,
+        W: Write,
+    {
         write!(
-            out,
+            out.writer(),
             "{} crb{}, crb{}, crb{}",
             self.op.mnemonic(),
             self.crb_d(),
@@ -814,11 +924,25 @@ impl Ins {
         )
     }
 
-    fn write_string_form_reg23<W: Write>(&self, out: &mut W) -> std::io::Result<()> {
-        write!(out, "{} r{}, r{}", self.op.mnemonic(), self.a(), self.b())
+    fn write_asm_form_reg23<F, W>(&self, out: &mut F) -> std::io::Result<()>
+    where
+        F: AsmFormatter<W>,
+        W: Write,
+    {
+        write!(
+            out.writer(),
+            "{} r{}, r{}",
+            self.op.mnemonic(),
+            self.a(),
+            self.b()
+        )
     }
 
-    fn write_string_form_reg213<W: Write>(&self, out: &mut W) -> std::io::Result<()> {
+    fn write_asm_form_reg213<F, W>(&self, out: &mut F) -> std::io::Result<()>
+    where
+        F: AsmFormatter<W>,
+        W: Write,
+    {
         let name_suffix = if self.rc() != 0 { "." } else { "" };
         let name = match self.op {
             Opcode::Eqv => "eqv",
@@ -826,7 +950,7 @@ impl Ins {
             Opcode::Nor => "nor",
             Opcode::Or => {
                 if self.s() == self.b() {
-                    return write!(out, "mr r{}, r{}", self.a(), self.s());
+                    return write!(out.writer(), "mr r{}, r{}", self.a(), self.s());
                 } else {
                     "or"
                 }
@@ -838,7 +962,7 @@ impl Ins {
             _ => disasm_unreachable!(self.code),
         };
         write!(
-            out,
+            out.writer(),
             "{}{} r{}, r{}, r{}",
             name,
             name_suffix,
@@ -848,10 +972,14 @@ impl Ins {
         )
     }
 
-    fn write_string_rlw_imm<W: Write>(&self, out: &mut W) -> std::io::Result<()> {
+    fn write_asm_rlw_imm<F, W>(&self, out: &mut F) -> std::io::Result<()>
+    where
+        F: AsmFormatter<W>,
+        W: Write,
+    {
         let name_prefix = if self.rc() != 0 { "." } else { "" };
         write!(
-            out,
+            out.writer(),
             "{}{} r{}, r{}, {}, {}, {}",
             self.op.mnemonic(),
             name_prefix,
@@ -863,11 +991,15 @@ impl Ins {
         )
     }
 
-    fn write_string_rlw_reg<W: Write>(&self, out: &mut W) -> std::io::Result<()> {
+    fn write_asm_rlw_reg<F, W>(&self, out: &mut F) -> std::io::Result<()>
+    where
+        F: AsmFormatter<W>,
+        W: Write,
+    {
         assert_eq!(self.op, Opcode::Rlwnm);
         let name_prefix = if self.rc() != 0 { "." } else { "" };
         write!(
-            out,
+            out.writer(),
             "rlwnm{} r{}, r{}, r{}, {}, {}",
             name_prefix,
             self.a(),
@@ -878,9 +1010,13 @@ impl Ins {
         )
     }
 
-    fn write_string_form_reg12_nb<W: Write>(&self, out: &mut W) -> std::io::Result<()> {
+    fn write_asm_form_reg12_nb<F, W>(&self, out: &mut F) -> std::io::Result<()>
+    where
+        F: AsmFormatter<W>,
+        W: Write,
+    {
         write!(
-            out,
+            out.writer(),
             "{} r{}, r{}, {}",
             self.op.mnemonic(),
             self.d(),
@@ -889,49 +1025,91 @@ impl Ins {
         )
     }
 
-    fn write_string_form_reg1_spr<W: Write>(&self, out: &mut W) -> std::io::Result<()> {
+    fn write_asm_form_reg1_spr<F, W>(&self, out: &mut F) -> std::io::Result<()>
+    where
+        F: AsmFormatter<W>,
+        W: Write,
+    {
         let name = match self.op {
             Opcode::Mfspr => match self.spr() {
-                1 => return write!(out, "mfxer r{}", self.s()),
-                8 => return write!(out, "mflr r{}", self.s()),
-                9 => return write!(out, "mfctr r{}", self.s()),
+                1 => return write!(out.writer(), "mfxer r{}", self.s()),
+                8 => return write!(out.writer(), "mflr r{}", self.s()),
+                9 => return write!(out.writer(), "mfctr r{}", self.s()),
                 _ => "mfspr",
             },
             Opcode::Mftb => "mftb",
             _ => disasm_unreachable!(self.code),
         };
-        write!(out, "{} r{}, {}", name, self.d(), self.spr())
+        write!(out.writer(), "{} r{}, {}", name, self.d(), self.spr())
     }
 
-    fn write_string_form_spr_reg1<W: Write>(&self, out: &mut W) -> std::io::Result<()> {
+    fn write_asm_form_spr_reg1<F, W>(&self, out: &mut F) -> std::io::Result<()>
+    where
+        F: AsmFormatter<W>,
+        W: Write,
+    {
         let name = match self.op {
             Opcode::Mtspr => match self.spr() {
-                1 => return write!(out, "mtxer r{}", self.s()),
-                8 => return write!(out, "mtlr r{}", self.s()),
-                9 => return write!(out, "mtctr r{}", self.s()),
+                1 => return write!(out.writer(), "mtxer r{}", self.s()),
+                8 => return write!(out.writer(), "mtlr r{}", self.s()),
+                9 => return write!(out.writer(), "mtctr r{}", self.s()),
                 _ => "mtspr",
             },
             _ => disasm_unreachable!(self.code),
         };
-        write!(out, "{} {}, r{}", name, self.spr(), self.s())
+        write!(out.writer(), "{} {}, r{}", name, self.spr(), self.s())
     }
 
-    fn write_string_form_reg1_sr<W: Write>(&self, out: &mut W) -> std::io::Result<()> {
-        write!(out, "{} r{}, {}", self.op.mnemonic(), self.d(), self.sr())
+    fn write_asm_form_reg1_sr<F, W>(&self, out: &mut F) -> std::io::Result<()>
+    where
+        F: AsmFormatter<W>,
+        W: Write,
+    {
+        write!(
+            out.writer(),
+            "{} r{}, {}",
+            self.op.mnemonic(),
+            self.d(),
+            self.sr()
+        )
     }
 
-    fn write_string_form_sr_reg1<W: Write>(&self, out: &mut W) -> std::io::Result<()> {
-        write!(out, "{} {}, r{}", self.op.mnemonic(), self.sr(), self.s())
+    fn write_asm_form_sr_reg1<F, W>(&self, out: &mut F) -> std::io::Result<()>
+    where
+        F: AsmFormatter<W>,
+        W: Write,
+    {
+        write!(
+            out.writer(),
+            "{} {}, r{}",
+            self.op.mnemonic(),
+            self.sr(),
+            self.s()
+        )
     }
 
-    fn write_string_mtcrf<W: Write>(&self, out: &mut W) -> std::io::Result<()> {
-        write!(out, "{} {}, r{}", self.op.mnemonic(), self.crm(), self.s())
+    fn write_asm_mtcrf<F, W>(&self, out: &mut F) -> std::io::Result<()>
+    where
+        F: AsmFormatter<W>,
+        W: Write,
+    {
+        write!(
+            out.writer(),
+            "{} {}, r{}",
+            self.op.mnemonic(),
+            self.crm(),
+            self.s()
+        )
     }
 
-    fn write_string_srawi<W: Write>(&self, out: &mut W) -> std::io::Result<()> {
+    fn write_asm_srawi<F, W>(&self, out: &mut F) -> std::io::Result<()>
+    where
+        F: AsmFormatter<W>,
+        W: Write,
+    {
         let name_suffix = if self.rc() != 0 { "." } else { "" };
         write!(
-            out,
+            out.writer(),
             "{}{} r{}, r{}, {}",
             self.op.mnemonic(),
             name_suffix,
@@ -941,9 +1119,13 @@ impl Ins {
         )
     }
 
-    fn write_string_tw<W: Write>(&self, out: &mut W) -> std::io::Result<()> {
+    fn write_asm_tw<F, W>(&self, out: &mut F) -> std::io::Result<()>
+    where
+        F: AsmFormatter<W>,
+        W: Write,
+    {
         write!(
-            out,
+            out.writer(),
             "{} {}, r{}, r{}",
             self.op.mnemonic(),
             self.to(),
@@ -952,9 +1134,13 @@ impl Ins {
         )
     }
 
-    fn write_string_twi<W: Write>(&self, out: &mut W) -> std::io::Result<()> {
+    fn write_asm_twi<F, W>(&self, out: &mut F) -> std::io::Result<()>
+    where
+        F: AsmFormatter<W>,
+        W: Write,
+    {
         write!(
-            out,
+            out.writer(),
             "{} {}, r{}, {}",
             self.op.mnemonic(),
             self.to(),
@@ -963,35 +1149,51 @@ impl Ins {
         )
     }
 
-    fn write_string_psq<W: Write>(&self, out: &mut W) -> std::io::Result<()> {
-        write!(
-            out,
-            "{} fr{}, {}(r{}), {}, qr{}",
-            self.op.mnemonic(),
-            self.d(),
-            self.ps_d(),
-            self.a(),
-            self.w(),
-            self.ps_l()
-        )
+    fn write_asm_psq<F, W>(&self, out: &mut F) -> std::io::Result<()>
+    where
+        F: AsmFormatter<W>,
+        W: Write,
+    {
+        out.write_mnemonic(self.op.mnemonic())?;
+        out.write_opcode_separator()?;
+        out.write_fpr(self.d())?;
+        out.write_operand_separator()?;
+        out.write_offset_unsigned_open(self.ps_d())?;
+        out.write_gpr(self.a())?;
+        out.write_offset_close()?;
+        out.write_operand_separator()?;
+        write!(out.writer(), "{}", self.w())?;
+        out.write_operand_separator()?;
+        out.write_qr(self.ps_l())?;
+        Ok(())
     }
 
-    fn write_string_psq_x<W: Write>(&self, out: &mut W) -> std::io::Result<()> {
-        write!(
-            out,
-            "{} fr{}, r{}, r{}, {}, {}",
-            self.op.mnemonic(),
-            self.d(),
-            self.a(),
-            self.b(),
-            self.w(),
-            self.ps_l()
-        )
+    fn write_asm_psq_x<F, W>(&self, out: &mut F) -> std::io::Result<()>
+    where
+        F: AsmFormatter<W>,
+        W: Write,
+    {
+        out.write_mnemonic(self.op.mnemonic())?;
+        out.write_opcode_separator()?;
+        out.write_fpr(self.d())?;
+        out.write_operand_separator()?;
+        out.write_gpr(self.a())?;
+        out.write_operand_separator()?;
+        out.write_gpr(self.b())?;
+        out.write_operand_separator()?;
+        write!(out.writer(), "{}", self.w())?;
+        out.write_operand_separator()?;
+        out.write_qr(self.ps_l())?;
+        Ok(())
     }
 
-    pub fn write_string<W: Write>(&self, out: &mut W) -> std::io::Result<()> {
+    pub fn write_string<F, W>(&self, out: &mut F) -> std::io::Result<()>
+    where
+        F: AsmFormatter<W>,
+        W: Write,
+    {
         match self.op {
-            Opcode::Illegal => write!(out, "<illegal>"),
+            Opcode::Illegal => write!(out.writer(), "<illegal>"),
 
             // Standalone instructions
             Opcode::Eieio
@@ -999,17 +1201,17 @@ impl Ins {
             | Opcode::Rfi
             | Opcode::Sc
             | Opcode::Sync
-            | Opcode::Tlbsync => self.write_string_noargs(out),
+            | Opcode::Tlbsync => out.write_mnemonic(self.op.mnemonic()),
 
             // General purpose register only
             Opcode::Mfcr | Opcode::Mfmsr | Opcode::Mtmsr | Opcode::Tlbie => {
-                self.write_string_form_reg1(out)
+                self.write_asm_form_reg1(out)
             }
             Opcode::Addme | Opcode::Addze | Opcode::Neg | Opcode::Subfme | Opcode::Subfze => {
-                self.write_string_form_reg12_oe_rc(out)
+                self.write_asm_form_reg12_oe_rc(out)
             }
-            Opcode::Mfsrin | Opcode::Mtsrin => self.write_string_form_reg13(out),
-            Opcode::Cntlzw | Opcode::Extsb | Opcode::Extsh => self.write_string_form_reg21_rc(out),
+            Opcode::Mfsrin | Opcode::Mtsrin => self.write_asm_form_reg13(out),
+            Opcode::Cntlzw | Opcode::Extsb | Opcode::Extsh => self.write_asm_form_reg21_rc(out),
             Opcode::Dcbf
             | Opcode::Dcbi
             | Opcode::Dcbst
@@ -1017,7 +1219,7 @@ impl Ins {
             | Opcode::Dcbtst
             | Opcode::Dcbz
             | Opcode::DcbzL
-            | Opcode::Icbi => self.write_string_form_reg23(out),
+            | Opcode::Icbi => self.write_asm_form_reg23(out),
             Opcode::Eciwx
             | Opcode::Ecowx
             | Opcode::Lhaux
@@ -1041,9 +1243,9 @@ impl Ins {
             | Opcode::Stwbrx
             | Opcode::Stwcx_
             | Opcode::Stwx
-            | Opcode::Stwux => self.write_string_form_reg123(out),
+            | Opcode::Stwux => self.write_asm_form_reg123(out),
             Opcode::And | Opcode::Andc | Opcode::Mulhw | Opcode::Mulhwu | Opcode::Xor => {
-                self.write_string_form_reg123_rc(out)
+                self.write_asm_form_reg123_rc(out)
             }
             Opcode::Add
             | Opcode::Addc
@@ -1053,7 +1255,7 @@ impl Ins {
             | Opcode::Mullw
             | Opcode::Subf
             | Opcode::Subfc
-            | Opcode::Subfe => self.write_string_form_reg123_oe_rc(out),
+            | Opcode::Subfe => self.write_asm_form_reg123_oe_rc(out),
             Opcode::Eqv
             | Opcode::Nand
             | Opcode::Nor
@@ -1061,11 +1263,11 @@ impl Ins {
             | Opcode::Orc
             | Opcode::Slw
             | Opcode::Sraw
-            | Opcode::Srw => self.write_string_form_reg213(out),
+            | Opcode::Srw => self.write_asm_form_reg213(out),
 
             // General purpose shifts
-            Opcode::Rlwimi | Opcode::Rlwinm => self.write_string_rlw_imm(out),
-            Opcode::Rlwnm => self.write_string_rlw_reg(out),
+            Opcode::Rlwimi | Opcode::Rlwinm => self.write_asm_rlw_imm(out),
+            Opcode::Rlwnm => self.write_asm_rlw_reg(out),
 
             // General purpose register misc
             Opcode::Addi
@@ -1073,13 +1275,13 @@ impl Ins {
             | Opcode::Addic_
             | Opcode::Addis
             | Opcode::Mulli
-            | Opcode::Subfic => self.write_string_form_reg12_simm(out),
+            | Opcode::Subfic => self.write_asm_form_reg12_simm(out),
             Opcode::Andi_
             | Opcode::Andis_
             | Opcode::Ori
             | Opcode::Oris
             | Opcode::Xori
-            | Opcode::Xoris => self.write_string_form_reg12_uimm(out),
+            | Opcode::Xoris => self.write_asm_form_reg12_uimm(out),
             Opcode::Lbz
             | Opcode::Lbzu
             | Opcode::Lha
@@ -1095,29 +1297,29 @@ impl Ins {
             | Opcode::Sthu
             | Opcode::Stmw
             | Opcode::Stw
-            | Opcode::Stwu => self.write_string_form_reg12_offset(out),
-            Opcode::Lswi | Opcode::Stswi => self.write_string_form_reg12_nb(out),
-            Opcode::Mfspr | Opcode::Mftb => self.write_string_form_reg1_spr(out),
-            Opcode::Mtspr => self.write_string_form_spr_reg1(out),
-            Opcode::Mfsr => self.write_string_form_reg1_sr(out),
-            Opcode::Mtsr => self.write_string_form_sr_reg1(out),
-            Opcode::Mtcrf => self.write_string_mtcrf(out),
-            Opcode::Srawi => self.write_string_srawi(out),
-            Opcode::Tw => self.write_string_tw(out),
-            Opcode::Twi => self.write_string_twi(out),
+            | Opcode::Stwu => self.write_asm_form_reg12_offset(out),
+            Opcode::Lswi | Opcode::Stswi => self.write_asm_form_reg12_nb(out),
+            Opcode::Mfspr | Opcode::Mftb => self.write_asm_form_reg1_spr(out),
+            Opcode::Mtspr => self.write_asm_form_spr_reg1(out),
+            Opcode::Mfsr => self.write_asm_form_reg1_sr(out),
+            Opcode::Mtsr => self.write_asm_form_sr_reg1(out),
+            Opcode::Mtcrf => self.write_asm_mtcrf(out),
+            Opcode::Srawi => self.write_asm_srawi(out),
+            Opcode::Tw => self.write_asm_tw(out),
+            Opcode::Twi => self.write_asm_twi(out),
 
             // Branch instructions
-            Opcode::B => self.write_string_b(out),
-            Opcode::Bc => self.write_string_bc(out),
-            Opcode::Bcctr | Opcode::Bclr => self.write_string_branch_cond_to_reg(out),
+            Opcode::B => self.write_asm_b(out),
+            Opcode::Bc => self.write_asm_bc(out),
+            Opcode::Bcctr | Opcode::Bclr => self.write_asm_branch_cond_to_reg(out),
 
             // Compare instructions
-            Opcode::Cmp | Opcode::Cmpl => self.write_string_cmp(out),
-            Opcode::Cmpi => self.write_string_cmp_simm(out),
-            Opcode::Cmpli => self.write_string_cmp_uimm(out),
+            Opcode::Cmp | Opcode::Cmpl => self.write_asm_cmp(out),
+            Opcode::Cmpi => self.write_asm_cmp_simm(out),
+            Opcode::Cmpli => self.write_asm_cmp_uimm(out),
 
             // Floating point register only instructions
-            Opcode::Mffs => self.write_string_form_fr1(out),
+            Opcode::Mffs => self.write_asm_form_fr1(out),
             Opcode::Fabs
             | Opcode::Fmr
             | Opcode::Fnabs
@@ -1130,7 +1332,7 @@ impl Ins {
             | Opcode::PsNabs
             | Opcode::PsNeg
             | Opcode::PsRes
-            | Opcode::PsRsqrte => self.write_string_form_fr13(out),
+            | Opcode::PsRsqrte => self.write_asm_form_fr13(out),
             Opcode::Fadd
             | Opcode::Fadds
             | Opcode::Fdiv
@@ -1143,9 +1345,9 @@ impl Ins {
             | Opcode::PsMerge01
             | Opcode::PsMerge10
             | Opcode::PsMerge11
-            | Opcode::PsSub => self.write_string_form_fr123(out),
+            | Opcode::PsSub => self.write_asm_form_fr123(out),
             Opcode::Fmul | Opcode::Fmuls | Opcode::PsMul | Opcode::PsMuls0 | Opcode::PsMuls1 => {
-                self.write_string_form_fr124(out)
+                self.write_asm_form_fr124(out)
             }
             Opcode::Fmadd
             | Opcode::Fmadds
@@ -1164,16 +1366,16 @@ impl Ins {
             | Opcode::PsNmsub
             | Opcode::PsSel
             | Opcode::PsSum0
-            | Opcode::PsSum1 => self.write_string_form_fr1243(out),
+            | Opcode::PsSum1 => self.write_asm_form_fr1243(out),
 
             // Floating point register misc instructions
-            Opcode::Fctiw | Opcode::Fctiwz => self.write_string_form_condreg1_fr13_rc(out),
+            Opcode::Fctiw | Opcode::Fctiwz => self.write_asm_form_condreg1_fr13_rc(out),
             Opcode::Fcmpo
             | Opcode::Fcmpu
             | Opcode::PsCmpo0
             | Opcode::PsCmpo1
             | Opcode::PsCmpu0
-            | Opcode::PsCmpu1 => self.write_string_form_condreg1_fr23(out),
+            | Opcode::PsCmpu1 => self.write_asm_form_condreg1_fr23(out),
             Opcode::Lfd
             | Opcode::Lfdu
             | Opcode::Lfs
@@ -1181,7 +1383,7 @@ impl Ins {
             | Opcode::Stfd
             | Opcode::Stfdu
             | Opcode::Stfs
-            | Opcode::Stfsu => self.write_string_form_fr1_reg2_offset(out),
+            | Opcode::Stfsu => self.write_asm_form_fr1_reg2_offset(out),
             Opcode::Lfdux
             | Opcode::Lfdx
             | Opcode::Lfsux
@@ -1190,12 +1392,12 @@ impl Ins {
             | Opcode::Stfdx
             | Opcode::Stfiwx
             | Opcode::Stfsux
-            | Opcode::Stfsx => self.write_string_form_fr1_reg23(out),
-            Opcode::Mtfsf => self.write_string_mtfsf(out),
+            | Opcode::Stfsx => self.write_asm_form_fr1_reg23(out),
+            Opcode::Mtfsf => self.write_asm_mtfsf(out),
 
             // Condition register only
-            Opcode::Mcrxr | Opcode::Mtfsb0 | Opcode::Mtfsb1 => self.write_string_form_condreg1(out),
-            Opcode::Mcrf | Opcode::Mcrfs => self.write_string_form_condreg12(out),
+            Opcode::Mcrxr | Opcode::Mtfsb0 | Opcode::Mtfsb1 => self.write_asm_form_condreg1(out),
+            Opcode::Mcrf | Opcode::Mcrfs => self.write_asm_form_condreg12(out),
             Opcode::Crand
             | Opcode::Crandc
             | Opcode::Creqv
@@ -1203,17 +1405,17 @@ impl Ins {
             | Opcode::Crnor
             | Opcode::Cror
             | Opcode::Crorc
-            | Opcode::Crxor => self.write_string_form_condreg123(out),
+            | Opcode::Crxor => self.write_asm_form_condreg123(out),
 
             // Condition register misc
-            Opcode::Mtfsfi => self.write_string_mtfsfi(out),
+            Opcode::Mtfsfi => self.write_asm_mtfsfi(out),
 
             // Paired-single instructions
             Opcode::PsqL | Opcode::PsqLu | Opcode::PsqSt | Opcode::PsqStu => {
-                self.write_string_psq(out)
+                self.write_asm_psq(out)
             }
             Opcode::PsqLx | Opcode::PsqLux | Opcode::PsqStx | Opcode::PsqStux => {
-                self.write_string_psq_x(out)
+                self.write_asm_psq_x(out)
             }
         }
     }
@@ -1221,9 +1423,10 @@ impl Ins {
 
 impl ToString for Ins {
     fn to_string(&self) -> String {
-        let mut buf = Vec::<u8>::new();
-        self.write_string(&mut buf).unwrap();
-        unsafe { String::from_utf8_unchecked(buf) }
+        let buf = Vec::<u8>::new();
+        let mut formatter = SimpleFormatter { writer: buf };
+        self.write_string(&mut formatter).unwrap();
+        unsafe { String::from_utf8_unchecked(formatter.writer) }
     }
 }
 
@@ -1271,41 +1474,41 @@ mod tests {
         }
         assert_asm!(0x4c000000, "mcrf crf0, crf0");
         assert_asm!(0x7c000278, "xor r0, r0, r0");
-        assert_asm!(0x10000014, "ps_sum0 fr0, fr0, fr0, fr0");
-        assert_asm!(0x10000032, "ps_mul fr0, fr0, fr0");
+        assert_asm!(0x10000014, "ps_sum0 f0, f0, f0, f0");
+        assert_asm!(0x10000032, "ps_mul f0, f0, f0");
         assert_asm!(0x7c00052a, "stswx r0, r0, r0");
-        assert_asm!(0x9421ffc0, "stwu r1, -64(r1)");
+        assert_asm!(0x9421ffc0, "stwu r1, -0x40(r1)");
         assert_asm!(0x7C0802A6, "mflr r0");
-        assert_asm!(0x90010044, "stw r0, 68(r1)");
-        assert_asm!(0xDBE10030, "stfd fr31, 48(r1)");
-        assert_asm!(0xF3E10038, "psq_st fr31, 56(r1), 0, qr0");
-        assert_asm!(0xDBC10020, "stfd fr30, 32(r1)");
-        assert_asm!(0xF3C10028, "psq_st fr30, 40(r1), 0, qr0");
-        assert_asm!(0xDBA10010, "stfd fr29, 16(r1)");
-        assert_asm!(0xF3A10018, "psq_st fr29, 24(r1), 0, qr0");
-        assert_asm!(0x93E1000C, "stw r31, 12(r1)");
-        assert_asm!(0xFFE01890, "fmr fr31, fr3");
+        assert_asm!(0x90010044, "stw r0, 0x44(r1)");
+        assert_asm!(0xDBE10030, "stfd f31, 0x30(r1)");
+        assert_asm!(0xF3E10038, "psq_st f31, 0x38(r1), 0, qr0");
+        assert_asm!(0xDBC10020, "stfd f30, 0x20(r1)");
+        assert_asm!(0xF3C10028, "psq_st f30, 0x28(r1), 0, qr0");
+        assert_asm!(0xDBA10010, "stfd f29, 0x10(r1)");
+        assert_asm!(0xF3A10018, "psq_st f29, 0x18(r1), 0, qr0");
+        assert_asm!(0x93E1000C, "stw r31, 0xc(r1)");
+        assert_asm!(0xFFE01890, "fmr f31, f3");
         assert_asm!(0x7C7F1B78, "mr r31, r3");
-        assert_asm!(0xFFA00890, "fmr fr29, fr1");
-        assert_asm!(0xFFC01090, "fmr fr30, fr2");
-        assert_asm!(0xFC20F890, "fmr fr1, fr31");
-        assert_asm!(0xEC3D0072, "fmuls fr1, fr29, fr1");
-        assert_asm!(0xEC1D0772, "fmuls fr0, fr29, fr29");
-        assert_asm!(0xEC5E0828, "fsubs fr2, fr30, fr1");
-        assert_asm!(0xEC21007A, "fmadds fr1, fr1, fr1, fr0");
-        assert_asm!(0xD05F0000, "stfs fr2, 0(r31)");
-        assert_asm!(0xD03F0004, "stfs fr1, 4(r31)");
-        assert_asm!(0xD3FF0008, "stfs fr31, 8(r31)");
-        assert_asm!(0xE3E10038, "psq_l fr31, 56(r1), 0, qr0");
-        assert_asm!(0xCBE10030, "lfd fr31, 48(r1)");
-        assert_asm!(0xE3C10028, "psq_l fr30, 40(r1), 0, qr0");
-        assert_asm!(0xCBC10020, "lfd fr30, 32(r1)");
-        assert_asm!(0xE3A10018, "psq_l fr29, 24(r1), 0, qr0");
-        assert_asm!(0xCBA10010, "lfd fr29, 16(r1)");
-        assert_asm!(0x80010044, "lwz r0, 68(r1)");
-        assert_asm!(0x83E1000C, "lwz r31, 12(r1)");
+        assert_asm!(0xFFA00890, "fmr f29, f1");
+        assert_asm!(0xFFC01090, "fmr f30, f2");
+        assert_asm!(0xFC20F890, "fmr f1, f31");
+        assert_asm!(0xEC3D0072, "fmuls f1, f29, f1");
+        assert_asm!(0xEC1D0772, "fmuls f0, f29, f29");
+        assert_asm!(0xEC5E0828, "fsubs f2, f30, f1");
+        assert_asm!(0xEC21007A, "fmadds f1, f1, f1, f0");
+        assert_asm!(0xD05F0000, "stfs f2, 0x0(r31)");
+        assert_asm!(0xD03F0004, "stfs f1, 0x4(r31)");
+        assert_asm!(0xD3FF0008, "stfs f31, 0x8(r31)");
+        assert_asm!(0xE3E10038, "psq_l f31, 0x38(r1), 0, qr0");
+        assert_asm!(0xCBE10030, "lfd f31, 0x30(r1)");
+        assert_asm!(0xE3C10028, "psq_l f30, 0x28(r1), 0, qr0");
+        assert_asm!(0xCBC10020, "lfd f30, 0x20(r1)");
+        assert_asm!(0xE3A10018, "psq_l f29, 0x18(r1), 0, qr0");
+        assert_asm!(0xCBA10010, "lfd f29, 0x10(r1)");
+        assert_asm!(0x80010044, "lwz r0, 0x44(r1)");
+        assert_asm!(0x83E1000C, "lwz r31, 0xc(r1)");
         assert_asm!(0x7C0803A6, "mtlr r0");
-        assert_asm!(0x38210040, "addi r1, r1, 64");
+        assert_asm!(0x38210040, "addi r1, r1, 0x40");
         assert_asm!(0x4E800020, "blr");
     }
 }
