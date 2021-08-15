@@ -811,11 +811,11 @@ impl Ins {
     {
         write_asm!(out, self => {
             (op.mnemonic, rc, oe) -> mnemonic;
-            (d) -> fpr;
-            (ps_d) -> offset_unsigned;
-            (a) -> gpr;
-            (w) -> mode;
-            (ps_l) -> qr;
+            d -> fpr;
+            ps_d -> offset_unsigned;
+            a -> gpr;
+            w -> mode;
+            ps_l -> qr;
         });
         Ok(())
     }

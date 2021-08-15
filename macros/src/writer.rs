@@ -8,7 +8,7 @@ use syn::parse::{Parse, ParseStream};
 use syn::punctuated::Punctuated;
 use syn::spanned::Spanned;
 use syn::token::Semi;
-use syn::{Expr, Ident};
+use syn::{Expr, ExprPath, Ident};
 
 struct Arguments {
     formatter: Expr,
@@ -33,16 +33,35 @@ impl Parse for Arguments {
     }
 }
 
+/// A single part of an instruction.
+///
+/// Examples:
+/// ```ignore
+/// (op.mnemonic, rc, oe) -> mnemonic;
+/// d -> fpr;
+/// ```
 struct Argument {
-    sources: Punctuated<Expr, syn::token::Comma>,
+    sources: Vec<Expr>,
     target: Ident,
 }
 
 impl Parse for Argument {
     fn parse(input: ParseStream) -> syn::Result<Self> {
-        let content;
-        syn::parenthesized!(content in input);
-        let sources = content.parse_terminated(Expr::parse)?;
+        // Parse source part.
+        let lookahead = input.lookahead1();
+        let sources;
+        if lookahead.peek(syn::token::Paren) {
+            // Parse multiple if we found a parenthesis.
+            let content;
+            syn::parenthesized!(content in input);
+            sources = content
+                .parse_terminated::<Expr, syn::token::Comma>(Expr::parse)?
+                .into_iter()
+                .collect();
+        } else {
+            let expr = input.parse::<ExprPath>()?.into();
+            sources = vec![expr];
+        }
         input.parse::<syn::token::RArrow>()?;
         let target = input.parse()?;
         Ok(Self { sources, target })
