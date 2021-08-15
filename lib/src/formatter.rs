@@ -1,7 +1,7 @@
 use crate::Ins;
-use std::io::Write;
 use num_traits::PrimInt;
 use std::fmt::{LowerHex, UpperHex};
+use std::io::Write;
 
 type IOResult = std::io::Result<()>;
 
