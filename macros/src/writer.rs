@@ -57,10 +57,7 @@ impl Parse for Argument {
                 .parse_terminated::<Expr, syn::token::Comma>(Expr::parse)?
                 .into_iter()
                 .collect();
-        } else if lookahead.peek(syn::LitStr) {
-            let expr = input.parse::<ExprLit>()?.into();
-            sources = vec![expr];
-        } else if lookahead.peek(syn::LitInt) {
+        } else if lookahead.peek(syn::LitStr) || lookahead.peek(syn::LitInt) {
             let expr = input.parse::<ExprLit>()?.into();
             sources = vec![expr];
         } else {

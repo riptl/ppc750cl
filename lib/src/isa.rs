@@ -1,3 +1,5 @@
+#![allow(clippy::bad_bit_mask)]
+
 use crate::{bit, bits};
 use ppc750cl_macros::isa;
 

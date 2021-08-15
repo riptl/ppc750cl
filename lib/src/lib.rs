@@ -502,8 +502,8 @@ impl Ins {
                 };
                 // TODO avoid string concatenation
                 out.write_mnemonic(&(mnemonic_base.to_owned() + bname))?;
-                out.write_aa(self.aa())?;
                 out.write_lk(self.lk())?;
+                out.write_aa(self.aa())?;
                 if bname.is_empty() {
                     out.write_opcode_separator()?;
                     if self.crf_s() != 0 {
@@ -511,11 +511,9 @@ impl Ins {
                         out.write_operand_separator()?;
                     }
                     out.write_branch_target(self.bd(), self.addr)?;
-                } else {
-                    if self.crf_s() != 0 {
-                        out.write_opcode_separator()?;
-                        out.write_cr(self.bi() >> 2)?;
-                    }
+                } else if self.crf_s() != 0 {
+                    out.write_opcode_separator()?;
+                    out.write_cr(self.bi() >> 2)?;
                 }
             }
         } else {
@@ -537,8 +535,8 @@ impl Ins {
             };
             // TODO avoid string concatenation
             out.write_mnemonic(&(mnemonic_base.to_owned() + bname))?;
-            out.write_aa(self.aa())?;
             out.write_lk(self.lk())?;
+            out.write_aa(self.aa())?;
             if bname.is_empty() {
                 out.write_opcode_separator()?;
                 if (self.bo() & 16) == 0 {
@@ -546,11 +544,9 @@ impl Ins {
                     out.write_operand_separator()?;
                 }
                 out.write_branch_target(self.bd(), self.addr)?;
-            } else {
-                if (self.bo() & 16) == 0 {
-                    out.write_opcode_separator()?;
-                    out.write_mode(self.bi())?;
-                }
+            } else if (self.bo() & 16) == 0 {
+                out.write_opcode_separator()?;
+                out.write_mode(self.bi())?;
             }
         }
         Ok(())
