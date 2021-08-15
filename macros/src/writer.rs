@@ -6,6 +6,7 @@ use quote::quote;
 use quote::ToTokens;
 use syn::parse::{Parse, ParseStream};
 use syn::punctuated::Punctuated;
+use syn::spanned::Spanned;
 use syn::token::Semi;
 use syn::{Expr, Ident};
 
@@ -52,7 +53,16 @@ impl Arguments {
     fn format_mnemonic(&self, tokens: &mut Vec<TokenTree>) {
         let arg = &self.args[0];
         assert!(!arg.sources.is_empty());
-        self.format_call(tokens, &arg.target, self.ins_call(&arg.sources[0]))
+        // Print the mnemonic.
+        self.format_call(tokens, &arg.target, self.ins_call(&arg.sources[0]));
+        // Print any mnemonic suffixes.
+        for src in arg.sources.iter().skip(1) {
+            self.format_call(
+                tokens,
+                &Ident::new(&src.into_token_stream().to_string(), src.span()),
+                self.ins_call(&src),
+            );
+        }
     }
 
     fn format_call(&self, tokens: &mut Vec<TokenTree>, method_arg: &Ident, args: TokenStream) {
