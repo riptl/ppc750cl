@@ -826,20 +826,23 @@ impl Ins {
         F: AsmFormatter<W>,
         W: Write,
     {
-        let name = match self.op {
-            Opcode::Mfspr => match self.spr() {
+        if self.op == Opcode::Mfspr {
+            match self.spr() {
                 1 => return write_asm!(out, self => { "mfxer": mnemonic; s: gpr }),
                 8 => return write_asm!(out, self => { "mflr": mnemonic; s: gpr }),
                 9 => return write_asm!(out, self => { "mfctr": mnemonic; s: gpr }),
                 18 => return write_asm!(out, self => { "mfdsisr": mnemonic; s: gpr }),
                 397 => return write_asm!(out, self => { "mfdbatu": mnemonic; s: gpr }),
                 571 => return write_asm!(out, self => { "mftdu": mnemonic; s: gpr }),
-                _ => "mfspr",
-            },
-            Opcode::Mftb => "mftb",
-            _ => disasm_unreachable!(self.code),
-        };
-        write!(out.writer(), "{} r{}, {}", name, self.d(), self.spr())
+                _ => (),
+            };
+        }
+        out.write_mnemonic(self.op.mnemonic())?;
+        out.write_opcode_separator()?;
+        out.write_gpr(self.d())?;
+        out.write_operand_separator()?;
+        write!(out.writer(), "{:#x}", self.spr())?;
+        Ok(())
     }
 
     fn write_asm_form_spr_reg1<F, W>(&self, out: &mut F) -> std::io::Result<()>
@@ -847,19 +850,23 @@ impl Ins {
         F: AsmFormatter<W>,
         W: Write,
     {
-        let name = match self.op {
-            Opcode::Mtspr => match self.spr() {
+        if self.op == Opcode::Mtspr {
+            match self.spr() {
                 1 => return write_asm!(out, self => { "mtxer": mnemonic; s: gpr }),
                 8 => return write_asm!(out, self => { "mtlr": mnemonic; s: gpr }),
                 9 => return write_asm!(out, self => { "mtctr": mnemonic; s: gpr }),
                 18 => return write_asm!(out, self => { "mtdsisr": mnemonic; s: gpr }),
                 397 => return write_asm!(out, self => { "mtdbatu": mnemonic; s: gpr }),
                 571 => return write_asm!(out, self => { "mttdu": mnemonic; s: gpr }),
-                _ => "mtspr",
-            },
-            _ => disasm_unreachable!(self.code),
-        };
-        write!(out.writer(), "{} {:#x}, r{}", name, self.spr(), self.s())
+                _ => (),
+            };
+        }
+        out.write_mnemonic(self.op.mnemonic())?;
+        out.write_opcode_separator()?;
+        write!(out.writer(), "{:#x}", self.spr())?;
+        out.write_operand_separator()?;
+        out.write_gpr(self.s())?;
+        Ok(())
     }
 
     fn write_asm_form_reg1_sr<F, W>(&self, out: &mut F) -> std::io::Result<()>
@@ -870,8 +877,11 @@ impl Ins {
         write_asm!(out, self => {
             (op.mnemonic): mnemonic;
             d: gpr;
-            sr: uimm;
-        })
+        })?;
+        // TODO ugly
+        out.write_operand_separator()?;
+        write!(out.writer(), "{:#x}", self.s())?;
+        Ok(())
     }
 
     fn write_asm_form_sr_reg1<F, W>(&self, out: &mut F) -> std::io::Result<()>
