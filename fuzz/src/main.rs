@@ -98,7 +98,7 @@ impl Fuzzer {
 fn disasm(x: u32) {
     let devnull = DevNull;
     let mut formatter = SimpleFormatter { writer: devnull };
-    let ins = Ins::disasm(x);
+    let ins = Ins::new(x, 0x8000_0000u32);
     ins.write_string(&mut formatter).unwrap();
 }
 

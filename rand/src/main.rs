@@ -12,7 +12,7 @@ fn main() {
     let stream = BufWriter::with_capacity(1_000_000, stdout_lock);
     let mut formatter = SimpleFormatter { writer: stream };
     loop {
-        let ins = Ins::disasm(rng.next_u32());
+        let ins = Ins::new(rng.next_u32(), 0);
         if ins.op == Opcode::Illegal {
             continue;
         }

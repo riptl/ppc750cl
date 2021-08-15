@@ -1,12 +1,14 @@
-use proc_macro::{quote, Delimiter, Group, Ident, Literal, Span, TokenStream, TokenTree};
 use std::iter::FromIterator;
+
+use proc_macro2::{Delimiter, Group, Ident, Literal, Span, TokenStream, TokenTree};
+use quote::quote;
 use syn::parse::{Parse, ParseStream};
 use syn::punctuated::Punctuated;
-use syn::token::{And, EqEq};
-use syn::{LitInt, LitStr, Token};
+use syn::token::{And, EqEq, Semi};
+use syn::{LitInt, LitStr};
 
 struct Opcodes {
-    opcodes: Punctuated<Opcode, Token![;]>,
+    opcodes: Punctuated<Opcode, Semi>,
 }
 
 impl Parse for Opcodes {
@@ -140,22 +142,20 @@ fn gen_mnemonic_fn(tokens: &mut Vec<TokenTree>, opcodes: &Opcodes) {
     tokens.push(TokenTree::Group(body));
 }
 
-pub(crate) fn isa(input: TokenStream) -> TokenStream {
-    let opcodes = syn::parse_macro_input!(input as Opcodes);
+pub(crate) fn isa(input: TokenStream) -> syn::Result<TokenStream> {
+    let opcodes: Opcodes = syn::parse2(input)?;
 
     // Assemble root stream.
     let mut root = Vec::<TokenTree>::new();
 
     // Define enum derives and header.
-    let derives = quote!(#[derive(Debug, Copy, Clone, Eq, PartialEq)]);
-    root.append(&mut derives.into_iter().collect());
-    let enum_header = quote!(pub enum Opcode);
-    root.append(&mut enum_header.into_iter().collect());
+    root.extend(quote!(#[derive(Debug, Copy, Clone, Eq, PartialEq)]));
+    root.extend(quote!(pub enum Opcode));
 
     // Create entries.
     // First entry is going to be the illegal entry.
     let mut enum_entries = Vec::<TokenTree>::new();
-    enum_entries.append(&mut (quote!(Illegal = -1,).into_iter().collect()));
+    enum_entries.extend(quote!(Illegal = -1,));
     // Append the actual opcodes.
     for opcode in &opcodes.opcodes {
         enum_entries.push(TokenTree::Ident(Ident::new(
@@ -169,19 +169,8 @@ pub(crate) fn isa(input: TokenStream) -> TokenStream {
     let enum_body = Group::new(Delimiter::Brace, TokenStream::from_iter(enum_entries));
     root.push(TokenTree::Group(enum_body));
 
-    // Default implementation.
-    let opcode_default = quote! {
-        impl Default for Opcode {
-            fn default() -> Self {
-                Opcode::Illegal
-            }
-        }
-    };
-    root.append(&mut opcode_default.into_iter().collect());
-
     // impl Opcode block.
-    let impl_opcode_header = quote!(impl Opcode);
-    root.append(&mut impl_opcode_header.into_iter().collect());
+    root.extend(quote!(impl Opcode));
     let mut impl_opcode_body_parts = Vec::<TokenTree>::new();
     gen_is_valid_fn(&mut impl_opcode_body_parts, &opcodes);
     gen_mnemonic_fn(&mut impl_opcode_body_parts, &opcodes);
@@ -191,21 +180,25 @@ pub(crate) fn isa(input: TokenStream) -> TokenStream {
     );
     root.push(TokenTree::Group(impl_opcode_body));
 
-    // impl ToString block.
-    let to_string_trait_impl = quote! {
+    // Extra code.
+    root.extend(quote! {
+        impl Default for Opcode {
+            fn default() -> Self {
+                Opcode::Illegal
+            }
+        }
+
         impl std::string::ToString for Opcode {
             fn to_string(&self) -> String {
                 let mnemonic = self.mnemonic();
                 mnemonic.to_owned()
             }
         }
-    };
-    root.append(&mut to_string_trait_impl.into_iter().collect());
+    });
 
-    TokenStream::from_iter(root)
+    Ok(TokenStream::from_iter(root))
 }
 
-#[proc_macro]
 #[cfg(test)]
 mod tests {
     use super::*;
