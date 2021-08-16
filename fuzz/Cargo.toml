@@ -9,4 +9,4 @@ repository = "https://github.com/terorie/ppc750cl"
 
 [dependencies]
 num_cpus = "1.13"
-ppc750cl = { path = "../lib", version = "0.1.0" }
+ppc750cl = { path = "../disasm", version = "0.1.0" }

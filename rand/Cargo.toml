@@ -8,6 +8,6 @@ description = "Generate random PowerPC 750CL instructions"
 repository = "https://github.com/terorie/ppc750cl"
 
 [dependencies]
-ppc750cl = { path = "../lib", version = "0.1.0" }
+ppc750cl = { path = "../disasm", version = "0.1.0" }
 rand_core = "0.5"
 sfmt = "0.6"

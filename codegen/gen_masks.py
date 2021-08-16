@@ -23,7 +23,7 @@ def dump_mask(line):
 
 def main():
     with open("patterns.txt", "r") as patterns, open(
-        "../lib/src/isa.rs", "w"
+            "../disasm/src/isa.rs", "w"
     ) as isa_file:
         sys.stdout = isa_file
         print("use ppc750cl_macros::isa;")
