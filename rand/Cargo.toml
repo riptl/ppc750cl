@@ -1,6 +1,6 @@
 [package]
 name = "ppc750cl-rand"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2018"
 authors = ["Richard Patel <me@terorie.dev>"]
 license = "GPL-3.0-or-later"
@@ -8,6 +8,6 @@ description = "Generate random PowerPC 750CL instructions"
 repository = "https://github.com/terorie/ppc750cl"
 
 [dependencies]
-ppc750cl = { path = "../disasm", version = "0.1.0" }
+ppc750cl = { path = "../disasm", version = "0.1.1" }
 rand_core = "0.5"
 sfmt = "0.6"

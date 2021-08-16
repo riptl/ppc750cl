@@ -1,6 +1,6 @@
 [package]
 name = "ppc750cl"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2018"
 authors = ["Richard Patel <me@terorie.dev>"]
 license = "GPL-3.0-or-later"
@@ -10,4 +10,4 @@ repository = "https://github.com/terorie/ppc750cl"
 
 [dependencies]
 num-traits = "0.2.14"
-ppc750cl-macros = { path = "../macros", version = "0.1.0" }
+ppc750cl-macros = { path = "../macros", version = "0.1.1" }

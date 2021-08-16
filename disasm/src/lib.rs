@@ -11,10 +11,12 @@ use ppc750cl_macros::write_asm;
 mod macros;
 pub mod formatter;
 mod isa;
+mod iter;
 
 pub use crate::formatter::AsmFormatter;
 use crate::formatter::SimpleFormatter;
 pub use crate::isa::Opcode;
+pub use crate::iter::{disasm_iter, DisasmIterator};
 
 #[derive(Default, Clone)]
 pub struct Ins {
@@ -40,7 +42,8 @@ where
 
 macro_rules! ins_bit {
     ($func:ident, $idx:expr) => {
-        fn $func(&self) -> u8 {
+        #[inline(always)]
+        pub fn $func(&self) -> u8 {
             bit(self.code, $idx)
         }
     };
@@ -48,7 +51,8 @@ macro_rules! ins_bit {
 
 macro_rules! ins_ufield {
     ($func:ident, $return_type:ident, $range:expr) => {
-        fn $func(&self) -> $return_type {
+        #[inline(always)]
+        pub fn $func(&self) -> $return_type {
             debug_assert!(
                 ($range).len() / 8 <= (std::mem::size_of::<$return_type>()),
                 "{:?} does not fit in {}",
@@ -62,7 +66,8 @@ macro_rules! ins_ufield {
 
 macro_rules! ins_ifield {
     ($func:ident, $range:expr) => {
-        fn $func(&self) -> i32 {
+        #[inline(always)]
+        pub fn $func(&self) -> i32 {
             debug_assert!(
                 ($range).len() / 8 <= (std::mem::size_of::<i32>()),
                 "{:?} does not fit in {}",
@@ -78,7 +83,8 @@ macro_rules! ins_ifield {
         }
     };
     ($func:ident, $range:expr, $shift:literal) => {
-        fn $func(&self) -> i32 {
+        #[inline(always)]
+        pub fn $func(&self) -> i32 {
             debug_assert!(
                 ($range).len() / 8 <= (std::mem::size_of::<i32>()),
                 "{:?} does not fit in {}",
@@ -123,7 +129,7 @@ impl Ins {
 
     ins_ufield!(crm, u8, 12..20);
     ins_ufield!(sr, u8, 12..16);
-    fn spr(&self) -> u16 {
+    pub fn spr(&self) -> u16 {
         bits::<u16>(self.code, 11..16) | (bits::<u16>(self.code, 16..21) << 5)
     }
     ins_ufield!(fm, u16, 7..15);
@@ -136,7 +142,7 @@ impl Ins {
     ins_ufield!(sh, u8, 16..21);
     ins_ufield!(mb, u8, 21..26);
     ins_ufield!(me, u8, 26..31);
-    fn me_31sub(&self) -> u8 {
+    pub fn me_31sub(&self) -> u8 {
         31 - self.me()
     }
     ins_ifield!(bd, 16..30, 2);
@@ -161,7 +167,7 @@ impl Ins {
 
     // Ported from
     // https://github.com/dolphin-emu/dolphin/blob/master/Source/Core/Common/GekkoDisassembler.cpp
-    #[inline]
+    #[inline(always)]
     fn write_asm_branch<F, W>(&self, out: &mut F, bname: &str) -> std::io::Result<()>
     where
         F: AsmFormatter<W>,
