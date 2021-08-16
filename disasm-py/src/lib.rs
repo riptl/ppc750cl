@@ -109,7 +109,7 @@ impl PyIterProtocol for DisasmIterator {
         if (slf.bytes.len() as u32) - slf.offset < 4 {
             return Ok(None);
         }
-        let code = ((slf.bytes[(slf.offset + 0) as usize] as u32) << 24)
+        let code = ((slf.bytes[(slf.offset) as usize] as u32) << 24)
             | ((slf.bytes[(slf.offset + 1) as usize] as u32) << 16)
             | ((slf.bytes[(slf.offset + 2) as usize] as u32) << 8)
             | (slf.bytes[(slf.offset + 3) as usize] as u32);
@@ -121,7 +121,7 @@ impl PyIterProtocol for DisasmIterator {
 }
 
 #[pyfunction]
-fn disasm_iter<'a>(code: &[u8], addr: u32) -> PyResult<DisasmIterator> {
+fn disasm_iter(code: &[u8], addr: u32) -> PyResult<DisasmIterator> {
     Ok(DisasmIterator {
         bytes: code.to_vec(),
         addr,

@@ -186,6 +186,12 @@ pub struct DoldecompFormatter<W: Write> {
     pub writer: W,
 }
 
+impl<W: Write> DoldecompFormatter<W> {
+    pub fn new(writer: W) -> Self {
+        Self { writer }
+    }
+}
+
 impl<W: Write> AsmFormatter<W> for DoldecompFormatter<W> {
     fn writer(&mut self) -> &mut W {
         &mut self.writer
@@ -194,7 +200,8 @@ impl<W: Write> AsmFormatter<W> for DoldecompFormatter<W> {
     fn before_instruction(&mut self, ins: &Ins) -> IOResult {
         write!(
             &mut self.writer,
-            "/* TODO */  {:X} {:X} {:X} {:X}\t",
+            "/* {:0>8X}  {:0>2X} {:0>2X} {:0>2X} {:0>2X} */\t",
+            ins.addr,
             (ins.code >> 24) as u8,
             (ins.code >> 16) as u8,
             (ins.code >> 8) as u8,
@@ -221,5 +228,24 @@ impl<N: PrimInt> UpperHex for ReallySigned<N> {
         let prefix = if f.alternate() { "0x" } else { "" };
         let bare_hex = format!("{:X}", num.abs());
         f.pad_integral(num >= 0, prefix, &bare_hex)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_doldecomp_formatter() {
+        let buf = Vec::<u8>::new();
+        let mut formatter = DoldecompFormatter::new(buf);
+
+        let ins = Ins::new(0x48000007, 6);
+        ins.write_string(&mut formatter).unwrap();
+
+        assert_eq!(
+            String::from_utf8(formatter.writer).unwrap(),
+            "/* 00000006  48 00 00 07 */\tbla 0x4"
+        );
     }
 }

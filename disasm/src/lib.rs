@@ -423,6 +423,17 @@ impl Ins {
         F: AsmFormatter<W>,
         W: Write,
     {
+        out.before_instruction(self)?;
+        self.write_string_inner(out)?;
+        out.after_instruction(self)?;
+        Ok(())
+    }
+
+    fn write_string_inner<F, W>(&self, out: &mut F) -> std::io::Result<()>
+    where
+        F: AsmFormatter<W>,
+        W: Write,
+    {
         // Simplified mnemonic.
         if self.op == Opcode::Or && self.s() == self.b() {
             return write_asm!(out, self => {
@@ -913,7 +924,7 @@ impl Ins {
 impl ToString for Ins {
     fn to_string(&self) -> String {
         let buf = Vec::<u8>::new();
-        let mut formatter = SimpleFormatter { writer: buf };
+        let mut formatter = SimpleFormatter::new(buf);
         self.write_string(&mut formatter).unwrap();
         unsafe { String::from_utf8_unchecked(formatter.writer) }
     }

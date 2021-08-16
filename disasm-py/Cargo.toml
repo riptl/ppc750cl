@@ -11,6 +11,10 @@ repository = "https://github.com/terorie/ppc750cl"
 name = "ppc750cl"
 crate-type = ["cdylib"]
 
+[features]
+extension-module = ["pyo3/extension-module"]
+default = ["extension-module"]
+
 [dependencies]
-pyo3 = { version = "0.14", features = ["extension-module", "multiple-pymethods"] }
+pyo3 = { version = "0.14", features = ["multiple-pymethods"] }
 ppc750cl = { version = "0.1.1", path = "../disasm" }
