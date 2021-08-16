@@ -47,7 +47,7 @@ macro_rules! ins_bit {
 }
 
 macro_rules! ins_ufield {
-    ($func:ident, $return_type:tt, $range:expr) => {
+    ($func:ident, $return_type:ident, $range:expr) => {
         fn $func(&self) -> $return_type {
             debug_assert!(
                 ($range).len() / 8 <= (std::mem::size_of::<$return_type>()),
@@ -96,6 +96,7 @@ macro_rules! ins_ifield {
 }
 
 impl Ins {
+    /// Reads an instruction given a machine code and its address.
     pub fn new(code: u32, addr: u32) -> Self {
         let op = Opcode::from_code(code);
         Self { code, addr, op }
@@ -145,159 +146,6 @@ impl Ins {
     ins_ufield!(ps_l, u8, 17..20);
     ins_ifield!(ps_d, 20..32);
 
-    fn write_asm_form_reg123<F, W>(&self, out: &mut F) -> std::io::Result<()>
-    where
-        F: AsmFormatter<W>,
-        W: Write,
-    {
-        write_asm!(out, self => {
-            (op.mnemonic): mnemonic;
-            d: gpr;
-            a: gpr0;
-            b: gpr;
-        })
-    }
-
-    fn write_asm_form_reg123_rc<F, W>(&self, out: &mut F) -> std::io::Result<()>
-    where
-        F: AsmFormatter<W>,
-        W: Write,
-    {
-        write_asm!(out, self => {
-            (op.mnemonic, rc): mnemonic;
-            d: gpr;
-            a: gpr;
-            b: gpr;
-        })
-    }
-
-    fn write_asm_form_reg123_oe_rc<F, W>(&self, out: &mut F) -> std::io::Result<()>
-    where
-        F: AsmFormatter<W>,
-        W: Write,
-    {
-        write_asm!(out, self => {
-            (op.mnemonic, oe, rc): mnemonic;
-            d: gpr;
-            a: gpr;
-            b: gpr;
-        })
-    }
-
-    fn write_asm_form_reg12_simm<F, W>(&self, out: &mut F) -> std::io::Result<()>
-    where
-        F: AsmFormatter<W>,
-        W: Write,
-    {
-        if self.op == Opcode::Addi && self.a() == 0 {
-            write_asm!(out, self => {
-                "li": mnemonic;
-                d: gpr;
-                simm: simm;
-            })
-        } else if self.op == Opcode::Addis && self.a() == 0 {
-            write_asm!(out, self => {
-                "lis": mnemonic;
-                d: gpr;
-                simm: simm;
-            })
-        } else {
-            write_asm!(out, self => {
-                (op.mnemonic): mnemonic;
-                d: gpr;
-                a: gpr;
-                simm: simm;
-            })
-        }
-    }
-
-    fn write_asm_form_reg12_uimm<F, W>(&self, out: &mut F) -> std::io::Result<()>
-    where
-        F: AsmFormatter<W>,
-        W: Write,
-    {
-        if self.op == Opcode::Addis && self.a() == 0 {
-            return write_asm!(out, self => {
-                "lis": mnemonic;
-                d: gpr;
-                uimm: uimm;
-            });
-        }
-        write_asm!(out, self => {
-            (op.mnemonic): mnemonic;
-            d: gpr;
-            a: gpr;
-            uimm: uimm;
-        })
-    }
-
-    fn write_asm_form_reg21_uimm<F, W>(&self, out: &mut F) -> std::io::Result<()>
-    where
-        F: AsmFormatter<W>,
-        W: Write,
-    {
-        if self.op == Opcode::Ori && self.a() == 0 && self.s() == 0 && self.uimm() == 0 {
-            return write_asm!(out, self => { "nop": mnemonic });
-        }
-        write_asm!(out, self => {
-            (op.mnemonic): mnemonic;
-            a: gpr;
-            s: gpr;
-            uimm: uimm;
-        })
-    }
-
-    fn write_asm_form_reg12_offset<F, W>(&self, out: &mut F) -> std::io::Result<()>
-    where
-        F: AsmFormatter<W>,
-        W: Write,
-    {
-        write_asm!(out, self => {
-            (op.mnemonic): mnemonic;
-            d: gpr;
-            simm: offset;
-            a: gpr0;
-        })
-    }
-
-    fn write_asm_form_fr1_reg2_offset<F, W>(&self, out: &mut F) -> std::io::Result<()>
-    where
-        F: AsmFormatter<W>,
-        W: Write,
-    {
-        write_asm!(out, self => {
-            (op.mnemonic): mnemonic;
-            d: fpr;
-            simm: offset;
-            a: gpr;
-        })
-    }
-
-    fn write_asm_form_fr1_reg23<F, W>(&self, out: &mut F) -> std::io::Result<()>
-    where
-        F: AsmFormatter<W>,
-        W: Write,
-    {
-        write_asm!(out, self => {
-            (op.mnemonic): mnemonic;
-            d: fpr;
-            a: gpr;
-            b: gpr;
-        })
-    }
-
-    fn write_asm_mtfsf<F, W>(&self, out: &mut F) -> std::io::Result<()>
-    where
-        F: AsmFormatter<W>,
-        W: Write,
-    {
-        write_asm!(out, self => {
-            (op.mnemonic): mnemonic;
-            fm: fm;
-            b: fpr;
-        })
-    }
-
     fn write_asm_mtfsfi<F, W>(&self, out: &mut F) -> std::io::Result<()>
     where
         F: AsmFormatter<W>,
@@ -309,153 +157,6 @@ impl Ins {
         out.write_operand_separator()?;
         write!(out.writer(), "{}", bits::<u8>(self.code, 16..20))?;
         Ok(())
-    }
-
-    fn write_asm_form_reg1<F, W>(&self, out: &mut F) -> std::io::Result<()>
-    where
-        F: AsmFormatter<W>,
-        W: Write,
-    {
-        write_asm!(out, self => {
-            (op.mnemonic): mnemonic;
-            d: gpr;
-        })
-    }
-
-    fn write_asm_form_reg12_oe_rc<F, W>(&self, out: &mut F) -> std::io::Result<()>
-    where
-        F: AsmFormatter<W>,
-        W: Write,
-    {
-        write_asm!(out, self => {
-            (op.mnemonic, oe, rc): mnemonic;
-            d: gpr;
-            a: gpr;
-        })
-    }
-
-    fn write_asm_form_reg13<F, W>(&self, out: &mut F) -> std::io::Result<()>
-    where
-        F: AsmFormatter<W>,
-        W: Write,
-    {
-        write_asm!(out, self => {
-            (op.mnemonic): mnemonic;
-            d: gpr;
-            b: gpr;
-        })
-    }
-
-    fn write_asm_form_reg21_rc<F, W>(&self, out: &mut F) -> std::io::Result<()>
-    where
-        F: AsmFormatter<W>,
-        W: Write,
-    {
-        write_asm!(out, self => {
-            (op.mnemonic, rc): mnemonic;
-            a: gpr;
-            s: gpr;
-        })
-    }
-
-    fn write_asm_form_fr1<F, W>(&self, out: &mut F) -> std::io::Result<()>
-    where
-        F: AsmFormatter<W>,
-        W: Write,
-    {
-        write_asm!(out, self => {
-            (op.mnemonic, rc): mnemonic;
-            d: fpr;
-        })
-    }
-
-    fn write_asm_form_fr13_rc<F, W>(&self, out: &mut F) -> std::io::Result<()>
-    where
-        F: AsmFormatter<W>,
-        W: Write,
-    {
-        write_asm!(out, self => {
-            (op.mnemonic, rc): mnemonic;
-            d: fpr;
-            b: fpr;
-        })
-    }
-
-    fn write_asm_form_fr123<F, W>(&self, out: &mut F) -> std::io::Result<()>
-    where
-        F: AsmFormatter<W>,
-        W: Write,
-    {
-        write_asm!(out, self => {
-            (op.mnemonic, rc): mnemonic;
-            d: fpr;
-            a: fpr;
-            b: fpr;
-        })
-    }
-
-    fn write_asm_form_fr1243<F, W>(&self, out: &mut F) -> std::io::Result<()>
-    where
-        F: AsmFormatter<W>,
-        W: Write,
-    {
-        write_asm!(out, self => {
-            (op.mnemonic, rc): mnemonic;
-            d: fpr;
-            a: fpr;
-            c: fpr;
-            b: fpr;
-        })
-    }
-
-    fn write_asm_form_fr124<F, W>(&self, out: &mut F) -> std::io::Result<()>
-    where
-        F: AsmFormatter<W>,
-        W: Write,
-    {
-        write_asm!(out, self => {
-            (op.mnemonic, rc): mnemonic;
-            d: fpr;
-            a: fpr;
-            c: fpr;
-        })
-    }
-
-    fn write_asm_form_condreg1_fr23<F, W>(&self, out: &mut F) -> std::io::Result<()>
-    where
-        F: AsmFormatter<W>,
-        W: Write,
-    {
-        write_asm!(out, self => {
-            (op.mnemonic): mnemonic;
-            crf_d: cr;
-            a: fpr;
-            b: fpr;
-        })
-    }
-
-    fn write_asm_form_condreg1_fr13_rc<F, W>(&self, out: &mut F) -> std::io::Result<()>
-    where
-        F: AsmFormatter<W>,
-        W: Write,
-    {
-        write_asm!(out, self => {
-            (op.mnemonic, rc): mnemonic;
-            crf_d: cr;
-            d: fpr;
-            b: fpr;
-        })
-    }
-
-    fn write_asm_b<F, W>(&self, out: &mut F) -> std::io::Result<()>
-    where
-        F: AsmFormatter<W>,
-        W: Write,
-    {
-        write_asm!(out, self => {
-            (op.mnemonic, lk, aa): mnemonic;
-            li: branch_target;
-        })
     }
 
     // Ported from
@@ -663,160 +364,6 @@ impl Ins {
         })
     }
 
-    fn write_asm_form_condreg1<F, W>(&self, out: &mut F) -> std::io::Result<()>
-    where
-        F: AsmFormatter<W>,
-        W: Write,
-    {
-        write_asm!(out, self => {
-            (op.mnemonic): mnemonic;
-            crf_d: cr;
-        })
-    }
-
-    fn write_asm_form_condreg1_rc<F, W>(&self, out: &mut F) -> std::io::Result<()>
-    where
-        F: AsmFormatter<W>,
-        W: Write,
-    {
-        write_asm!(out, self => {
-            (op.mnemonic, rc): mnemonic;
-            crf_d: cr;
-        })
-    }
-
-    fn write_asm_form_condreg12<F, W>(&self, out: &mut F) -> std::io::Result<()>
-    where
-        F: AsmFormatter<W>,
-        W: Write,
-    {
-        write_asm!(out, self => {
-            (op.mnemonic): mnemonic;
-            crf_d: cr;
-            crf_s: cr;
-        })
-    }
-
-    fn write_asm_form_condreg123<F, W>(&self, out: &mut F) -> std::io::Result<()>
-    where
-        F: AsmFormatter<W>,
-        W: Write,
-    {
-        write_asm!(out, self => {
-            (op.mnemonic): mnemonic;
-            crb_d: cr;
-            crb_a: cr;
-            crb_b: cr;
-        })
-    }
-
-    fn write_asm_form_reg23<F, W>(&self, out: &mut F) -> std::io::Result<()>
-    where
-        F: AsmFormatter<W>,
-        W: Write,
-    {
-        write_asm!(out, self => {
-            (op.mnemonic): mnemonic;
-            a: gpr0;
-            b: gpr0;
-        })
-    }
-
-    fn write_asm_form_reg213<F, W>(&self, out: &mut F) -> std::io::Result<()>
-    where
-        F: AsmFormatter<W>,
-        W: Write,
-    {
-        if self.op == Opcode::Or && self.s() == self.b() {
-            return write_asm!(out, self => {
-                "mr": mnemonic;
-                a: gpr;
-                s: gpr;
-            });
-        }
-        write_asm!(out, self => {
-            (op.mnemonic, rc): mnemonic;
-            a: gpr;
-            s: gpr;
-            b: gpr;
-        })
-    }
-
-    fn write_asm_rlw_imm<F, W>(&self, out: &mut F) -> std::io::Result<()>
-    where
-        F: AsmFormatter<W>,
-        W: Write,
-    {
-        if self.op == Opcode::Rlwinm && self.sh() == 0 && self.me() == 31 {
-            return write_asm!(out, self => {
-                ("clrlwi", rc): mnemonic;
-                a: gpr;
-                s: gpr;
-                mb: uimm;
-            });
-        }
-        if self.op == Opcode::Rlwinm && self.mb() == 0 && self.me() == 31 {
-            return write_asm!(out, self => {
-                ("rotlwi", rc): mnemonic;
-                a: gpr;
-                s: gpr;
-                sh: uimm;
-            });
-        }
-        if self.op == Opcode::Rlwinm && self.mb() == 0 && 31 - self.sh() == self.me() {
-            return write_asm!(out, self => {
-                ("slwi", rc): mnemonic;
-                a: gpr;
-                s: gpr;
-                me_31sub: uimm;
-            });
-        }
-        if self.op == Opcode::Rlwinm && self.me() == 31 && 32 - self.mb() == self.sh() {
-            return write_asm!(out, self => {
-                ("srwi", rc): mnemonic;
-                a: gpr;
-                s: gpr;
-                mb: uimm;
-            });
-        }
-        write_asm!(out, self => {
-            (op.mnemonic, rc): mnemonic;
-            a: gpr;
-            s: gpr;
-            sh: mode;
-            mb: uimm;
-            me: uimm;
-        })
-    }
-
-    fn write_asm_rlw_reg<F, W>(&self, out: &mut F) -> std::io::Result<()>
-    where
-        F: AsmFormatter<W>,
-        W: Write,
-    {
-        write_asm!(out, self => {
-            (op.mnemonic, rc): mnemonic;
-            a: gpr;
-            s: gpr;
-            b: gpr;
-            mb: uimm;
-            me: uimm;
-        })
-    }
-
-    fn write_asm_form_reg12_nb<F, W>(&self, out: &mut F) -> std::io::Result<()>
-    where
-        F: AsmFormatter<W>,
-        W: Write,
-    {
-        write_asm!(out, self => {
-            (op.mnemonic): mnemonic;
-            d: gpr;
-            a: gpr;
-            b: mode;
-        })
-    }
-
     fn write_asm_form_reg1_spr<F, W>(&self, out: &mut F) -> std::io::Result<()>
     where
         F: AsmFormatter<W>,
@@ -865,75 +412,51 @@ impl Ins {
         Ok(())
     }
 
-    fn write_asm_form_reg1_sr<F, W>(&self, out: &mut F) -> std::io::Result<()>
+    pub fn write_string<F, W>(&self, out: &mut F) -> std::io::Result<()>
     where
         F: AsmFormatter<W>,
         W: Write,
     {
-        write_asm!(out, self => {
-            (op.mnemonic): mnemonic;
-            d: gpr;
-            sr: mode;
-        })
-    }
-
-    fn write_asm_form_sr_reg1<F, W>(&self, out: &mut F) -> std::io::Result<()>
-    where
-        F: AsmFormatter<W>,
-        W: Write,
-    {
-        write_asm!(out, self => {
-            (op.mnemonic): mnemonic;
-            sr: uimm;
-            s: gpr;
-        })
-    }
-
-    fn write_asm_mtcrf<F, W>(&self, out: &mut F) -> std::io::Result<()>
-    where
-        F: AsmFormatter<W>,
-        W: Write,
-    {
-        write!(
-            out.writer(),
-            "{} {}, r{}",
-            self.op.mnemonic(),
-            self.crm(),
-            self.s()
-        )
-    }
-
-    fn write_asm_srawi<F, W>(&self, out: &mut F) -> std::io::Result<()>
-    where
-        F: AsmFormatter<W>,
-        W: Write,
-    {
-        write_asm!(out, self => {
-            (op.mnemonic, rc): mnemonic;
-            a: gpr;
-            s: gpr;
-            sh: uimm;
-        })
-    }
-
-    fn write_asm_tw<F, W>(&self, out: &mut F) -> std::io::Result<()>
-    where
-        F: AsmFormatter<W>,
-        W: Write,
-    {
-        write_asm!(out, self => {
-            (op.mnemonic): mnemonic;
-            to: mode;
-            a: gpr;
-            b: gpr;
-        })
-    }
-
-    fn write_asm_twi<F, W>(&self, out: &mut F) -> std::io::Result<()>
-    where
-        F: AsmFormatter<W>,
-        W: Write,
-    {
+        // Simplified mnemonic.
+        if self.op == Opcode::Or && self.s() == self.b() {
+            return write_asm!(out, self => {
+                "mr": mnemonic;
+                a: gpr;
+                s: gpr;
+            });
+        }
+        if self.op == Opcode::Rlwinm && self.sh() == 0 && self.me() == 31 {
+            return write_asm!(out, self => {
+                ("clrlwi", rc): mnemonic;
+                a: gpr;
+                s: gpr;
+                mb: uimm;
+            });
+        }
+        if self.op == Opcode::Rlwinm && self.mb() == 0 && self.me() == 31 {
+            return write_asm!(out, self => {
+                ("rotlwi", rc): mnemonic;
+                a: gpr;
+                s: gpr;
+                sh: uimm;
+            });
+        }
+        if self.op == Opcode::Rlwinm && self.mb() == 0 && 31 - self.sh() == self.me() {
+            return write_asm!(out, self => {
+                ("slwi", rc): mnemonic;
+                a: gpr;
+                s: gpr;
+                me_31sub: uimm;
+            });
+        }
+        if self.op == Opcode::Rlwinm && self.me() == 31 && 32 - self.mb() == self.sh() {
+            return write_asm!(out, self => {
+                ("srwi", rc): mnemonic;
+                a: gpr;
+                s: gpr;
+                mb: uimm;
+            });
+        }
         if self.op == Opcode::Twi && self.to() == 31 {
             return write_asm!(out, self => {
                 "twui": mnemonic;
@@ -941,49 +464,31 @@ impl Ins {
                 simm: simm;
             });
         }
-        write_asm!(out, self => {
-            (op.mnemonic): mnemonic;
-            to: mode;
-            a: gpr;
-            simm: simm;
-        })
-    }
-
-    fn write_asm_psq<F, W>(&self, out: &mut F) -> std::io::Result<()>
-    where
-        F: AsmFormatter<W>,
-        W: Write,
-    {
-        write_asm!(out, self => {
-            (op.mnemonic): mnemonic;
-            d: fpr;
-            ps_d: offset;
-            a: gpr;
-            w: mode;
-            ps_l: qr;
-        })
-    }
-
-    fn write_asm_psq_x<F, W>(&self, out: &mut F) -> std::io::Result<()>
-    where
-        F: AsmFormatter<W>,
-        W: Write,
-    {
-        write_asm!(out, self => {
-            (op.mnemonic): mnemonic;
-            d: fpr;
-            a: gpr;
-            b: gpr;
-            w: mode;
-            ps_l: qr;
-        })
-    }
-
-    pub fn write_string<F, W>(&self, out: &mut F) -> std::io::Result<()>
-    where
-        F: AsmFormatter<W>,
-        W: Write,
-    {
+        if self.op == Opcode::Ori && self.a() == 0 && self.s() == 0 && self.uimm() == 0 {
+            return write_asm!(out, self => { "nop": mnemonic });
+        }
+        if self.op == Opcode::Addis && self.a() == 0 {
+            return write_asm!(out, self => {
+                "lis": mnemonic;
+                d: gpr;
+                uimm: uimm;
+            });
+        }
+        if self.op == Opcode::Addi && self.a() == 0 {
+            return write_asm!(out, self => {
+                "li": mnemonic;
+                d: gpr;
+                simm: simm;
+            });
+        }
+        if self.op == Opcode::Addis && self.a() == 0 {
+            return write_asm!(out, self => {
+                "lis": mnemonic;
+                d: gpr;
+                simm: simm;
+            });
+        }
+        // Generic.
         match self.op {
             Opcode::Illegal => write!(out.writer(), "<illegal>"),
 
@@ -997,13 +502,28 @@ impl Ins {
 
             // General purpose register only
             Opcode::Mfcr | Opcode::Mfmsr | Opcode::Mtmsr | Opcode::Tlbie => {
-                self.write_asm_form_reg1(out)
+                write_asm!(out, self => {
+                    (op.mnemonic): mnemonic;
+                    d: gpr;
+                })
             }
             Opcode::Addme | Opcode::Addze | Opcode::Neg | Opcode::Subfme | Opcode::Subfze => {
-                self.write_asm_form_reg12_oe_rc(out)
+                write_asm!(out, self => {
+                    (op.mnemonic, oe, rc): mnemonic;
+                    d: gpr;
+                    a: gpr;
+                })
             }
-            Opcode::Mfsrin | Opcode::Mtsrin => self.write_asm_form_reg13(out),
-            Opcode::Cntlzw | Opcode::Extsb | Opcode::Extsh => self.write_asm_form_reg21_rc(out),
+            Opcode::Mfsrin | Opcode::Mtsrin => write_asm!(out, self => {
+                (op.mnemonic): mnemonic;
+                d: gpr;
+                b: gpr;
+            }),
+            Opcode::Cntlzw | Opcode::Extsb | Opcode::Extsh => write_asm!(out, self => {
+                (op.mnemonic, rc): mnemonic;
+                a: gpr;
+                s: gpr;
+            }),
             Opcode::Dcbf
             | Opcode::Dcbi
             | Opcode::Dcbst
@@ -1011,7 +531,11 @@ impl Ins {
             | Opcode::Dcbtst
             | Opcode::Dcbz
             | Opcode::DcbzL
-            | Opcode::Icbi => self.write_asm_form_reg23(out),
+            | Opcode::Icbi => write_asm!(out, self => {
+                (op.mnemonic): mnemonic;
+                a: gpr0;
+                b: gpr0;
+            }),
             Opcode::Eciwx
             | Opcode::Ecowx
             | Opcode::Lhaux
@@ -1035,8 +559,18 @@ impl Ins {
             | Opcode::Stwbrx
             | Opcode::Stwcx_
             | Opcode::Stwx
-            | Opcode::Stwux => self.write_asm_form_reg123(out),
-            Opcode::Mulhw | Opcode::Mulhwu => self.write_asm_form_reg123_rc(out),
+            | Opcode::Stwux => write_asm!(out, self => {
+                (op.mnemonic): mnemonic;
+                d: gpr;
+                a: gpr0;
+                b: gpr;
+            }),
+            Opcode::Mulhw | Opcode::Mulhwu => write_asm!(out, self => {
+                (op.mnemonic, rc): mnemonic;
+                d: gpr;
+                a: gpr;
+                b: gpr;
+            }),
             Opcode::Add
             | Opcode::Addc
             | Opcode::Adde
@@ -1045,7 +579,12 @@ impl Ins {
             | Opcode::Mullw
             | Opcode::Subf
             | Opcode::Subfc
-            | Opcode::Subfe => self.write_asm_form_reg123_oe_rc(out),
+            | Opcode::Subfe => write_asm!(out, self => {
+                (op.mnemonic, oe, rc): mnemonic;
+                d: gpr;
+                a: gpr;
+                b: gpr;
+            }),
             Opcode::Eqv
             | Opcode::Nand
             | Opcode::Nor
@@ -1056,23 +595,57 @@ impl Ins {
             | Opcode::Srw
             | Opcode::Xor
             | Opcode::And
-            | Opcode::Andc => self.write_asm_form_reg213(out),
+            | Opcode::Andc => write_asm!(out, self => {
+                (op.mnemonic, rc): mnemonic;
+                a: gpr;
+                s: gpr;
+                b: gpr;
+            }),
 
             // General purpose shifts
-            Opcode::Rlwimi | Opcode::Rlwinm => self.write_asm_rlw_imm(out),
-            Opcode::Rlwnm => self.write_asm_rlw_reg(out),
+            Opcode::Rlwimi | Opcode::Rlwinm => write_asm!(out, self => {
+                (op.mnemonic, rc): mnemonic;
+                a: gpr;
+                s: gpr;
+                sh: mode;
+                mb: uimm;
+                me: uimm;
+            }),
+            Opcode::Rlwnm => write_asm!(out, self => {
+                (op.mnemonic, rc): mnemonic;
+                a: gpr;
+                s: gpr;
+                b: gpr;
+                mb: uimm;
+                me: uimm;
+            }),
 
             // General purpose register misc
             Opcode::Addi | Opcode::Addic | Opcode::Addic_ | Opcode::Mulli | Opcode::Subfic => {
-                self.write_asm_form_reg12_simm(out)
+                write_asm!(out, self => {
+                    (op.mnemonic): mnemonic;
+                    d: gpr;
+                    a: gpr;
+                    simm: simm;
+                })
             }
-            Opcode::Addis => self.write_asm_form_reg12_uimm(out),
+            Opcode::Addis => write_asm!(out, self => {
+                (op.mnemonic): mnemonic;
+                d: gpr;
+                a: gpr;
+                uimm: uimm;
+            }),
             Opcode::Andi_
             | Opcode::Andis_
             | Opcode::Ori
             | Opcode::Oris
             | Opcode::Xori
-            | Opcode::Xoris => self.write_asm_form_reg21_uimm(out),
+            | Opcode::Xoris => write_asm!(out, self => {
+                (op.mnemonic): mnemonic;
+                a: gpr;
+                s: gpr;
+                uimm: uimm;
+            }),
             Opcode::Lbz
             | Opcode::Lbzu
             | Opcode::Lha
@@ -1088,19 +661,59 @@ impl Ins {
             | Opcode::Sthu
             | Opcode::Stmw
             | Opcode::Stw
-            | Opcode::Stwu => self.write_asm_form_reg12_offset(out),
-            Opcode::Lswi | Opcode::Stswi => self.write_asm_form_reg12_nb(out),
+            | Opcode::Stwu => write_asm!(out, self => {
+                (op.mnemonic): mnemonic;
+                d: gpr;
+                simm: offset;
+                a: gpr0;
+            }),
+            Opcode::Lswi | Opcode::Stswi => write_asm!(out, self => {
+                (op.mnemonic): mnemonic;
+                d: gpr;
+                a: gpr;
+                b: mode;
+            }),
             Opcode::Mfspr | Opcode::Mftb => self.write_asm_form_reg1_spr(out),
             Opcode::Mtspr => self.write_asm_form_spr_reg1(out),
-            Opcode::Mfsr => self.write_asm_form_reg1_sr(out),
-            Opcode::Mtsr => self.write_asm_form_sr_reg1(out),
-            Opcode::Mtcrf => self.write_asm_mtcrf(out),
-            Opcode::Srawi => self.write_asm_srawi(out),
-            Opcode::Tw => self.write_asm_tw(out),
-            Opcode::Twi => self.write_asm_twi(out),
+            Opcode::Mfsr => write_asm!(out, self => {
+                (op.mnemonic): mnemonic;
+                d: gpr;
+                sr: mode;
+            }),
+            Opcode::Mtsr => write_asm!(out, self => {
+                (op.mnemonic): mnemonic;
+                sr: uimm;
+                s: gpr;
+            }),
+            Opcode::Mtcrf => write_asm!(out, self => {
+                (op.mnemonic): mnemonic;
+                crm: mode;
+                s: gpr;
+            }),
+            Opcode::Srawi => write_asm!(out, self => {
+                (op.mnemonic, rc): mnemonic;
+                a: gpr;
+                s: gpr;
+                sh: uimm;
+            }),
+            Opcode::Tw => write_asm!(out, self => {
+                (op.mnemonic): mnemonic;
+                to: mode;
+                a: gpr;
+                b: gpr;
+            }),
+            Opcode::Twi => write_asm!(out, self => {
+                (op.mnemonic): mnemonic;
+                to: mode;
+                a: gpr;
+                simm: simm;
+            }),
 
             // Branch instructions
-            Opcode::B => self.write_asm_b(out),
+            Opcode::B => write_asm!(out, self => {
+                (op.mnemonic, lk, aa): mnemonic;
+                li: branch_target;
+            }),
             Opcode::Bc => self.write_asm_branch(out, ""),
             Opcode::Bcctr => self.write_asm_branch(out, "ctr"),
             Opcode::Bclr => self.write_asm_branch(out, "lr"),
@@ -1111,7 +724,10 @@ impl Ins {
             Opcode::Cmpli => self.write_asm_cmp_uimm(out),
 
             // Floating point register only instructions
-            Opcode::Mffs => self.write_asm_form_fr1(out),
+            Opcode::Mffs => write_asm!(out, self => {
+                (op.mnemonic, rc): mnemonic;
+                d: fpr;
+            }),
             Opcode::Fabs
             | Opcode::Fmr
             | Opcode::Fnabs
@@ -1125,7 +741,11 @@ impl Ins {
             | Opcode::PsNabs
             | Opcode::PsNeg
             | Opcode::PsRes
-            | Opcode::PsRsqrte => self.write_asm_form_fr13_rc(out),
+            | Opcode::PsRsqrte => write_asm!(out, self => {
+                (op.mnemonic, rc): mnemonic;
+                d: fpr;
+                b: fpr;
+            }),
             Opcode::Fadd
             | Opcode::Fadds
             | Opcode::Fdiv
@@ -1138,9 +758,19 @@ impl Ins {
             | Opcode::PsMerge01
             | Opcode::PsMerge10
             | Opcode::PsMerge11
-            | Opcode::PsSub => self.write_asm_form_fr123(out),
+            | Opcode::PsSub => write_asm!(out, self => {
+                (op.mnemonic, rc): mnemonic;
+                d: fpr;
+                a: fpr;
+                b: fpr;
+            }),
             Opcode::Fmul | Opcode::Fmuls | Opcode::PsMul | Opcode::PsMuls0 | Opcode::PsMuls1 => {
-                self.write_asm_form_fr124(out)
+                write_asm!(out, self => {
+                    (op.mnemonic, rc): mnemonic;
+                    d: fpr;
+                    a: fpr;
+                    c: fpr;
+                })
             }
             Opcode::Fmadd
             | Opcode::Fmadds
@@ -1159,16 +789,32 @@ impl Ins {
             | Opcode::PsNmsub
             | Opcode::PsSel
             | Opcode::PsSum0
-            | Opcode::PsSum1 => self.write_asm_form_fr1243(out),
+            | Opcode::PsSum1 => write_asm!(out, self => {
+                (op.mnemonic, rc): mnemonic;
+                d: fpr;
+                a: fpr;
+                c: fpr;
+                b: fpr;
+            }),
 
             // Floating point register misc instructions
-            Opcode::Fctiw => self.write_asm_form_condreg1_fr13_rc(out),
+            Opcode::Fctiw => write_asm!(out, self => {
+                (op.mnemonic, rc): mnemonic;
+                crf_d: cr;
+                d: fpr;
+                b: fpr;
+            }),
             Opcode::Fcmpo
             | Opcode::Fcmpu
             | Opcode::PsCmpo0
             | Opcode::PsCmpo1
             | Opcode::PsCmpu0
-            | Opcode::PsCmpu1 => self.write_asm_form_condreg1_fr23(out),
+            | Opcode::PsCmpu1 => write_asm!(out, self => {
+                (op.mnemonic): mnemonic;
+                crf_d: cr;
+                a: fpr;
+                b: fpr;
+            }),
             Opcode::Lfd
             | Opcode::Lfdu
             | Opcode::Lfs
@@ -1176,7 +822,12 @@ impl Ins {
             | Opcode::Stfd
             | Opcode::Stfdu
             | Opcode::Stfs
-            | Opcode::Stfsu => self.write_asm_form_fr1_reg2_offset(out),
+            | Opcode::Stfsu => write_asm!(out, self => {
+                (op.mnemonic): mnemonic;
+                d: fpr;
+                simm: offset;
+                a: gpr;
+            }),
             Opcode::Lfdux
             | Opcode::Lfdx
             | Opcode::Lfsux
@@ -1185,13 +836,32 @@ impl Ins {
             | Opcode::Stfdx
             | Opcode::Stfiwx
             | Opcode::Stfsux
-            | Opcode::Stfsx => self.write_asm_form_fr1_reg23(out),
-            Opcode::Mtfsf => self.write_asm_mtfsf(out),
+            | Opcode::Stfsx => write_asm!(out, self => {
+                (op.mnemonic): mnemonic;
+                d: fpr;
+                a: gpr;
+                b: gpr;
+            }),
+            Opcode::Mtfsf => write_asm!(out, self => {
+                (op.mnemonic): mnemonic;
+                fm: fm;
+                b: fpr;
+            }),
 
             // Condition register only
-            Opcode::Mcrxr => self.write_asm_form_condreg1(out),
-            Opcode::Mtfsb0 | Opcode::Mtfsb1 => self.write_asm_form_condreg1_rc(out),
-            Opcode::Mcrf | Opcode::Mcrfs => self.write_asm_form_condreg12(out),
+            Opcode::Mcrxr => write_asm!(out, self => {
+                (op.mnemonic): mnemonic;
+                crf_d: cr;
+            }),
+            Opcode::Mtfsb0 | Opcode::Mtfsb1 => write_asm!(out, self => {
+                (op.mnemonic, rc): mnemonic;
+                crf_d: cr;
+            }),
+            Opcode::Mcrf | Opcode::Mcrfs => write_asm!(out, self => {
+                (op.mnemonic): mnemonic;
+                crf_d: cr;
+                crf_s: cr;
+            }),
             Opcode::Crand
             | Opcode::Crandc
             | Opcode::Creqv
@@ -1199,17 +869,36 @@ impl Ins {
             | Opcode::Crnor
             | Opcode::Cror
             | Opcode::Crorc
-            | Opcode::Crxor => self.write_asm_form_condreg123(out),
+            | Opcode::Crxor => write_asm!(out, self => {
+                (op.mnemonic): mnemonic;
+                crb_d: cr;
+                crb_a: cr;
+                crb_b: cr;
+            }),
 
             // Condition register misc
             Opcode::Mtfsfi => self.write_asm_mtfsfi(out),
 
             // Paired-single instructions
             Opcode::PsqL | Opcode::PsqLu | Opcode::PsqSt | Opcode::PsqStu => {
-                self.write_asm_psq(out)
+                write_asm!(out, self => {
+                    (op.mnemonic): mnemonic;
+                    d: fpr;
+                    ps_d: offset;
+                    a: gpr;
+                    w: mode;
+                    ps_l: qr;
+                })
             }
             Opcode::PsqLx | Opcode::PsqLux | Opcode::PsqStx | Opcode::PsqStux => {
-                self.write_asm_psq_x(out)
+                write_asm!(out, self => {
+                    (op.mnemonic): mnemonic;
+                    d: fpr;
+                    a: gpr;
+                    b: gpr;
+                    w: mode;
+                    ps_l: qr;
+                })
             }
         }
     }
