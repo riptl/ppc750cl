@@ -2,5 +2,13 @@
 
 Rust tools for working with the PowerPC 750CL family of processors.
 
-Working on a disassembler at the moment.
-Nothing to see here yet.
+### Python module
+
+Build instructions:
+
+```shell
+python -m venv env
+source ./env/bin/activate
+pip install maturin
+maturin build -m ./disasm-py/Cargo.toml
+```
