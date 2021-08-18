@@ -120,10 +120,16 @@ impl PyIterProtocol for DisasmIterator {
     }
 }
 
-#[pyfunction]
-fn disasm_iter(code: &[u8], addr: u32) -> PyResult<DisasmIterator> {
+#[pyfunction(code, addr, offset = "0", size = "None")]
+fn disasm_iter(code: &[u8], addr: u32, offset: u32, size: Option<u32>) -> PyResult<DisasmIterator> {
+    let mut bytes = &code[offset as usize..];
+    if let Some(size) = size {
+        if (size as usize) < bytes.len() {
+            bytes = &bytes[..size as usize];
+        }
+    }
     Ok(DisasmIterator {
-        bytes: code.to_vec(),
+        bytes: bytes.to_vec(),
         addr,
         offset: 0,
     })
