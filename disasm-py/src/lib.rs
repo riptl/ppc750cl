@@ -1,4 +1,5 @@
 use pyo3::prelude::*;
+use pyo3::types::PyBytes;
 use pyo3::{PyIterProtocol, PyObjectProtocol};
 
 #[pyclass]
@@ -95,9 +96,10 @@ impl<'a> PyObjectProtocol<'a> for Ins {
 
 #[pyclass]
 struct DisasmIterator {
-    bytes: Vec<u8>,
+    bytes: Py<PyBytes>,
     addr: u32,
     offset: u32,
+    left: usize,
 }
 
 #[pyproto]
@@ -106,14 +108,16 @@ impl PyIterProtocol for DisasmIterator {
         slf
     }
     fn __next__(mut slf: PyRefMut<Self>) -> PyResult<Option<Ins>> {
-        if (slf.bytes.len() as u32) - slf.offset < 4 {
+        if slf.left < 4 {
             return Ok(None);
         }
-        let code = ((slf.bytes[(slf.offset) as usize] as u32) << 24)
-            | ((slf.bytes[(slf.offset + 1) as usize] as u32) << 16)
-            | ((slf.bytes[(slf.offset + 2) as usize] as u32) << 8)
-            | (slf.bytes[(slf.offset + 3) as usize] as u32);
+        let bytes = slf.bytes.as_ref(slf.py());
+        let code = ((bytes[(slf.offset) as usize] as u32) << 24)
+            | ((bytes[(slf.offset + 1) as usize] as u32) << 16)
+            | ((bytes[(slf.offset + 2) as usize] as u32) << 8)
+            | (bytes[(slf.offset + 3) as usize] as u32);
         slf.offset += 4;
+        slf.left -= 4;
         let ins = Ins::new(code, slf.addr);
         slf.addr += 4;
         Ok(Some(ins))
@@ -121,17 +125,25 @@ impl PyIterProtocol for DisasmIterator {
 }
 
 #[pyfunction(code, addr, offset = "0", size = "None")]
-fn disasm_iter(code: &[u8], addr: u32, offset: u32, size: Option<u32>) -> PyResult<DisasmIterator> {
-    let mut bytes = &code[offset as usize..];
-    if let Some(size) = size {
-        if (size as usize) < bytes.len() {
-            bytes = &bytes[..size as usize];
-        }
-    }
+fn disasm_iter(
+    code: &PyBytes,
+    addr: u32,
+    offset: u32,
+    size: Option<u32>,
+) -> PyResult<DisasmIterator> {
+    let left = match size {
+        None => code
+            .as_bytes()
+            .len()
+            .checked_sub(offset as usize)
+            .unwrap_or(0),
+        Some(v) => v as usize,
+    };
     Ok(DisasmIterator {
-        bytes: bytes.to_vec(),
+        bytes: code.into(),
         addr,
-        offset: 0,
+        offset,
+        left,
     })
 }
 
