@@ -4,5 +4,6 @@ members = [
     "disasm-py",
     "macros",
     "fuzz",
+    "flow-graph",
     "rand",
 ]
