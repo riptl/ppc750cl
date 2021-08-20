@@ -7,6 +7,7 @@ use petgraph::dot::{Config as DotConfig, Dot};
 use petgraph::graph::{DefaultIx, NodeIndex};
 use petgraph::Graph;
 
+use itertools::Itertools;
 use ppc750cl::{disasm_iter, Ins, Opcode};
 
 fn main() {
@@ -133,6 +134,26 @@ impl BasicSlices {
             };
             debug_assert!(graph[dst_node_idx].range.contains(&branch.1));
             graph.add_edge(src_node_idx, dst_node_idx, ());
+        }
+        // Walk blocks and re-connect nodes that were split off.
+        for (src_node_idx, dst_node_idx) in node_by_addr.values().tuple_windows::<(_, _)>() {
+            // Get pairs of two blocks as a sliding window.
+            let src_block: &BasicBlock = &graph[*src_node_idx];
+            let dst_block: &BasicBlock = &graph[*dst_node_idx];
+            assert_eq!(src_block.range.end, dst_block.range.start);
+            // Get last instruction of left block.
+            // Unless it's an unconditional branch, we can connect the blocks.
+            let last_ins = src_block.code.last().unwrap();
+            if last_ins.code == Opcode::BLR
+                || (last_ins.op == Opcode::B && last_ins.bo() == 0b10100)
+            {
+                continue;
+            }
+            // Execution can continue past the last instruction of a block,
+            // so re-connect two blocks that were split off.
+            if !graph.contains_edge(*src_node_idx, *dst_node_idx) {
+                graph.add_edge(*src_node_idx, *dst_node_idx, ());
+            }
         }
         graph
     }
