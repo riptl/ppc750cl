@@ -4,3 +4,5 @@
 *.profraw
 env/
 lib/
+*.bin
+*.png

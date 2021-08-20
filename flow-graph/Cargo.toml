@@ -2,12 +2,13 @@
 name = "ppc750cl-flow-graph"
 version = "0.1.1"
 edition = "2018"
-authors = ["riidefi", "Richard Patel <me@terorie.dev>"]
+authors = ["riidefi <riidefi@rii.dev>", "Richard Patel <me@terorie.dev>"]
 license = "GPL-3.0-or-later"
 description = "Control flow graph analysis for PowerPC 750CL"
 repository = "https://github.com/terorie/ppc750cl"
 
 [dependencies]
 clap = "2.33"
-parse_int = "0.5.0"
+parse_int = "0.5"
+petgraph = "0.6"
 ppc750cl = { version = "0.1.1", path = "../disasm" }

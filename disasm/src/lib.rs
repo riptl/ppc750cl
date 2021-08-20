@@ -152,6 +152,24 @@ impl Ins {
     ins_ufield!(ps_l, u8, 17..20);
     ins_ifield!(ps_d, 20..32);
 
+    pub fn branch_offset(&self) -> Option<i32> {
+        match self.op {
+            Opcode::B => Some(self.li()),
+            Opcode::Bc | Opcode::Bcctr | Opcode::Bclr => Some(self.bd()),
+            _ => None,
+        }
+    }
+
+    pub fn branch_dest(&self) -> Option<u32> {
+        self.branch_offset().and_then(|offset| {
+            if offset < 0 {
+                self.addr.checked_sub((-offset) as u32)
+            } else {
+                self.addr.checked_add(offset as u32)
+            }
+        })
+    }
+
     fn write_asm_mtfsfi<F, W>(&self, out: &mut F) -> std::io::Result<()>
     where
         F: AsmFormatter<W>,

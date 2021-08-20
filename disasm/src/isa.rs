@@ -238,6 +238,8 @@ isa! {
 }
 
 impl Opcode {
+    pub const BLR: u32 = 0x4c000020;
+
     pub fn from_code(x: u32) -> Self {
         let op = match bits(x, 0..6) {
             0b000011 => Opcode::Twi,
