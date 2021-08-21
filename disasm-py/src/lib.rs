@@ -132,11 +132,7 @@ fn disasm_iter(
     size: Option<u32>,
 ) -> PyResult<DisasmIterator> {
     let left = match size {
-        None => code
-            .as_bytes()
-            .len()
-            .checked_sub(offset as usize)
-            .unwrap_or(0),
+        None => code.as_bytes().len().saturating_sub(offset as usize),
         Some(v) => v as usize,
     };
     Ok(DisasmIterator {
