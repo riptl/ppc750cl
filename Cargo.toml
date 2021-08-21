@@ -2,6 +2,7 @@
 members = [
     "disasm",
     "disasm-py",
+    "dol",
     "macros",
     "fuzz",
     "flow-graph",
