@@ -6,3 +6,5 @@ env/
 lib/
 *.bin
 *.png
+*.dol
+*.rel

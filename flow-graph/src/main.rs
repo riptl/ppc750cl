@@ -8,24 +8,32 @@ pub mod slices;
 
 use crate::flow::FlowGraph;
 use crate::slices::BasicSlices;
+use dol::Dol;
 
 fn main() {
     let matches = clap_app!(myapp =>
         (version: "1.0")
         (about: "Control flow graph analysis for PowerPC 750CL")
-        (@arg ADDR: --addr +required +takes_value "Address")
+        (@arg START: --start +required +takes_value "Start address")
+        (@arg STOP: --stop +required +takes_value "Stop address")
         (@arg INPUT: +required "Binary input file")
     )
     .get_matches();
 
-    let addr = matches.value_of("ADDR").unwrap();
-    let addr: u32 = ::parse_int::parse(addr).expect("Invalid address flag");
+    let start_addr = matches.value_of("START").unwrap();
+    let start_addr: u32 = ::parse_int::parse(start_addr).expect("Invalid address flag");
+    let stop_addr = matches.value_of("STOP").unwrap();
+    let stop_addr: u32 = ::parse_int::parse(stop_addr).expect("Invalid address flag");
 
     let file_path = matches.value_of("INPUT").unwrap();
-    let bytes = std::fs::read(file_path).expect("Failed to read file");
+    let dol_file = std::fs::File::open(file_path).expect("Failed to read file");
+    let dol = Dol::read_from(&dol_file).expect("Invalid DOL file");
+    drop(dol_file);
+    let mut bytes = vec![0u8; (stop_addr - start_addr) as usize];
+    dol.virtual_read(&mut bytes, start_addr);
 
     // Create control flow graph.
-    let ins_list: Vec<Ins> = disasm_iter(&bytes, addr).collect();
+    let ins_list: Vec<Ins> = disasm_iter(&bytes, start_addr).collect();
     let basic_slices = BasicSlices::from_code(&ins_list);
     let graph = FlowGraph::from_basic_slices(&basic_slices, &ins_list);
 

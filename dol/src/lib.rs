@@ -20,10 +20,10 @@ pub enum Error {
     IOError(std::io::Error),
     #[error("No sections in DOL")]
     NoSections,
-    #[error("Overlapping sections")]
-    OverlappingSections,
-    #[error("Section sizes overflow")]
-    SizeOverflow,
+    #[error("Overlapping sections: {0:8>X} {1:8>X}")]
+    OverlappingSections(u32, u32),
+    #[error("Section sizes too large")]
+    SectionsTooLarge,
 }
 
 impl From<bincode::Error> for Error {
@@ -48,7 +48,8 @@ impl Dol {
         R: Read + Seek,
     {
         // Read header.
-        let header = DolHeader::read_from(&mut r)?;
+        let header_data = DolHeaderData::read_from(&mut r)?;
+        let header: DolHeader = (&header_data).into();
         Dol::read_with_header(r, header)
     }
 
@@ -57,68 +58,45 @@ impl Dol {
     where
         R: Read + Seek,
     {
-        let dol_start = r.stream_position()? - DolHeader::SERIALIZED_SIZE;
-        // Re-arrange section specifiers into a more workable format.
-        // Also remove the text vs data distinction because it's irrelevant.
-        struct DolSection {
-            offset: u32,
-            target: u32,
-            size: u32,
-        }
-        let mut dol_sections =
-            Vec::with_capacity(DolHeader::TEXT_SECTION_COUNT + DolHeader::DATA_SECTION_COUNT);
-        for i in 0..DolHeader::TEXT_SECTION_COUNT {
-            if header.text_sizes[i] > 0 {
-                dol_sections.push(DolSection {
-                    offset: header.text_offsets[i],
-                    target: header.text_targets[i],
-                    size: header.text_sizes[i],
-                });
-            }
-        }
-        for i in 0..DolHeader::DATA_SECTION_COUNT {
-            if header.data_sizes[i] > 0 {
-                dol_sections.push(DolSection {
-                    offset: header.data_offsets[i],
-                    target: header.data_targets[i],
-                    size: header.data_sizes[i],
-                });
-            }
-        }
-        if dol_sections.is_empty() {
+        let dol_start = r.stream_position()? - DolHeaderData::SERIALIZED_SIZE;
+        if header.sections.is_empty() {
             return Err(Error::NoSections);
         }
-        // Sort sections by target address to prepare them for mapping.
-        dol_sections.sort_by_key(|s| s.target);
+        /*
         // Verify that sections are not overlapping.
         let mut end_target_addr = 0u32;
-        for section in &dol_sections {
+        for section in &header.sections {
             if section.target < end_target_addr {
-                return Err(Error::OverlappingSections);
+                return Err(Error::OverlappingSections(end_target_addr, section.target));
             }
             end_target_addr = section.target + section.size
         }
+        */
         // Remember the memory offset of the first section.
         // Then shift all sections to the beginning of memory.
-        let memory_offset = dol_sections[0].target;
-        for mut section in &mut dol_sections {
-            section.target -= memory_offset;
-        }
+        let memory_offset = header.sections[0].target;
         // Get the size of all sections combined.
         let mut total_size = 0usize;
-        for section in &dol_sections {
+        for section in &header.sections {
             if let Some(sum) = total_size.checked_add(section.size as usize) {
                 total_size = sum;
             } else {
-                return Err(Error::SizeOverflow);
+                return Err(Error::SectionsTooLarge);
             }
+        }
+        // Cannot be larger than 24 MiB.
+        if total_size > 0x180_0000 {
+            return Err(Error::SectionsTooLarge);
         }
         // Create memory.
         let mut memory = vec![0u8; total_size];
         // Read sections into memory.
-        for section in &dol_sections {
+        for section in &header.sections {
+            if section.kind == DolSectionType::Bss {
+                continue;
+            }
             r.seek(SeekFrom::Start(dol_start + section.offset as u64))?;
-            let mem_start = section.target as usize;
+            let mem_start = (section.target - memory_offset) as usize;
             let mem_end = mem_start + section.size as usize;
             r.read_exact(&mut memory[mem_start..mem_end])?;
         }
@@ -128,38 +106,84 @@ impl Dol {
             memory_offset,
         })
     }
+
+    /// Reads bytes into a destination buffer given a virtual address.
+    pub fn virtual_read(&self, dest: &mut [u8], virtual_addr: u32) {
+        let offset = (virtual_addr - self.memory_offset) as usize;
+        // TODO Gracefully handle errors.
+        dest.copy_from_slice(&self.memory[offset..offset + dest.len()])
+    }
+}
+
+#[derive(Debug, Clone, Copy, Eq, PartialEq)]
+pub enum DolSectionType {
+    Data,
+    Bss,
+}
+
+#[derive()]
+pub struct DolSection {
+    pub kind: DolSectionType,
+    pub index: usize,
+    pub offset: u32,
+    pub target: u32,
+    pub size: u32,
+}
+
+pub struct DolHeader {
+    pub sections: Vec<DolSection>,
+}
+
+impl From<&DolHeaderData> for DolHeader {
+    fn from(header: &DolHeaderData) -> Self {
+        let mut sections = Vec::with_capacity(DolHeaderData::SECTION_COUNT);
+        for i in 0..DolHeaderData::SECTION_COUNT {
+            if header.section_sizes[i] > 0 {
+                sections.push(DolSection {
+                    kind: DolSectionType::Data,
+                    index: i,
+                    offset: header.section_offsets[i],
+                    target: header.section_targets[i],
+                    size: header.section_sizes[i],
+                });
+            }
+        }
+        if header.bss_target > 0 {
+            sections.push(DolSection {
+                kind: DolSectionType::Bss,
+                index: 0,
+                offset: 0,
+                target: header.bss_target,
+                size: header.bss_size,
+            })
+        }
+        // Sort sections by target address to prepare them for mapping.
+        sections.sort_by_key(|s| s.target);
+        Self { sections }
+    }
 }
 
 #[derive(Debug, Serialize, Deserialize)]
-pub struct DolHeader {
-    text_offsets: [u32; Self::TEXT_SECTION_COUNT],
-    data_offsets: [u32; Self::DATA_SECTION_COUNT],
-    text_targets: [u32; Self::TEXT_SECTION_COUNT],
-    data_targets: [u32; Self::DATA_SECTION_COUNT],
-    text_sizes: [u32; Self::TEXT_SECTION_COUNT],
-    data_sizes: [u32; Self::DATA_SECTION_COUNT],
-    bss_target: u32,
-    bss_size: u32,
-    entry_point: u32,
+pub struct DolHeaderData {
+    pub section_offsets: [u32; Self::SECTION_COUNT],
+    pub section_targets: [u32; Self::SECTION_COUNT],
+    pub section_sizes: [u32; Self::SECTION_COUNT],
+    pub bss_target: u32,
+    pub bss_size: u32,
+    pub entry_point: u32,
+    pub padding: [u8; 0x1c],
 }
 
-impl DolHeader {
-    const TEXT_SECTION_COUNT: usize = 7;
-    const DATA_SECTION_COUNT: usize = 11;
+impl DolHeaderData {
+    const SECTION_COUNT: usize = 18;
     const SERIALIZED_SIZE: u64 = 0x100;
 
-    fn bincode_options() -> impl bincode::Options {
+    /// Reads the DOL header from a `Reader`.
+    pub fn read_from<R: Read + Seek>(mut r: R) -> bincode::Result<Self> {
         bincode::DefaultOptions::new()
             .with_big_endian()
             .allow_trailing_bytes()
-    }
-
-    /// Reads the DOL header from a `Reader`.
-    pub fn read_from<R: Read>(mut r: R) -> bincode::Result<Self> {
-        // Deserialize DOL header.
-        let this: Self = Self::bincode_options().deserialize_from(&mut r)?;
-        // Read padding.
-        let _: [u8; 0x1c] = Self::bincode_options().deserialize_from(&mut r)?;
-        Ok(this)
+            .with_fixint_encoding()
+            .deserialize_from(&mut r)
     }
 }

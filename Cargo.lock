@@ -321,6 +321,7 @@ name = "ppc750cl-flow-graph"
 version = "0.1.1"
 dependencies = [
  "clap",
+ "dol",
  "itertools",
  "parse_int",
  "petgraph",

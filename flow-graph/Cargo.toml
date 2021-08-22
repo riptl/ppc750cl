@@ -9,6 +9,7 @@ repository = "https://github.com/terorie/ppc750cl"
 
 [dependencies]
 clap = "2.33"
+dol = { version = "0.1.0", path = "../dol" }
 itertools = "0.10"
 parse_int = "0.5"
 petgraph = "0.6"
