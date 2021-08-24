@@ -32,7 +32,7 @@ opcodes:
     pattern: 0x38000000
     args: [ "rD", "rA", "simm" ]
     defs: [ "rD" ]
-    uses: [ "rA" ]
+    uses: [ "rA.nz" ]
 
   - name: "addic"
     desc: "Add Immediate Carrying"
@@ -58,7 +58,7 @@ opcodes:
     args: [ "rD", "rA", "uimm" ]
     side_effects: [ "Rc" ]
     defs: [ "rD" ]
-    uses: [ "rA" ]
+    uses: [ "rA.nz" ]
 
   - name: "addme"
     desc: "Add to Minus One Extended"
@@ -254,49 +254,49 @@ opcodes:
     bitmask: 0xffe007ff
     pattern: 0x7c0000ac
     args: [ "rA", "rB" ]
-    uses: [ "rA", "rB" ]
+    uses: [ "rA.nz", "rB" ]
 
   - name: "dcbi"
     desc: "Data Cache Block Invalidate"
     bitmask: 0xffe007ff
     pattern: 0x7c0003ac
     args: [ "rA", "rB" ]
-    uses: [ "rA", "rB" ]
+    uses: [ "rA.nz", "rB" ]
 
   - name: "dcbst"
     desc: "Data Cache Block Store"
     bitmask: 0xffe007ff
     pattern: 0x7c00006c
     args: [ "rA", "rB" ]
-    uses: [ "rA", "rB" ]
+    uses: [ "rA.nz", "rB" ]
 
   - name: "dcbt"
     desc: "Data Cache Block Touch"
     bitmask: 0xffe007ff
     pattern: 0x7c00022c
     args: [ "rA", "rB" ]
-    uses: [ "rA", "rB" ]
+    uses: [ "rA.nz", "rB" ]
 
   - name: "dcbtst"
     desc: "Data Cache Block Touch for Store"
     bitmask: 0xffe007ff
     pattern: 0x7c0001ec
     args: [ "rA", "rB" ]
-    uses: [ "rA", "rB" ]
+    uses: [ "rA.nz", "rB" ]
 
   - name: "dcbz"
     desc: "Data Cache Block Clear to Zero"
     bitmask: 0xffe007ff
     pattern: 0x7c0007ec
     args: [ "rA", "rB" ]
-    uses: [ "rA", "rB" ]
+    uses: [ "rA.nz", "rB" ]
 
   - name: "dcbz_l"
     desc: "Data Cache Block Set to Zero Locked"
     bitmask: 0xffe007ff
     pattern: 0x100007ec
     args: [ "rA", "rB" ]
-    uses: [ "rA", "rB" ]
+    uses: [ "rA.nz", "rB" ]
 
   - name: "divw"
     desc: "Divide Word"
@@ -322,14 +322,14 @@ opcodes:
     pattern: 0x7c00026c
     args: [ "rD", "rA", "rB" ]
     defs: [ "rD" ]
-    uses: [ "rA", "rB" ]
+    uses: [ "rA.nz", "rB" ]
 
   - name: "ecowx"
     desc: "External Control Out Word Indexed"
     bitmask: 0xfc0003ff
     pattern: 0x7c00036c
     args: [ "rS", "rA", "rB" ]
-    uses: [ "rS", "rA", "rB" ]
+    uses: [ "rS", "rA.nz", "rB" ]
 
   - name: "eieio"
     desc: "Enforce In-Order Execution of I/O"
@@ -619,7 +619,7 @@ opcodes:
     pattern: 0x7c0007ac
     modifiers: [ "Rc" ]
     args: [ "rA", "rB" ]
-    uses: [ "rA", "rB" ]
+    uses: [ "rA.nz", "rB" ]
 
   - name: "isync"
     desc: "Instruction Synchronize"
@@ -632,7 +632,7 @@ opcodes:
     pattern: 0x88000000
     args: [ "rD", "offset", "rA" ]
     defs: [ "rD" ]
-    uses: [ "offset", "rA" ]
+    uses: [ "offset", "rA.nz" ]
 
   - name: "lbzu"
     desc: "Load Byte and Zero with Update"
@@ -656,7 +656,7 @@ opcodes:
     pattern: 0x7c0000ae
     args: [ "rD", "rA", "rB" ]
     defs: [ "rD" ]
-    uses: [ "rA", "rB" ]
+    uses: [ "rA.nz", "rB" ]
 
   - name: "lfd"
     desc: "Load Floating-Point Double"
@@ -664,7 +664,7 @@ opcodes:
     pattern: 0xc8000000
     args: [ "frD", "offset", "rA" ]
     defs: [ "frD" ]
-    uses: [ "offset", "rA" ]
+    uses: [ "offset", "rA.nz" ]
 
   - name: "lfdu"
     desc: "Load Floating-Point Double with Update"
@@ -688,7 +688,7 @@ opcodes:
     pattern: 0x7c00045e
     args: [ "frD", "rA", "rB" ]
     defs: [ "frD" ]
-    uses: [ "rA", "rB" ]
+    uses: [ "rA.nz", "rB" ]
 
   - name: "lfs"
     desc: "Load Floating-Point Single"
@@ -696,7 +696,7 @@ opcodes:
     pattern: 0xc0000000
     args: [ "frD", "offset", "rA" ]
     defs: [ "frD" ]
-    uses: [ "offset", "rA" ]
+    uses: [ "offset", "rA.nz" ]
 
   - name: "lfsu"
     desc: "Load Floating-Point Single with Update"
@@ -720,7 +720,7 @@ opcodes:
     pattern: 0x7c00042e
     args: [ "frD", "rA", "rB" ]
     defs: [ "frD" ]
-    uses: [ "rA", "rB" ]
+    uses: [ "rA.nz", "rB" ]
 
   - name: "lha"
     desc: "Load Half Word Algebraic"
@@ -728,7 +728,7 @@ opcodes:
     pattern: 0xa8000000
     args: [ "rD", "offset", "rA" ]
     defs: [ "rD" ]
-    uses: [ "offset", "rA" ]
+    uses: [ "offset", "rA.nz" ]
 
   - name: "lhau"
     desc: "Load Half Word Algebraic with Update"
@@ -752,7 +752,7 @@ opcodes:
     pattern: 0x7c0002ae
     args: [ "rD", "rA", "rB" ]
     defs: [ "rD" ]
-    uses: [ "rA", "rB" ]
+    uses: [ "rA.nz", "rB" ]
 
   - name: "lhbrx"
     desc: "Load Half Word Byte-Reverse Indexed"
@@ -760,7 +760,7 @@ opcodes:
     pattern: 0x7c00062c
     args: [ "rD", "rA", "rB" ]
     defs: [ "rD" ]
-    uses: [ "rA", "rB" ]
+    uses: [ "rA.nz", "rB" ]
 
   - name: "lhz"
     desc: "Load Half Word and Zero"
@@ -768,7 +768,7 @@ opcodes:
     pattern: 0xa0000000
     args: [ "rD", "offset", "rA" ]
     defs: [ "rD" ]
-    uses: [ "offset", "rA" ]
+    uses: [ "offset", "rA.nz" ]
 
   - name: "lhzu"
     desc: "Load Half Word and Zero with Update"
@@ -792,7 +792,7 @@ opcodes:
     pattern: 0x7c00022e
     args: [ "rD", "rA", "rB" ]
     defs: [ "rD" ]
-    uses: [ "rA", "rB" ]
+    uses: [ "rA.nz", "rB" ]
 
   # TODO lmw has much more defs
   - name: "lmw"
@@ -801,7 +801,7 @@ opcodes:
     pattern: 0xb8000000
     args: [ "rD", "offset", "rA" ]
     defs: [ "rD" ]
-    uses: [ "offset", "rA" ]
+    uses: [ "offset", "rA.nz" ]
 
   - name: "lswi"
     desc: "Load String Word Immediate"
@@ -809,7 +809,7 @@ opcodes:
     pattern: 0x7c0004aa
     args: [ "rD", "rA", "NB" ]
     defs: [ "rD" ]
-    uses: [ "rA" ]
+    uses: [ "rA.nz" ]
 
   - name: "lswx"
     desc: "Load String Word Indexed"
@@ -817,7 +817,7 @@ opcodes:
     pattern: 0x7c00042a
     args: [ "rD", "rA", "rB" ]
     defs: [ "rD" ]
-    uses: [ "rA", "rB" ]
+    uses: [ "rA.nz", "rB" ]
 
   - name: "lwarx"
     desc: "Load String Word and Reverse Indexed"
@@ -825,7 +825,7 @@ opcodes:
     pattern: 0x7c000028
     args: [ "rD", "rA", "rB" ]
     defs: [ "rD" ]
-    uses: [ "rA", "rB" ]
+    uses: [ "rA.nz", "rB" ]
 
   - name: "lwbrx"
     desc: "Load String Word and Byte-Reverse Indexed"
@@ -833,7 +833,7 @@ opcodes:
     pattern: 0x7c00042c
     args: [ "rD", "rA", "rB" ]
     defs: [ "rD" ]
-    uses: [ "rA", "rB" ]
+    uses: [ "rA.nz", "rB" ]
 
   - name: "lwz"
     desc: "Load Word and Zero"
@@ -841,7 +841,7 @@ opcodes:
     pattern: 0x80000000
     args: [ "rD", "offset", "rA" ]
     defs: [ "rD" ]
-    uses: [ "offset", "rA" ]
+    uses: [ "offset", "rA.nz" ]
 
   - name: "lwzu"
     desc: "Load Word and Zero with Update"
@@ -865,7 +865,7 @@ opcodes:
     pattern: 0x7c00002e
     args: [ "rD", "rA", "rB" ]
     defs: [ "rD" ]
-    uses: [ "rA", "rB" ]
+    uses: [ "rA.nz", "rB" ]
 
   - name: "mcrf"
     desc: "Move Condition Register Field"
@@ -1111,7 +1111,7 @@ opcodes:
     pattern: 0xe0000000
     args: [ "frD", "offset", "rA", "W", "l" ]
     defs: [ "frD" ]
-    uses: [ "rA" ]
+    uses: [ "rA.nz" ]
 
   - name: "psq_lu"
     desc: "Paired Single Quantized Load with Update"
@@ -1135,14 +1135,14 @@ opcodes:
     pattern: 0x1000000c
     args: [ "frD", "rA", "rB", "W", "l" ]
     defs: [ "frD" ]
-    uses: [ "rA", "rB" ]
+    uses: [ "rA.nz", "rB" ]
 
   - name: "psq_st"
     desc: "Paired Single Quantized Store"
     bitmask: 0xfc000000
     pattern: 0xf0000000
     args: [ "frS", "offset", "rA", "W", "l" ]
-    uses: [ "frS", "rA" ]
+    uses: [ "frS", "rA.nz" ]
 
   - name: "psq_stu"
     desc: "Paired Single Quantized Store with Update"
@@ -1165,7 +1165,7 @@ opcodes:
     bitmask: 0xfc00007f
     pattern: 0x1000000e
     args: [ "frS", "rA", "rB", "W", "l" ]
-    uses: [ "frS", "rA", "rB" ]
+    uses: [ "frS", "rA.nz", "rB" ]
 
   - name: "ps_abs"
     desc: "Paired Single Absolute Value"
@@ -1191,7 +1191,7 @@ opcodes:
     pattern: 0x10000040
     args: [ "crfD", "frA", "frB" ]
     defs: [ "crfD" ]
-    uses: [ "frA", "frB" ]
+    uses: [ "frA.nz", "frB" ]
 
   - name: "ps_cmpo1"
     desc: "Paired Singles Compare Ordered Low"
@@ -1199,7 +1199,7 @@ opcodes:
     pattern: 0x100000c0
     args: [ "crfD", "frA", "frB" ]
     defs: [ "crfD" ]
-    uses: [ "frA", "frB" ]
+    uses: [ "frA.nz", "frB" ]
 
   - name: "ps_cmpu0"
     desc: "Paired Singles Compare Unordered High"
@@ -1207,7 +1207,7 @@ opcodes:
     pattern: 0x10000000
     args: [ "crfD", "frA", "frB" ]
     defs: [ "crfD" ]
-    uses: [ "frA", "frB" ]
+    uses: [ "frA.nz", "frB" ]
 
   - name: "ps_cmpu1"
     desc: "Paired Singles Compare Unordered Low"
@@ -1215,7 +1215,7 @@ opcodes:
     pattern: 0x10000080
     args: [ "crfD", "frA", "frB" ]
     defs: [ "crfD" ]
-    uses: [ "frA", "frB" ]
+    uses: [ "frA.nz", "frB" ]
 
   - name: "ps_div"
     desc: "Paired Single Divide"
@@ -1502,7 +1502,7 @@ opcodes:
     bitmask: 0xfc000000
     pattern: 0x98000000
     args: [ "rS", "offset", "rA" ]
-    uses: [ "rS", "rA" ]
+    uses: [ "rS", "rA.nz" ]
 
   - name: "stbu"
     desc: "Store Byte with Update"
@@ -1525,14 +1525,14 @@ opcodes:
     bitmask: 0xfc0003ff
     pattern: 0x7c0001ae
     args: [ "rS", "rA", "rB" ]
-    uses: [ "rS", "rA", "rB" ]
+    uses: [ "rS", "rA.nz", "rB" ]
 
   - name: "stfd"
     desc: "Store Floating-Point Double"
     bitmask: 0xfc000000
     pattern: 0xd8000000
     args: [ "rS", "offset", "rA" ]
-    uses: [ "rS", "rA" ]
+    uses: [ "rS", "rA.nz" ]
 
   - name: "stfdu"
     desc: "Store Floating-Point Double with Update"
@@ -1555,21 +1555,21 @@ opcodes:
     bitmask: 0xfc0007ff
     pattern: 0x7c0005ae
     args: [ "frS", "rA", "rB" ]
-    uses: [ "frS", "rA", "rB" ]
+    uses: [ "frS", "rA.nz", "rB" ]
 
   - name: "stfiwx"
     desc: "Store Floating-Point as Integer Word Indexed"
     bitmask: 0xfc0007ff
     pattern: 0x7c0007ae
     args: [ "frS", "rA", "rB" ]
-    uses: [ "frS", "rA", "rB" ]
+    uses: [ "frS", "rA.nz", "rB" ]
 
   - name: "stfs"
     desc: "Store Floating-Point Single"
     bitmask: 0xfc000000
     pattern: 0xd0000000
     args: [ "rS", "offset", "rA" ]
-    uses: [ "rS", "rA" ]
+    uses: [ "rS", "rA.nz" ]
 
   - name: "stfsu"
     desc: "Store Floating-Point Single with Update"
@@ -1592,21 +1592,21 @@ opcodes:
     bitmask: 0xfc0007ff
     pattern: 0x7c00052e
     args: [ "frS", "rA", "rB" ]
-    uses: [ "frS", "rA", "rB" ]
+    uses: [ "frS", "rA.nz", "rB" ]
 
   - name: "sth"
     desc: "Store Half Word"
     bitmask: 0xfc000000
     pattern: 0xb0000000
     args: [ "rS", "offset", "rA" ]
-    uses: [ "rS", "rA" ]
+    uses: [ "rS", "rA.nz" ]
 
   - name: "sthbrx"
     desc: "Store Half Word Byte-Reverse Indexed"
     bitmask: 0xfc0007ff
     pattern: 0x7c00072c
     args: [ "rS", "rA", "rB" ]
-    uses: [ "rS", "rA", "rB" ]
+    uses: [ "rS", "rA.nz", "rB" ]
 
   - name: "sthu"
     desc: "Store Half Word with Update"
@@ -1629,49 +1629,49 @@ opcodes:
     bitmask: 0xfc0007ff
     pattern: 0x7c00032e
     args: [ "rS", "rA", "rB" ]
-    uses: [ "rS", "rA", "rB" ]
+    uses: [ "rS", "rA.nz", "rB" ]
 
   - name: "stmw"
     desc: "Store Multiple Word"
     bitmask: 0xfc000000
     pattern: 0xbc000000
     args: [ "rS", "offset", "rA" ]
-    uses: [ "rS", "rA" ]
+    uses: [ "rS", "rA.nz" ]
 
   - name: "stswi"
     desc: "Store String Word Immediate"
     bitmask: 0xfc0007ff
     pattern: 0x7c0005aa
     args: [ "rS", "rA", "NB" ]
-    uses: [ "rS", "rA" ]
+    uses: [ "rS", "rA.nz" ]
 
   - name: "stswx"
     desc: "Store String Word Indexed"
     bitmask: 0xfc0007ff
     pattern: 0x7c00052a
     args: [ "rS", "rA", "rB" ]
-    uses: [ "rS", "rA", "rB" ]
+    uses: [ "rS", "rA.nz", "rB" ]
 
   - name: "stw"
     desc: "Store Word"
     bitmask: 0xfc000000
     pattern: 0x90000000
     args: [ "rS", "offset", "rA" ]
-    uses: [ "rS", "rA" ]
+    uses: [ "rS", "rA.nz" ]
 
   - name: "stwbrx"
     desc: "Store Word Byte-Reverse Indexed"
     bitmask: 0xfc0007ff
     pattern: 0x7c00052c
     args: [ "rS", "rA", "rB" ]
-    uses: [ "rS", "rA", "rB" ]
+    uses: [ "rS", "rA.nz", "rB" ]
 
   - name: "stwcx."
     desc: "Store Word Conditional Indexed"
     bitmask: 0xfc0007ff
     pattern: 0x7c00012d
     args: [ "rS", "rA", "rB" ]
-    uses: [ "rS", "rA", "rB" ]
+    uses: [ "rS", "rA.nz", "rB" ]
 
   - name: "stwu"
     desc: "Store Word with Update"
@@ -1694,7 +1694,7 @@ opcodes:
     bitmask: 0xfc0007ff
     pattern: 0x7c00012e
     args: [ "rS", "rA", "rB" ]
-    uses: [ "rS", "rA", "rB" ]
+    uses: [ "rS", "rA.nz", "rB" ]
 
   - name: "subf"
     desc: "Subtract From Carrying"
