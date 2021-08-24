@@ -1,3 +1,88 @@
+fields:
+  - name: "Rc"
+    desc: "record"
+    bits: "31"
+  # Immediates
+  - name: "simm"
+    bits: "16..32"
+    signed: true
+  - name: "uimm"
+    bits: "16..32"
+  # Branch fields
+  - name: "BO"
+    bits: "6..11"
+  - name: "BI"
+    bits: "11..16"
+  - name: "BD"
+    desc: "branch destination"
+    bits: "16..30"
+    shift_left: 2
+  - name: "LI"
+    desc: "branch destination"
+    bits: "6..30"
+    shift_left: 2
+  # Shift/rotate type fields
+  - name: "SH"
+    desc: "Shift"
+    bits: "16..21"
+  - name: "MB"
+    desc: "Mask start"
+    bits: "21..26"
+  - name: "ME"
+    desc: "Mask stop"
+    bits: "26..31"
+  # Branch bits
+  - name: "AA"
+    desc: "absolute"
+    bits: "30"
+  - name: "LK"
+    desc: "save to link register"
+    bits: "31"
+  # Arithmetic bits
+  - name: "OE"
+    desc: "overflow"
+    bits: "21"
+  # Registers
+  - name: "rS"
+    bits: "6..11"
+  - name: "rD"
+    bits: "6..11"
+  - name: "rA"
+    bits: "11..16"
+  - name: "rB"
+    bits: "16..21"
+  - name: "rC"
+    bits: "21..26"
+  # Condition registers
+  - name: "crbD"
+    bits: "6..11"
+  - name: "crbA"
+    bits: "11..16"
+  - name: "crbB"
+    bits: "16..21"
+  # Condition register fields
+  - name: "crfD"
+    desc: "condition register field"
+    bits: "6..9"
+  - name: "crfS"
+    desc: "condition register field"
+    bits: "11..14"
+  - name: "crm"
+    desc: "condition register field mask"
+    bits: "12..20"
+
+  # Paired single fields
+  - name: "ps_l"
+    bits: "17..20"
+  # Misc
+  - name: "sr"
+    desc: "Segment register"
+    bits: "12..16"
+  - name: "spr"
+    desc: "Special-purpose register"
+    bits: "11..21"
+    split: true
+
 opcodes:
   - name: "add"
     desc: "Add"
@@ -148,7 +233,7 @@ opcodes:
     desc: "Compare"
     bitmask: 0xfc4007ff
     pattern: 0x7c000000
-    args: [ "crfD", "L", "rA", "rB" ]
+    args: [ "crfD", "cmpL", "rA", "rB" ]
     defs: [ "crfD" ]
     uses: [ "rA", "rB" ]
 
@@ -156,7 +241,7 @@ opcodes:
     desc: "Compare Immediate"
     bitmask: 0xfc400000
     pattern: 0x2c000000
-    args: [ "crfD", "L", "rA", "simm" ]
+    args: [ "crfD", "cmpL", "rA", "simm" ]
     defs: [ "crfD" ]
     uses: [ "rA" ]
 
@@ -164,7 +249,7 @@ opcodes:
     desc: "Compare Logical"
     bitmask: 0xfc4007ff
     pattern: 0x7c000040
-    args: [ "crfD", "L", "rA", "rB" ]
+    args: [ "crfD", "cmpL", "rA", "rB" ]
     defs: [ "crfD" ]
     uses: [ "rA", "rB" ]
 
@@ -172,7 +257,7 @@ opcodes:
     desc: "Compare Logical Immediate"
     bitmask: 0xfc400000
     pattern: 0x28000000
-    args: [ "crfD", "L", "rA", "uimm" ]
+    args: [ "crfD", "cmpL", "rA", "uimm" ]
     defs: [ "crfD" ]
     uses: [ "rA" ]
 
@@ -685,7 +770,7 @@ opcodes:
   - name: "lfdx"
     desc: "Load Floating-Point Double Indexed"
     bitmask: 0xfc0007ff
-    pattern: 0x7c00045e
+    pattern: 0x7c0004ae
     args: [ "frD", "rA", "rB" ]
     defs: [ "frD" ]
     uses: [ "rA.nz", "rB" ]
@@ -900,7 +985,7 @@ opcodes:
   - name: "mffs"
     desc: "Move from FPSCR"
     bitmask: 0xfc1ffffe
-    pattern: 0x7c00048e
+    pattern: 0xfc00048e
     modifier: [ "Rc" ]
     args: [ "crfD" ]
     defs: [ "crfD" ]
@@ -1109,7 +1194,7 @@ opcodes:
     desc: "Paired Single Quantized Load"
     bitmask: 0xfc000000
     pattern: 0xe0000000
-    args: [ "frD", "offset", "rA", "W", "l" ]
+    args: [ "frD", "offset", "rA", "W", "ps_l" ]
     defs: [ "frD" ]
     uses: [ "rA.nz" ]
 
@@ -1117,7 +1202,7 @@ opcodes:
     desc: "Paired Single Quantized Load with Update"
     bitmask: 0xfc000000
     pattern: 0xe4000000
-    args: [ "frD", "offset", "rA", "W", "l" ]
+    args: [ "frD", "offset", "rA", "W", "ps_l" ]
     defs: [ "frD", "rA" ]
     uses: [ "rA" ]
 
@@ -1125,7 +1210,7 @@ opcodes:
     desc: "Paired Single Quantized Load with Update Indexed"
     bitmask: 0xfc00007f
     pattern: 0x1000004c
-    args: [ "frD", "rA", "rB", "W", "l" ]
+    args: [ "frD", "rA", "rB", "W", "ps_l" ]
     defs: [ "frD", "rA" ]
     uses: [ "rA", "rB" ]
 
@@ -1133,7 +1218,7 @@ opcodes:
     desc: "Paired Single Quantized Load Indexed"
     bitmask: 0xfc00007f
     pattern: 0x1000000c
-    args: [ "frD", "rA", "rB", "W", "l" ]
+    args: [ "frD", "rA", "rB", "W", "ps_l" ]
     defs: [ "frD" ]
     uses: [ "rA.nz", "rB" ]
 
@@ -1141,14 +1226,14 @@ opcodes:
     desc: "Paired Single Quantized Store"
     bitmask: 0xfc000000
     pattern: 0xf0000000
-    args: [ "frS", "offset", "rA", "W", "l" ]
+    args: [ "frS", "offset", "rA", "W", "ps_l" ]
     uses: [ "frS", "rA.nz" ]
 
   - name: "psq_stu"
     desc: "Paired Single Quantized Store with Update"
     bitmask: 0xfc000000
     pattern: 0xf4000000
-    args: [ "frS", "offset", "rA", "W", "l" ]
+    args: [ "frS", "offset", "rA", "W", "ps_l" ]
     defs: [ "rA" ]
     uses: [ "frS", "rA" ]
 
@@ -1156,7 +1241,7 @@ opcodes:
     desc: "Paired Single Quantized Store with Update Indexed"
     bitmask: 0xfc00007f
     pattern: 0x1000004e
-    args: [ "frS", "rA", "rB", "W", "l" ]
+    args: [ "frS", "rA", "rB", "W", "ps_l" ]
     defs: [ "rA" ]
     uses: [ "frS", "rA", "rB" ]
 
@@ -1164,7 +1249,7 @@ opcodes:
     desc: "Paired Single Quantized Store Indexed"
     bitmask: 0xfc00007f
     pattern: 0x1000000e
-    args: [ "frS", "rA", "rB", "W", "l" ]
+    args: [ "frS", "rA", "rB", "W", "ps_l" ]
     uses: [ "frS", "rA.nz", "rB" ]
 
   - name: "ps_abs"
@@ -1805,12 +1890,215 @@ opcodes:
     uses: [ "rS" ]
 
 mnemonics:
+  # Arithmetic
   - name: "lis"
     opcode: "addis"
+    args: [ "rD", "uimm" ]
+    match:
+      - arg: rA
+        value: 0
+  - name: "li"
+    opcode: "addi"
     args: [ "rD", "simm" ]
     match:
       - arg: rA
         value: 0
+  - name: "mr"
+    opcode: "or"
+    args: [ "rA", "rS" ]
+    condition: "S == B"
+  - name: "nop"
+    opcode: "ori"
+    condition:
+      - arg: "rA"
+        value: 0
+      - arg: "rS"
+        value: 0
+      - arg: "uimm"
+        value: 0
+
+  # Rotates/Shifts
+  - name: "clrlwi"
+    opcode: "rlwinm"
+    args: [ "rA", "rS", "MB" ]
+    condition: "SH == 0 && ME == 31"
+  - name: "rotlwi"
+    opcode: "rlwinm"
+    args: [ "rA", "rS", "SH" ]
+    condition: "MB == 0 && ME == 31"
+  - name: "slwi"
+    opcode: "rlwinm"
+    args: [ "rA", "rS", "ME" ]
+    condition: "MB == 0 && 31 - SH == ME"
+  - name: "srwi"
+    opcode: "rlwinm"
+    args: [ "rA", "rS", "MB" ]
+    condition: "ME == 31 && 32 - MB == SH"
+
+  # Compares
+  - name: "cmpw"
+    opcode: "cmp"
+    args: [ "rA", "rB" ]
+    match:
+      - arg: "crfD"
+        value: 0
+      - arg: "cmpL"
+        value: 0
+  - name: "cmpw"
+    opcode: "cmp"
+    args: [ "crfD", "rA", "rB" ]
+    match:
+      - arg: "cmpL"
+        value: 0
+  - name: "cmplw"
+    opcode: "cmpl"
+    args: [ "rA", "rB" ]
+    match:
+      - arg: "crfD"
+        value: 0
+      - arg: "cmpL"
+        value: 0
+  - name: "cmplw"
+    opcode: "cmpl"
+    args: [ "crfD", "rA", "rB" ]
+    match:
+      - arg: "cmpL"
+        value: 0
+  - name: "cmpwi"
+    opcode: "cmpi"
+    args: [ "rA", "simm" ]
+    match:
+      - arg: "crfD"
+        value: 0
+      - arg: "cmpL"
+        value: 0
+  - name: "cmpwi"
+    opcode: "cmpi"
+    args: [ "crfD", "rA", "simm" ]
+    match:
+      - arg: "crfD"
+        value: 0
+      - arg: "cmpL"
+        value: 0
+ - name: "cmplwi"
+    opcode: "cmpli"
+    args: [ "rA", "uimm" ]
+    match:
+      - arg: "crfD"
+        value: 0
+      - arg: "cmpL"
+        value: 0
+  - name: "cmplwi"
+    opcode: "cmpli"
+    args: [ "crfD", "rA", "uimm" ]
+    match:
+      - arg: "crfD"
+        value: 0
+      - arg: "cmpL"
+        value: 0
+
+  # Misc
+  - name: "twgti"
+    opcode: "twi"
+    args: [ "rA", "simm" ]
+    match:
+      - arg: TO
+        value: 8
+  - name: "twllei"
+    opcode: "twi"
+    args: [ "rA", "simm" ]
+    match:
+      - arg: TO
+        value: 6
+  - name: "twui"
+    args: [ "rA", "simm" ]
+    match:
+      - arg: TO
+        value: 31
+  # Branches
+  - name: "blr"
+    opcode: "bclr"
+    match:
+      - arg: BO
+        value: 20
+      - arg: BI
+        value: 0
+
+  # Move to special-purpose register
+  - name: "mtxer"
+    opcode: "mtspr"
+    args: [ "rS" ]
+    match:
+      - arg: "spr"
+        value: 1
+  - name: "mtlr"
+    opcode: "mtspr"
+    args: [ "rS" ]
+    match:
+      - arg: "spr"
+        value: 8
+  - name: "mtctr"
+    opcode: "mtspr"
+    args: [ "rS" ]
+    match:
+      - arg: "spr"
+        value: 9
+  - name: "mtdsisr"
+    opcode: "mtspr"
+    args: [ "rS" ]
+    match:
+      - arg: "spr"
+        value: 18
+  - name: "mtdbatu"
+    opcode: "mtspr"
+    args: [ "rS" ]
+    match:
+      - arg: "spr"
+        value: 397
+  - name: "mttdu"
+    opcode: "mtspr"
+    args: [ "rS" ]
+    match:
+      - arg: "spr"
+        value: 571
+
+  # Move from special-purpose register
+  - name: "mfxer"
+    opcode: "mfspr"
+    args: [ "rD" ]
+    match:
+      - arg: "spr"
+        value: 1
+  - name: "mflr"
+    opcode: "mfspr"
+    args: [ "rD" ]
+    match:
+      - arg: "spr"
+        value: 8
+  - name: "mfctr"
+    opcode: "mfspr"
+    args: [ "rD" ]
+    match:
+      - arg: "spr"
+        value: 9
+  - name: "mfdsisr"
+    opcode: "mfspr"
+    args: [ "rD" ]
+    match:
+      - arg: "spr"
+        value: 18
+  - name: "mfdbatu"
+    opcode: "mfspr"
+    args: [ "rD" ]
+    match:
+      - arg: "spr"
+        value: 397
+  - name: "mftdu"
+    opcode: "mfspr"
+    args: [ "rD" ]
+    match:
+      - arg: "spr"
+        value: 571
 
   # Branch Conditional
   - name: "blt"
