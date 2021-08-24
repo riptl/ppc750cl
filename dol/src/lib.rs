@@ -121,7 +121,7 @@ pub enum DolSectionType {
     Bss,
 }
 
-#[derive()]
+#[derive(Debug, Clone)]
 pub struct DolSection {
     pub kind: DolSectionType,
     pub index: usize,
