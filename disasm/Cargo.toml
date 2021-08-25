@@ -9,6 +9,6 @@ keywords = ["powerpc", "wii", "gamecube"]
 repository = "https://github.com/terorie/ppc750cl"
 
 [dependencies]
-num-traits = "0.2.14"
+num-traits = "0.2"
 ppc750cl-macros = { path = "../macros", version = "0.1.1" }
-serde = "1.0.129"
+serde = "1.0"

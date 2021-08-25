@@ -1,6 +1,11 @@
 //pub mod formatter;
 mod iter;
-pub mod prelude;
+
+pub mod prelude {
+    pub use crate::Field::*;
+    pub use crate::Ins;
+    pub use crate::Opcode::*;
+}
 
 use ppc750cl_macros::{fields, ins_impl, opcodes};
 
