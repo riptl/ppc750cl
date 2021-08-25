@@ -4,13 +4,16 @@ version = "0.1.1"
 edition = "2018"
 authors = ["Richard Patel <me@terorie.dev>"]
 license = "GPL-3.0-or-later"
-description = "Procedural macros for powerpc750cl"
+description = "Auxiliary procedural macros for the ppc750cl disassembler"
 repository = "https://github.com/terorie/ppc750cl"
 
 [lib]
 proc-macro = true
 
 [dependencies]
-proc-macro2 = "1.0.28"
-quote = "1.0.9"
-syn = { version = "1.0.74", features = ["full", "parsing"] }
+itertools = "0.10.1"
+proc-macro2 = "1.0"
+quote = "1.0"
+serde = { version = "1.0", features = ["derive"] }
+serde_yaml = "0.8"
+syn = { version = "1.0", features = ["full", "parsing"] }

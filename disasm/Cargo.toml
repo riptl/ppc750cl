@@ -11,3 +11,4 @@ repository = "https://github.com/terorie/ppc750cl"
 [dependencies]
 num-traits = "0.2.14"
 ppc750cl-macros = { path = "../macros", version = "0.1.1" }
+serde = "1.0.129"

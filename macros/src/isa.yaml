@@ -1,87 +1,150 @@
 fields:
-  - name: "Rc"
-    desc: "record"
-    bits: "31"
   # Immediates
   - name: "simm"
+    arg: "Simm"
     bits: "16..32"
     signed: true
   - name: "uimm"
+    arg: "Uimm"
     bits: "16..32"
+  - name: "offset"
+    arg: "Offset"
+    bits: "16..32"
+    signed: true
   # Branch fields
   - name: "BO"
+    arg: "OpaqueU"
     bits: "6..11"
   - name: "BI"
+    arg: "OpaqueU"
     bits: "11..16"
   - name: "BD"
-    desc: "branch destination"
+    arg: "BranchDest"
     bits: "16..30"
     shift_left: 2
   - name: "LI"
-    desc: "branch destination"
+    arg: "BranchDest"
     bits: "6..30"
     shift_left: 2
   # Shift/rotate type fields
   - name: "SH"
+    arg: "OpaqueU"
     desc: "Shift"
     bits: "16..21"
   - name: "MB"
+    arg: "OpaqueU"
     desc: "Mask start"
     bits: "21..26"
   - name: "ME"
+    arg: "OpaqueU"
     desc: "Mask stop"
     bits: "26..31"
-  # Branch bits
-  - name: "AA"
-    desc: "absolute"
-    bits: "30"
-  - name: "LK"
-    desc: "save to link register"
-    bits: "31"
-  # Arithmetic bits
-  - name: "OE"
-    desc: "overflow"
-    bits: "21"
   # Registers
   - name: "rS"
+    arg: "GPR"
     bits: "6..11"
   - name: "rD"
+    arg: "GPR"
     bits: "6..11"
   - name: "rA"
+    arg: "GPR"
+    bits: "11..16"
+  - name: "rA.nz"
+    arg: "GPR"
     bits: "11..16"
   - name: "rB"
+    arg: "GPR"
     bits: "16..21"
   - name: "rC"
+    arg: "GPR"
+    bits: "21..26"
+  - name: "sr"
+    arg: "SR"
+    bits: "12..16"
+  - name: "spr"
+    arg: "SPR"
+    bits: "11..21"
+    split: true
+  # Floating-point registers
+  - name: "frS"
+    arg: "FPR"
+    bits: "6..11"
+  - name: "frD"
+    arg: "FPR"
+    bits: "6..11"
+  - name: "frA"
+    arg: "FPR"
+    bits: "11..16"
+  - name: "frB"
+    arg: "FPR"
+    bits: "16..21"
+  - name: "frC"
+    arg: "FPR"
     bits: "21..26"
   # Condition registers
+  # TODO This looks swapped the wrong way around
   - name: "crbD"
+    arg: "CRField"
     bits: "6..11"
   - name: "crbA"
+    arg: "CRField"
     bits: "11..16"
   - name: "crbB"
+    arg: "CRField"
     bits: "16..21"
   # Condition register fields
   - name: "crfD"
-    desc: "condition register field"
+    arg: "CRBit"
     bits: "6..9"
   - name: "crfS"
-    desc: "condition register field"
+    arg: "CRBit"
     bits: "11..14"
+  # Condition register misc
   - name: "crm"
-    desc: "condition register field mask"
+    arg: "OpaqueU"
     bits: "12..20"
-
+  - name: "cmpL"
+    arg: "OpaqueU"
+    bits: "10"
   # Paired single fields
   - name: "ps_l"
+    arg: "GQR"
     bits: "17..20"
+  - name: "ps_W"
+    arg: "OpaqueU"
+    bits: "16"
   # Misc
-  - name: "sr"
-    desc: "Segment register"
-    bits: "12..16"
-  - name: "spr"
-    desc: "Special-purpose register"
+  - name: "NB"
+    arg: "OpaqueU"
+    bits: "16..21"
+  - name: "tbr"
+    arg: "OpaqueU"
+    desc: "Time Base"
     bits: "11..21"
     split: true
+  - name: "mtfsf_FM"
+    arg: "OpaqueU"
+    desc: "Field Mask for mtfsf"
+    bits: "7..15"
+  - name: "mtfsf_IMM"
+    arg: "OpaqueU"
+    desc: "Immediate for mtfsfi"
+    bits: "16..20"
+  - name: "tw_TO"
+    arg: "OpaqueU"
+    desc: "Bitset for tw and twi"
+    bits: "6..11"
+
+# TODO Add defs/uses for modifiers.
+modifiers:
+  - name: "OE"
+    suffix: "o"
+  - name: "Rc"
+    suffix: "."
+  - name: "LK"
+    suffix: "l"
+  - name: "AA"
+    suffix: "a"
 
 opcodes:
   - name: "add"
@@ -972,7 +1035,7 @@ opcodes:
     desc: "Move to Condition Register from XER"
     bitmask: 0xfc30ffff
     pattern: 0x7c000400
-    args: [ "crfD", "xer" ]
+    args: [ "crfD" ]
     defs: [ "crfD", "xer" ]
 
   - name: "mfcr"
@@ -1054,7 +1117,7 @@ opcodes:
     bitmask: 0xfe0107fe
     pattern: 0xfc00058e
     modifier: [ "Rc" ]
-    args: [ "FM", "frB" ]
+    args: [ "mtfsf_FM", "frB" ]
     uses: [ "frB" ]
 
   - name: "mtfsfi"
@@ -1062,7 +1125,7 @@ opcodes:
     bitmask: 0xfc7f0ffe
     pattern: 0xfc00010c
     modifier: [ "Rc" ]
-    args: [ "crfD", "IMM" ]
+    args: [ "crfD", "mtfsf_IMM" ]
     defs: [ "crfD" ]
 
   - name: "mtmsr"
@@ -1194,7 +1257,7 @@ opcodes:
     desc: "Paired Single Quantized Load"
     bitmask: 0xfc000000
     pattern: 0xe0000000
-    args: [ "frD", "offset", "rA", "W", "ps_l" ]
+    args: [ "frD", "offset", "rA", "ps_W", "ps_l" ]
     defs: [ "frD" ]
     uses: [ "rA.nz" ]
 
@@ -1202,7 +1265,7 @@ opcodes:
     desc: "Paired Single Quantized Load with Update"
     bitmask: 0xfc000000
     pattern: 0xe4000000
-    args: [ "frD", "offset", "rA", "W", "ps_l" ]
+    args: [ "frD", "offset", "rA", "ps_W", "ps_l" ]
     defs: [ "frD", "rA" ]
     uses: [ "rA" ]
 
@@ -1210,7 +1273,7 @@ opcodes:
     desc: "Paired Single Quantized Load with Update Indexed"
     bitmask: 0xfc00007f
     pattern: 0x1000004c
-    args: [ "frD", "rA", "rB", "W", "ps_l" ]
+    args: [ "frD", "rA", "rB", "ps_W", "ps_l" ]
     defs: [ "frD", "rA" ]
     uses: [ "rA", "rB" ]
 
@@ -1218,7 +1281,7 @@ opcodes:
     desc: "Paired Single Quantized Load Indexed"
     bitmask: 0xfc00007f
     pattern: 0x1000000c
-    args: [ "frD", "rA", "rB", "W", "ps_l" ]
+    args: [ "frD", "rA", "rB", "ps_W", "ps_l" ]
     defs: [ "frD" ]
     uses: [ "rA.nz", "rB" ]
 
@@ -1226,14 +1289,14 @@ opcodes:
     desc: "Paired Single Quantized Store"
     bitmask: 0xfc000000
     pattern: 0xf0000000
-    args: [ "frS", "offset", "rA", "W", "ps_l" ]
+    args: [ "frS", "offset", "rA", "ps_W", "ps_l" ]
     uses: [ "frS", "rA.nz" ]
 
   - name: "psq_stu"
     desc: "Paired Single Quantized Store with Update"
     bitmask: 0xfc000000
     pattern: 0xf4000000
-    args: [ "frS", "offset", "rA", "W", "ps_l" ]
+    args: [ "frS", "offset", "rA", "ps_W", "ps_l" ]
     defs: [ "rA" ]
     uses: [ "frS", "rA" ]
 
@@ -1241,7 +1304,7 @@ opcodes:
     desc: "Paired Single Quantized Store with Update Indexed"
     bitmask: 0xfc00007f
     pattern: 0x1000004e
-    args: [ "frS", "rA", "rB", "W", "ps_l" ]
+    args: [ "frS", "rA", "rB", "ps_W", "ps_l" ]
     defs: [ "rA" ]
     uses: [ "frS", "rA", "rB" ]
 
@@ -1249,7 +1312,7 @@ opcodes:
     desc: "Paired Single Quantized Store Indexed"
     bitmask: 0xfc00007f
     pattern: 0x1000000e
-    args: [ "frS", "rA", "rB", "W", "ps_l" ]
+    args: [ "frS", "rA", "rB", "ps_W", "ps_l" ]
     uses: [ "frS", "rA.nz", "rB" ]
 
   - name: "ps_abs"
@@ -1855,14 +1918,14 @@ opcodes:
     desc: "Trap Word"
     bitmask: 0xfc0007ff
     pattern: 0x7c000008
-    args: [ "TO", "rA", "rB" ]
+    args: [ "tw_TO", "rA", "rB" ]
     uses: [ "rA", "rB" ]
 
   - name: "twi"
     desc: "Trap Word Immediate"
     bitmask: 0xfc000000
     pattern: 0xc0000000
-    args: [ "TO", "rA", "simm" ]
+    args: [ "tw_TO", "rA", "simm" ]
     uses: [ "rA" ]
 
   - name: "xor"
@@ -1909,7 +1972,7 @@ mnemonics:
     condition: "S == B"
   - name: "nop"
     opcode: "ori"
-    condition:
+    match:
       - arg: "rA"
         value: 0
       - arg: "rS"
@@ -1980,7 +2043,7 @@ mnemonics:
         value: 0
       - arg: "cmpL"
         value: 0
- - name: "cmplwi"
+  - name: "cmplwi"
     opcode: "cmpli"
     args: [ "rA", "uimm" ]
     match:
