@@ -194,7 +194,8 @@ impl Isa {
             .iter()
             .map(|opcode| {
                 let variant = opcode.variant_identifier()?;
-                let literal = Literal::string(&opcode.name);
+                let literal =
+                    Literal::string(&opcode.name.strip_suffix(".").unwrap_or(&opcode.name));
                 Ok(quote! {
                     Opcode::#variant => #literal,
                 })
@@ -299,6 +300,20 @@ impl Isa {
                     "Rc" => quote! { m.rc = self.bit(31); },
                     "AA" => quote! { m.aa = self.bit(30); },
                     "LK" => quote! { m.lk = self.bit(31); },
+                    _ => {
+                        return Err(syn::Error::new(
+                            Span::call_site(),
+                            format!("unsupported modifier {}", modifier),
+                        ))
+                    }
+                })
+            }
+            for modifier in &opcode.side_effects {
+                set_modifiers.extend(match modifier.as_str() {
+                    "OE" => quote! { m.oe = true; },
+                    "Rc" => quote! { m.rc = true; },
+                    "AA" => quote! { m.aa = true; },
+                    "LK" => quote! { m.lk = true; },
                     _ => {
                         return Err(syn::Error::new(
                             Span::call_site(),
