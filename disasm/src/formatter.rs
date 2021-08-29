@@ -27,6 +27,7 @@ impl FormattedIns {
             Self::fmt_field(field, f)?;
             if writing_offset {
                 write!(f, ")")?;
+                writing_offset = false;
             }
             if i != fields.len() - 1 {
                 write!(f, ", ")?;
