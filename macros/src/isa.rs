@@ -8,6 +8,12 @@ use serde::{Deserialize, Deserializer};
 use std::collections::HashMap;
 use syn::LitInt;
 
+macro_rules! token_stream {
+    ($stream:ident) => {
+        TokenStream::from_iter($stream.into_iter())
+    };
+}
+
 #[derive(Default)]
 pub(crate) struct BitRange(Range<u8>);
 
@@ -159,9 +165,8 @@ impl Isa {
                     #ident,
                 })
             })
-            .try_collect::<TokenStream, Vec<TokenStream>, syn::Error>()?
-            .into_iter();
-        let enum_variants = TokenStream::from_iter(enum_variants);
+            .try_collect::<TokenStream, Vec<TokenStream>, syn::Error>()?;
+        let enum_variants = token_stream!(enum_variants);
 
         // Create functions.
         let mnemonic_fn = self.gen_mnemonic_fn()?;
@@ -194,12 +199,11 @@ impl Isa {
                     Opcode::#variant => #literal,
                 })
             })
-            .try_collect::<TokenStream, Vec<TokenStream>, syn::Error>()?
-            .into_iter();
-        let match_arms = TokenStream::from_iter(match_arms);
+            .try_collect::<TokenStream, Vec<TokenStream>, syn::Error>()?;
+        let match_arms = token_stream!(match_arms);
         // Create final function.
         let mnemonic_fn = quote! {
-            pub fn mnemonic(self) -> &'static str {
+            fn _mnemonic(self) -> &'static str {
                 match self {
                     Opcode::Illegal => "<illegal>",
                     #match_arms
@@ -226,12 +230,11 @@ impl Isa {
                     }
                 })
             })
-            .try_collect::<TokenStream, Vec<TokenStream>, syn::Error>()?
-            .into_iter();
-        let if_chain = TokenStream::from_iter(if_chain);
+            .try_collect::<TokenStream, Vec<TokenStream>, syn::Error>()?;
+        let if_chain = token_stream!(if_chain);
         // Generate function.
         let func = quote! {
-            pub fn detect(code: u32) -> Self {
+            fn _detect(code: u32) -> Self {
                 #if_chain
                 Opcode::Illegal
             }
@@ -247,7 +250,7 @@ impl Isa {
                 enum_variants.push(field);
             }
         }
-        let enum_variants = TokenStream::from_iter(enum_variants.into_iter());
+        let enum_variants = token_stream!(enum_variants);
 
         // Create final enum.
         let field_enum = quote! {
@@ -269,6 +272,7 @@ impl Isa {
         let mut field_match_arms = Vec::new();
         let mut def_match_arms = Vec::new();
         let mut use_match_arms = Vec::new();
+        let mut modifier_match_arms = Vec::new();
         for opcode in &self.opcodes {
             // Generate fields of opcode.
             // TODO Support mnemonics.
@@ -280,13 +284,39 @@ impl Isa {
                 let variant = field.construct_variant_self();
                 fields.extend(quote! { #variant, })
             }
-            let fields = TokenStream::from_iter(fields.into_iter());
+            let fields = token_stream!(fields);
             // Emit match arm.
             let ident = opcode.variant_identifier()?;
             field_match_arms.push(quote! {
                 Opcode::#ident => vec![#fields],
             });
 
+            // Generate modifiers.
+            let mut set_modifiers: Vec<TokenTree> = Vec::new();
+            for modifier in &opcode.modifiers {
+                set_modifiers.extend(match modifier.as_str() {
+                    "OE" => quote! { m.oe = self.bit(21); },
+                    "Rc" => quote! { m.rc = self.bit(31); },
+                    "AA" => quote! { m.aa = self.bit(30); },
+                    "LK" => quote! { m.lk = self.bit(31); },
+                    _ => {
+                        return Err(syn::Error::new(
+                            Span::call_site(),
+                            format!("unsupported modifier {}", modifier),
+                        ))
+                    }
+                })
+            }
+            let set_modifiers = token_stream!(set_modifiers);
+            modifier_match_arms.push(quote! {
+                Opcode::#ident => {
+                    let mut m: Modifiers = std::default::Default::default();
+                    #set_modifiers
+                    m
+                }
+            });
+
+            // Generate defs.
             let mut defs = Vec::new();
             for arg in &opcode.defs {
                 let field: &Field = field_by_name.get(arg).ok_or_else(|| {
@@ -295,12 +325,13 @@ impl Isa {
                 let variant = field.construct_variant_self();
                 defs.extend(quote! { #variant, })
             }
-            let defs = TokenStream::from_iter(defs.into_iter());
+            let defs = token_stream!(defs);
             let ident = opcode.variant_identifier()?;
             def_match_arms.push(quote! {
                 Opcode::#ident => vec![#defs],
             });
 
+            // Generate uses.
             let mut uses = Vec::new();
             let mut special_uses = Vec::new();
             for arg in &opcode.uses {
@@ -329,9 +360,9 @@ impl Isa {
                     })
                 }
             }
-            let uses = TokenStream::from_iter(uses.into_iter());
+            let uses = token_stream!(uses);
             let ident = opcode.variant_identifier()?;
-            let special_uses = TokenStream::from_iter(special_uses.into_iter());
+            let special_uses = token_stream!(special_uses);
             use_match_arms.push(quote! {
                 Opcode::#ident => {
                     let mut uses = vec![#uses];
@@ -340,9 +371,10 @@ impl Isa {
                 },
             });
         }
-        let field_match_arms = TokenStream::from_iter(field_match_arms.into_iter());
-        let def_match_arms = TokenStream::from_iter(def_match_arms.into_iter());
-        let use_match_arms = TokenStream::from_iter(use_match_arms.into_iter());
+        let field_match_arms = token_stream!(field_match_arms);
+        let def_match_arms = token_stream!(def_match_arms);
+        let use_match_arms = token_stream!(use_match_arms);
+        let modifier_match_arms = token_stream!(modifier_match_arms);
         // Generate final fields function.
         let ins_impl = quote! {
             impl Ins {
@@ -366,6 +398,14 @@ impl Isa {
                     match self.op {
                         Opcode::Illegal => vec![],
                         #use_match_arms
+                        _ => todo!()
+                    }
+                }
+
+                fn _modifiers(&self) -> Modifiers {
+                    match self.op {
+                        Opcode::Illegal => std::default::Default::default(),
+                        #modifier_match_arms
                         _ => todo!()
                     }
                 }

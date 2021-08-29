@@ -1,28 +1,46 @@
+use std::fmt::Formatter;
+use std::ops::Range;
+
+use num_traits::AsPrimitive;
+
+use ppc750cl_macros::{fields, ins_impl, opcodes};
+
+pub use crate::iter::{disasm_iter, DisasmIterator};
+
 pub mod formatter;
 mod iter;
 
 pub mod prelude {
+    pub use crate::formatter::FormattedIns;
     pub use crate::Field;
     pub use crate::Field::*;
     pub use crate::Ins;
-    pub use crate::formatter::FormattedIns;
     pub use crate::Opcode::*;
     pub use crate::{
         Bit, BranchDest, CRBit, CRField, Offset, OpaqueU, Simm, Uimm, FPR, GPR, GQR, SPR, SR,
     };
 }
 
-use ppc750cl_macros::{fields, ins_impl, opcodes};
-
-//pub use crate::formatter::AsmFormatter;
-//use crate::formatter::SimpleFormatter;
-pub use crate::iter::{disasm_iter, DisasmIterator};
-
 macro_rules! field_arg {
     ($name:ident, $typ:ident) => {
         #[derive(Debug, Copy, Clone, Ord, PartialOrd, Eq, PartialEq)]
         pub struct $name(pub $typ);
     };
+}
+
+#[inline(always)]
+fn bit(x: u32, idx: usize) -> bool {
+    ((x >> (32 - idx - 1)) & 1) == 1
+}
+
+#[inline(always)]
+fn bits<F>(x: u32, range: Range<usize>) -> F
+where
+    F: 'static + std::marker::Copy,
+    u32: AsPrimitive<F>,
+{
+    let masked: u32 = (x >> (32 - range.end)) & ((1 << range.len()) - 1);
+    masked.as_()
 }
 
 // General-purpose register.
@@ -55,9 +73,47 @@ field_arg!(OpaqueU, u32);
 // Generate the Field enum and impls.
 fields!();
 
+#[derive(Debug, Default)]
+pub struct Modifiers {
+    pub oe: bool,
+    pub rc: bool,
+    pub lk: bool,
+    pub aa: bool,
+}
+
+impl std::fmt::Display for Modifiers {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        if self.aa {
+            write!(f, "a")?;
+        }
+        if self.lk {
+            write!(f, "l")?;
+        }
+        if self.oe {
+            write!(f, "o")?;
+        }
+        if self.rc {
+            write!(f, ".")?;
+        }
+        Ok(())
+    }
+}
+
 // Generate the Opcode enum and impls.
 // TODO This could be made more readable with a derive over an empty enum.
 opcodes!();
+
+impl Opcode {
+    /// Detects the opcode of a machine code instruction.
+    pub fn detect(code: u32) -> Self {
+        Self::_detect(code) // auto-generated
+    }
+
+    /// Prints the basic mnemonic of an opcode.
+    pub fn mnemonic(self) -> &'static str {
+        self._mnemonic() // auto-generated
+    }
+}
 
 impl Default for Opcode {
     fn default() -> Self {
@@ -95,6 +151,11 @@ impl Ins {
         self._fields() // auto-generated
     }
 
+    /// Gets the modifiers of an instruction.
+    pub fn modifiers(&self) -> Modifiers {
+        self._modifiers() // auto-generated
+    }
+
     /// Gets the defs of an instruction.
     pub fn defs(&self) -> Vec<Field> {
         self._defs() // auto-generated
@@ -103,6 +164,16 @@ impl Ins {
     /// Gets the uses of an instruction.
     pub fn uses(&self) -> Vec<Field> {
         self._uses() // auto-generated
+    }
+
+    /// Gets the given bit from the machine code instruction.
+    pub fn bit(&self, idx: usize) -> bool {
+        bit(self.code, idx)
+    }
+
+    /// Gets the given range of btis from the machine code instruction.
+    pub fn bits(&self, range: Range<usize>) -> u32 {
+        bits(self.code, range)
     }
 }
 

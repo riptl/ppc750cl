@@ -4,6 +4,10 @@ macro_rules! assert_asm {
     ($ins:ident, $disasm:literal) => {{
         assert_eq!(format!("{}", FormattedIns($ins)), $disasm)
     }};
+    ($code:literal, $disasm:literal) => {{
+        let ins = Ins::new($code, 0x8000_0000);
+        assert_eq!(format!("{}", FormattedIns(ins)), $disasm)
+    }};
 }
 
 #[test]
@@ -25,6 +29,13 @@ fn test_ins_addi() {
     assert_eq!(ins.defs(), vec![rD(GPR(0))]);
     assert_eq!(ins.uses(), vec![rA(GPR(1))]);
     assert_asm!(ins, "addi r0, r1, 0x140");
+
+    assert_asm!(0x38010008, "addi r0, r1, 0x8");
+    assert_asm!(0x38010010, "addi r0, r1, 0x10");
+    assert_asm!(0x38010018, "addi r0, r1, 0x18");
+    assert_asm!(0x38010140, "addi r0, r1, 0x140");
+    assert_asm!(0x38049000, "addi r0, r4, -0x7000");
+    //assert_asm!(0x38a00000, "li r5, 0");
 }
 
 #[test]
@@ -45,48 +56,26 @@ fn test_ins_psq_lx() {
     assert_eq!(ins.uses(), vec![rB(GPR(0))]);
 }
 
-/*
-
-#[test]
-fn test_ins_addc() {
-    assert_asm!(0x7c002014, "addc r0, r0, r4");
-}
-
 #[test]
 fn test_ins_adde() {
     assert_asm!(0x7c006114, "adde r0, r0, r12");
 }
 
 #[test]
-fn test_ins_addi() {
-    assert_asm!(0x38010008, "addi r0, r1, 0x8");
-    assert_asm!(0x38010010, "addi r0, r1, 0x10");
-    assert_asm!(0x38010018, "addi r0, r1, 0x18");
-    assert_asm!(0x38010140, "addi r0, r1, 0x140");
-    assert_asm!(0x38049000, "addi r0, r4, -28672");
-    assert_asm!(0x38a00000, "li r5, 0");
-}
-
-#[test]
 fn test_ins_addic() {
-    assert_asm!(0x3060ffff, "addic r3, r0, -1");
+    assert_asm!(0x3060ffff, "addic r3, r0, -0x1");
     assert_asm!(0x30840800, "addic r4, r4, 0x800");
     assert_asm!(0x30a50008, "addic r5, r5, 0x8");
     assert_asm!(0x37DF001C, "addic. r30, r31, 0x1c");
     assert_asm!(0x37E06278, "addic. r31, r0, 0x6278");
-    assert_asm!(0x37E3FFFF, "addic. r31, r3, -1");
-}
-
-#[test]
-fn test_ins_addic_() {
-    assert_asm!(0x341D001C, "addic. r0, r29, 0x1c");
+    assert_asm!(0x37E3FFFF, "addic. r31, r3, -0x1");
 }
 
 #[test]
 fn test_ins_addis() {
-    assert_asm!(0x3C030000, "addis r0, r3, 0");
+    assert_asm!(0x3C030000, "addis r0, r3, 0x0");
     assert_asm!(0x3C038000, "addis r0, r3, 0x8000");
-    assert_asm!(0x3D00EFCE, "lis r8, 0xefce");
+    //assert_asm!(0x3D00EFCE, "lis r8, 0xefce");
 }
 
 #[test]
@@ -99,6 +88,8 @@ fn test_ins_and() {
     assert_asm!(0x7C001838, "and r0, r0, r3");
     assert_asm!(0x7C001839, "and. r0, r0, r3");
 }
+
+/*
 
 #[test]
 fn test_ins_andc() {

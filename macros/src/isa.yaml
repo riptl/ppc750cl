@@ -204,7 +204,6 @@ opcodes:
     bitmask: 0xfc000000
     pattern: 0x3c000000
     args: [ "rD", "rA", "uimm" ]
-    side_effects: [ "Rc" ]
     defs: [ "rD" ]
     uses: [ "rA.nz" ]
 

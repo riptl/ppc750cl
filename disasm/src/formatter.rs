@@ -1,4 +1,4 @@
-use std::fmt::{Display, LowerHex, UpperHex, Formatter};
+use std::fmt::{Display, Formatter, LowerHex, UpperHex};
 
 use num_traits::PrimInt;
 
@@ -14,8 +14,7 @@ impl Display for FormattedIns {
 
 impl FormattedIns {
     fn fmt_ins(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        let mnemonic = self.0.op.mnemonic();
-        write!(f, "{} ", mnemonic)?;
+        write!(f, "{}{} ", self.0.op.mnemonic(), self.0.modifiers())?;
         let fields = self.0.fields();
         let mut writing_offset = false;
         for (i, field) in fields.iter().enumerate() {
