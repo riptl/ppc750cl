@@ -44,7 +44,7 @@ impl Field {
         if self.name.strip_suffix(".nz").is_none() {
             Some(to_rust_ident(&self.name))
         } else {
-            return None;
+            None
         }
     }
 
@@ -61,11 +61,7 @@ impl Field {
     }
 
     fn enum_variant_definition(&self) -> Option<TokenStream> {
-        let ident = if let Some(ident) = self.variant_identifier() {
-            ident
-        } else {
-            return None;
-        };
+        let ident = self.variant_identifier()?;
         Some(if let Some(arg) = &self.arg {
             let arg = TokenTree::Ident(Ident::new(arg, Span::call_site()));
             quote! {

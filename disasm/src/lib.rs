@@ -1,9 +1,11 @@
-//pub mod formatter;
+pub mod formatter;
 mod iter;
 
 pub mod prelude {
+    pub use crate::Field;
     pub use crate::Field::*;
     pub use crate::Ins;
+    pub use crate::formatter::FormattedIns;
     pub use crate::Opcode::*;
     pub use crate::{
         Bit, BranchDest, CRBit, CRField, Offset, OpaqueU, Simm, Uimm, FPR, GPR, GQR, SPR, SR,
@@ -105,14 +107,3 @@ impl Ins {
 }
 
 ins_impl!();
-
-/*
-impl ToString for Ins {
-    fn to_string(&self) -> String {
-        let buf = Vec::<u8>::new();
-        let mut formatter = SimpleFormatter::new(buf);
-        self.write_string(&mut formatter).unwrap();
-        unsafe { String::from_utf8_unchecked(formatter.writer) }
-    }
-}
-*/

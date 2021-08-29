@@ -1,10 +1,17 @@
 use ppc750cl::prelude::*;
 
+macro_rules! assert_asm {
+    ($ins:ident, $disasm:literal) => {{
+        assert_eq!(format!("{}", FormattedIns($ins)), $disasm)
+    }};
+}
+
 #[test]
 fn test_ins_addc() {
     let ins = Ins::new(0x7c002014, 0x8000_0000u32);
     assert_eq!(ins.op, Addc);
     assert_eq!(ins.fields(), vec![rD(GPR(0)), rA(GPR(0)), rB(GPR(4))]);
+    assert_asm!(ins, "addc r0, r0, r4");
 }
 
 #[test]
@@ -17,6 +24,7 @@ fn test_ins_addi() {
     );
     assert_eq!(ins.defs(), vec![rD(GPR(0))]);
     assert_eq!(ins.uses(), vec![rA(GPR(1))]);
+    assert_asm!(ins, "addi r0, r1, 0x140");
 }
 
 #[test]
@@ -38,11 +46,6 @@ fn test_ins_psq_lx() {
 }
 
 /*
-macro_rules! assert_asm {
-    ($code:expr, $disasm:expr) => {{
-        assert_eq!(Ins::new($code, 0x8000_0000u32).to_string(), $disasm)
-    }};
-}
 
 #[test]
 fn test_ins_addc() {

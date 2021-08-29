@@ -17,7 +17,7 @@ pub fn opcodes(_: proc_macro::TokenStream) -> proc_macro::TokenStream {
     };
     match isa.gen_opcode_enum() {
         Ok(v) => v.into(),
-        Err(err) => return proc_macro::TokenStream::from(err.to_compile_error()),
+        Err(err) => proc_macro::TokenStream::from(err.to_compile_error()),
     }
 }
 
@@ -29,7 +29,7 @@ pub fn fields(_: proc_macro::TokenStream) -> proc_macro::TokenStream {
     };
     match isa.gen_field_enum() {
         Ok(v) => v.into(),
-        Err(err) => return proc_macro::TokenStream::from(err.to_compile_error()),
+        Err(err) => proc_macro::TokenStream::from(err.to_compile_error()),
     }
 }
 
@@ -41,7 +41,7 @@ pub fn ins_impl(_: proc_macro::TokenStream) -> proc_macro::TokenStream {
     };
     match isa.gen_ins_impl() {
         Ok(v) => v.into(),
-        Err(err) => return proc_macro::TokenStream::from(err.to_compile_error()),
+        Err(err) => proc_macro::TokenStream::from(err.to_compile_error()),
     }
 }
 

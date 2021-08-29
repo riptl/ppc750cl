@@ -1,107 +1,122 @@
-use std::fmt::{Display, LowerHex, UpperHex};
-use std::io::Write;
+use std::fmt::{Display, LowerHex, UpperHex, Formatter};
 
 use num_traits::PrimInt;
 
-use crate::Ins;
+use crate::prelude::*;
 
-/*
-type IOResult = std::io::Result<()>;
+pub struct FormattedIns(pub Ins);
 
-pub trait AsmFormatter<W>
-where
-    W: Write,
-{
-    fn write_ins(ins: &Ins);
-}
-
-pub struct SimpleFormatter();
-
-impl<W: Write> SimpleFormatter {
-    /// Writes the instruction mnemonic.
-    fn write_mnemonic(writer: &mut W, name: &str) -> IOResult {
-        write!(writer, "{}", name)
-    }
-
-    /// Separates the instruction mnemonic and arguments.
-    fn write_opcode_separator(writer: &mut W) -> IOResult {
-        write!(writer, " ")
-    }
-
-    /// Separates two instruction arguments (e.g. registers).
-    fn write_operand_separator(writer: &mut W) -> IOResult {
-        write!(writer, ", ")
-    }
-
-    /// Writes a general-purpose register argument.
-    fn write_gpr(writer: &mut W, reg: u8) -> IOResult {
-        write!(writer, "r{}", reg)
-    }
-
-    /// Writes a nullable general-purpose register argument.
-    fn write_gpr0(writer: &mut W, reg: u8) -> IOResult {
-        if reg != 0 {
-            Self::write_gpr(writer, reg)
-        } else {
-            write!(writer, "0")
-        }
-    }
-
-    /// Writes a floating point register argument.
-    fn write_fpr(writer: &mut W, reg: u8) -> IOResult {
-        write!(writer, "f{}", reg)
-    }
-
-    /// Writes a condition register argument.
-    fn write_cr(writer: &mut W, reg: u8) -> IOResult {
-        write!(writer, "cr{}", reg)
-    }
-
-    /// Writes a paired-singles quantization register argument.
-    fn write_qr(writer: &mut W, reg: u8) -> IOResult {
-        write!(writer, "qr{}", reg)
-    }
-
-    fn write_sr(writer: &mut W, reg: u8) -> IOResult {
-        write!(writer, "{}", reg)
-    }
-
-    /// Sets the mnemonic 'o' suffix.
-    fn write_oe(writer: &mut W, oe: u8) -> IOResult {
-        if oe != 0 {
-            write!(writer, "o")?;
-        }
-        Ok(())
-    }
-
-    /// Sets the mnemonic 'a' suffix.
-    fn write_aa(writer: &mut W, aa: u8) -> IOResult {
-        if aa != 0 {
-            write!(writer, "a")?;
-        }
-        Ok(())
-    }
-
-    /// Sets the mnemonic 'l' suffix.
-    fn write_lk(writer: &mut W, lk: u8) -> IOResult {
-        if lk != 0 {
-            write!(writer, "l")?;
-        }
-        Ok(())
-    }
-
-    /// Sets the mnemonic '.' suffix.
-    fn write_rc(writer: &mut W, rc: u8) -> IOResult {
-        if rc != 0 {
-            write!(writer, ".")?;
-        }
-        Ok(())
+impl Display for FormattedIns {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        self.fmt_ins(f)
     }
 }
 
-impl<W: Write> AsmFormatter<W> for SimpleFormatter<W> {
-    fn write_ins(ins: &Ins) {
-        todo!()
+impl FormattedIns {
+    fn fmt_ins(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let mnemonic = self.0.op.mnemonic();
+        write!(f, "{} ", mnemonic)?;
+        let fields = self.0.fields();
+        let mut writing_offset = false;
+        for (i, field) in fields.iter().enumerate() {
+            if let offset(o) = field {
+                writing_offset = true;
+                write!(f, "{:#x}(", ReallySigned(o.0))?;
+                continue;
+            }
+            Self::fmt_field(field, f)?;
+            if writing_offset {
+                write!(f, ")")?;
+            }
+            if i != fields.len() - 1 {
+                write!(f, ", ")?;
+            }
+        }
+        Ok(())
+    }
+
+    fn fmt_field(field: &Field, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match field {
+            simm(s) => Self::fmt_simm(*s, f),
+            uimm(u) => Self::fmt_uimm(*u, f),
+            BO(o) => Self::fmt_opaque_u(*o, f),
+            BI(o) => Self::fmt_opaque_u(*o, f),
+            BD(bd) => Self::fmt_branch_dest(*bd, f),
+            LI(bd) => Self::fmt_branch_dest(*bd, f),
+            SH(o) => Self::fmt_opaque_u(*o, f),
+            MB(o) => Self::fmt_opaque_u(*o, f),
+            ME(o) => Self::fmt_opaque_u(*o, f),
+            rS(gpr) => Self::fmt_gpr(*gpr, f),
+            rD(gpr) => Self::fmt_gpr(*gpr, f),
+            rA(gpr) => Self::fmt_gpr(*gpr, f),
+            rB(gpr) => Self::fmt_gpr(*gpr, f),
+            rC(gpr) => Self::fmt_gpr(*gpr, f),
+            sr(s) => Self::fmt_sr(*s, f),
+            spr(s) => Self::fmt_spr(*s, f),
+            frS(fpr) => Self::fmt_fpr(*fpr, f),
+            frD(fpr) => Self::fmt_fpr(*fpr, f),
+            frA(fpr) => Self::fmt_fpr(*fpr, f),
+            frB(fpr) => Self::fmt_fpr(*fpr, f),
+            frC(fpr) => Self::fmt_fpr(*fpr, f),
+            crbD(crb) => Self::fmt_crb(*crb, f),
+            crbA(crb) => Self::fmt_crb(*crb, f),
+            crbB(crb) => Self::fmt_crb(*crb, f),
+            crfD(crf) => Self::fmt_crf(*crf, f),
+            crfS(crf) => Self::fmt_crf(*crf, f),
+            crm(o) => Self::fmt_opaque_u(*o, f),
+            ps_l(gqr) => Self::fmt_gqr(*gqr, f),
+            ps_W(o) => Self::fmt_opaque_u(*o, f),
+            NB(o) => Self::fmt_opaque_u(*o, f),
+            tbr(o) => Self::fmt_opaque_u(*o, f),
+            mtfsf_FM(o) => Self::fmt_opaque_u(*o, f),
+            mtfsf_IMM(o) => Self::fmt_opaque_u(*o, f),
+            tw_TO(o) => Self::fmt_opaque_u(*o, f),
+            _ => Ok(()),
+        }
+    }
+
+    fn fmt_gpr(gpr: GPR, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "r{}", gpr.0)
+    }
+
+    fn fmt_fpr(gpr: FPR, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "fr{}", gpr.0)
+    }
+
+    fn fmt_opaque_u(u: OpaqueU, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", u.0)
+    }
+
+    fn fmt_gqr(gqr: GQR, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", gqr.0)
+    }
+
+    fn fmt_spr(s: SPR, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", s.0)
+    }
+
+    fn fmt_sr(s: SR, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", s.0)
+    }
+
+    fn fmt_crb(crb: CRField, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", crb.0)
+    }
+
+    fn fmt_crf(crf: CRBit, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", crf.0)
+    }
+
+    fn fmt_branch_dest(bd: BranchDest, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{:#x}", ReallySigned(bd.0))
+    }
+
+    fn fmt_uimm(u: Uimm, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{:#x}", u.0)
+    }
+
+    fn fmt_simm(s: Simm, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{:#x}", ReallySigned(s.0))
     }
 }
 
@@ -125,4 +140,3 @@ impl<N: PrimInt> UpperHex for ReallySigned<N> {
         f.pad_integral(num >= 0, prefix, &bare_hex)
     }
 }
-*/
