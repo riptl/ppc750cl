@@ -36,12 +36,16 @@ pub(crate) struct Field {
     bits: BitRange,
     signed: bool,
     split: bool,
-    arg: String,
+    arg: Option<String>,
 }
 
 impl Field {
-    fn variant_identifier(&self) -> TokenTree {
-        to_rust_ident(&self.name)
+    fn variant_identifier(&self) -> Option<TokenTree> {
+        if self.name.strip_suffix(".nz").is_none() {
+            Some(to_rust_ident(&self.name))
+        } else {
+            return None;
+        }
     }
 
     fn express_value(&self, code: TokenStream) -> TokenStream {
@@ -50,6 +54,47 @@ impl Field {
         quote! {
             (((#code) >> (32 - #mask_stop)) & ((1 << #mask_size) - 1))
         }
+    }
+
+    fn express_value_self(&self) -> TokenStream {
+        self.express_value(quote!(self.code))
+    }
+
+    fn enum_variant_definition(&self) -> Option<TokenStream> {
+        let ident = if let Some(ident) = self.variant_identifier() {
+            ident
+        } else {
+            return None;
+        };
+        Some(if let Some(arg) = &self.arg {
+            let arg = TokenTree::Ident(Ident::new(arg, Span::call_site()));
+            quote! {
+                #ident(#arg),
+            }
+        } else {
+            quote! {
+                #ident,
+            }
+        })
+    }
+
+    fn construct_variant(&self, code: TokenStream) -> TokenStream {
+        let field_variant = self.variant_identifier();
+        if let Some(arg) = &self.arg {
+            let field_arg = TokenTree::Ident(Ident::new(arg, Span::call_site()));
+            let value = self.express_value(code);
+            quote! {
+                Field::#field_variant(#field_arg(#value as _))
+            }
+        } else {
+            quote! {
+                Field::#field_variant
+            }
+        }
+    }
+
+    fn construct_variant_self(&self) -> TokenStream {
+        self.construct_variant(quote!(self.code))
     }
 }
 
@@ -200,14 +245,13 @@ impl Isa {
 
     pub(crate) fn gen_field_enum(&self) -> syn::Result<TokenStream> {
         // Create enum variants.
-        let enum_variants = self.fields.iter().map(|field| {
-            let ident = field.variant_identifier();
-            let arg = TokenTree::Ident(Ident::new(&field.arg, Span::call_site()));
-            quote! {
-                #ident(#arg),
+        let mut enum_variants = Vec::new();
+        for field in &self.fields {
+            if let Some(field) = field.enum_variant_definition() {
+                enum_variants.push(field);
             }
-        });
-        let enum_variants = TokenStream::from_iter(enum_variants);
+        }
+        let enum_variants = TokenStream::from_iter(enum_variants.into_iter());
 
         // Create final enum.
         let field_enum = quote! {
@@ -226,7 +270,9 @@ impl Isa {
             field_by_name.insert(field.name.clone(), field);
         }
         // Generate match arms for each opcode.
-        let mut match_arms = Vec::new();
+        let mut field_match_arms = Vec::new();
+        let mut def_match_arms = Vec::new();
+        let mut use_match_arms = Vec::new();
         for opcode in &self.opcodes {
             // Generate fields of opcode.
             // TODO Support mnemonics.
@@ -235,28 +281,95 @@ impl Isa {
                 let field: &Field = field_by_name.get(arg).ok_or_else(|| {
                     syn::Error::new(Span::call_site(), format!("undefined field {}", arg))
                 })?;
-                let field_variant = field.variant_identifier();
-                let field_arg = TokenTree::Ident(Ident::new(&field.arg, Span::call_site()));
-                let value = field.express_value(quote!(self.code));
-                fields.extend(quote! {
-                    Field::#field_variant(#field_arg(#value as _)),
-                })
+                let variant = field.construct_variant_self();
+                fields.extend(quote! { #variant, })
             }
             let fields = TokenStream::from_iter(fields.into_iter());
             // Emit match arm.
             let ident = opcode.variant_identifier()?;
-            match_arms.push(quote! {
-                #ident => vec![#fields],
-            })
+            field_match_arms.push(quote! {
+                Opcode::#ident => vec![#fields],
+            });
+
+            let mut defs = Vec::new();
+            for arg in &opcode.defs {
+                let field: &Field = field_by_name.get(arg).ok_or_else(|| {
+                    syn::Error::new(Span::call_site(), format!("undefined field {}", arg))
+                })?;
+                let variant = field.construct_variant_self();
+                defs.extend(quote! { #variant, })
+            }
+            let defs = TokenStream::from_iter(defs.into_iter());
+            let ident = opcode.variant_identifier()?;
+            def_match_arms.push(quote! {
+                Opcode::#ident => vec![#defs],
+            });
+
+            let mut uses = Vec::new();
+            let mut special_uses = Vec::new();
+            for arg in &opcode.uses {
+                // Detect non-zero modifier.
+                let mut arg = arg.as_str();
+                let mut non_zero = false;
+                if let Some(substr) = arg.strip_suffix(".nz") {
+                    non_zero = true;
+                    arg = substr;
+                }
+                // Get underlying field.
+                let field: &Field = field_by_name.get(arg).ok_or_else(|| {
+                    syn::Error::new(Span::call_site(), format!("undefined field {}", arg))
+                })?;
+                let variant = field.construct_variant_self();
+                if non_zero {
+                    let value = field.express_value_self();
+                    special_uses.extend(quote! {
+                        if (#value) != 0 {
+                            uses.push(#variant);
+                        }
+                    })
+                } else {
+                    uses.extend(quote! {
+                        #variant,
+                    })
+                }
+            }
+            let uses = TokenStream::from_iter(uses.into_iter());
+            let ident = opcode.variant_identifier()?;
+            let special_uses = TokenStream::from_iter(special_uses.into_iter());
+            use_match_arms.push(quote! {
+                Opcode::#ident => {
+                    let mut uses = vec![#uses];
+                    #special_uses
+                    uses
+                },
+            });
         }
-        let match_arms = TokenStream::from_iter(match_arms.into_iter());
+        let field_match_arms = TokenStream::from_iter(field_match_arms.into_iter());
+        let def_match_arms = TokenStream::from_iter(def_match_arms.into_iter());
+        let use_match_arms = TokenStream::from_iter(use_match_arms.into_iter());
         // Generate final fields function.
         let ins_impl = quote! {
             impl Ins {
                 fn _fields(&self) -> Vec<Field> {
                     match self.op {
                         Opcode::Illegal => vec![],
-                        #match_arms
+                        #field_match_arms
+                        _ => todo!()
+                    }
+                }
+
+                fn _defs(&self) -> Vec<Field> {
+                    match self.op {
+                        Opcode::Illegal => vec![],
+                        #def_match_arms
+                        _ => todo!()
+                    }
+                }
+
+                fn _uses(&self) -> Vec<Field> {
+                    match self.op {
+                        Opcode::Illegal => vec![],
+                        #use_match_arms
                         _ => todo!()
                     }
                 }

@@ -5,6 +5,9 @@ pub mod prelude {
     pub use crate::Field::*;
     pub use crate::Ins;
     pub use crate::Opcode::*;
+    pub use crate::{
+        Bit, BranchDest, CRBit, CRField, Offset, OpaqueU, Simm, Uimm, FPR, GPR, GQR, SPR, SR,
+    };
 }
 
 use ppc750cl_macros::{fields, ins_impl, opcodes};
@@ -88,6 +91,16 @@ impl Ins {
     /// Gets the fields of an instruction.
     pub fn fields(&self) -> Vec<Field> {
         self._fields() // auto-generated
+    }
+
+    /// Gets the defs of an instruction.
+    pub fn defs(&self) -> Vec<Field> {
+        self._defs() // auto-generated
+    }
+
+    /// Gets the uses of an instruction.
+    pub fn uses(&self) -> Vec<Field> {
+        self._uses() // auto-generated
     }
 }
 

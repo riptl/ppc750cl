@@ -103,9 +103,6 @@ fields:
   - name: "crm"
     arg: "OpaqueU"
     bits: "12..20"
-  - name: "cmpL"
-    arg: "OpaqueU"
-    bits: "10"
   # Paired single fields
   - name: "ps_l"
     arg: "GQR"
@@ -134,6 +131,9 @@ fields:
     arg: "OpaqueU"
     desc: "Bitset for tw and twi"
     bits: "6..11"
+  - name: "xer"
+  - name: "ctr"
+  - name: "lr"
 
 # TODO Add defs/uses for modifiers.
 modifiers:
@@ -296,7 +296,7 @@ opcodes:
     desc: "Compare"
     bitmask: 0xfc4007ff
     pattern: 0x7c000000
-    args: [ "crfD", "cmpL", "rA", "rB" ]
+    args: [ "crfD", "rA", "rB" ]
     defs: [ "crfD" ]
     uses: [ "rA", "rB" ]
 
@@ -304,7 +304,7 @@ opcodes:
     desc: "Compare Immediate"
     bitmask: 0xfc400000
     pattern: 0x2c000000
-    args: [ "crfD", "cmpL", "rA", "simm" ]
+    args: [ "crfD", "rA", "simm" ]
     defs: [ "crfD" ]
     uses: [ "rA" ]
 
@@ -312,7 +312,7 @@ opcodes:
     desc: "Compare Logical"
     bitmask: 0xfc4007ff
     pattern: 0x7c000040
-    args: [ "crfD", "cmpL", "rA", "rB" ]
+    args: [ "crfD", "rA", "rB" ]
     defs: [ "crfD" ]
     uses: [ "rA", "rB" ]
 
@@ -320,7 +320,7 @@ opcodes:
     desc: "Compare Logical Immediate"
     bitmask: 0xfc400000
     pattern: 0x28000000
-    args: [ "crfD", "cmpL", "rA", "uimm" ]
+    args: [ "crfD", "rA", "uimm" ]
     defs: [ "crfD" ]
     uses: [ "rA" ]
 
@@ -2005,35 +2005,23 @@ mnemonics:
     match:
       - arg: "crfD"
         value: 0
-      - arg: "cmpL"
-        value: 0
   - name: "cmpw"
     opcode: "cmp"
     args: [ "crfD", "rA", "rB" ]
-    match:
-      - arg: "cmpL"
-        value: 0
   - name: "cmplw"
     opcode: "cmpl"
     args: [ "rA", "rB" ]
     match:
       - arg: "crfD"
         value: 0
-      - arg: "cmpL"
-        value: 0
   - name: "cmplw"
     opcode: "cmpl"
     args: [ "crfD", "rA", "rB" ]
-    match:
-      - arg: "cmpL"
-        value: 0
   - name: "cmpwi"
     opcode: "cmpi"
     args: [ "rA", "simm" ]
     match:
       - arg: "crfD"
-        value: 0
-      - arg: "cmpL"
         value: 0
   - name: "cmpwi"
     opcode: "cmpi"
@@ -2041,23 +2029,17 @@ mnemonics:
     match:
       - arg: "crfD"
         value: 0
-      - arg: "cmpL"
-        value: 0
   - name: "cmplwi"
     opcode: "cmpli"
     args: [ "rA", "uimm" ]
     match:
       - arg: "crfD"
         value: 0
-      - arg: "cmpL"
-        value: 0
   - name: "cmplwi"
     opcode: "cmpli"
     args: [ "crfD", "rA", "uimm" ]
     match:
       - arg: "crfD"
-        value: 0
-      - arg: "cmpL"
         value: 0
 
   # Misc

@@ -1,11 +1,40 @@
 use ppc750cl::prelude::*;
-use ppc750cl::GPR;
 
 #[test]
-fn test_ins_addi() {
+fn test_ins_addc() {
     let ins = Ins::new(0x7c002014, 0x8000_0000u32);
     assert_eq!(ins.op, Addc);
     assert_eq!(ins.fields(), vec![rD(GPR(0)), rA(GPR(0)), rB(GPR(4))]);
+}
+
+#[test]
+fn test_ins_addi() {
+    let ins = Ins::new(0x38010140, 0x8000_0000u32);
+    assert_eq!(ins.op, Addi);
+    assert_eq!(
+        ins.fields(),
+        vec![rD(GPR(0)), rA(GPR(1)), simm(Simm(0x140))]
+    );
+    assert_eq!(ins.defs(), vec![rD(GPR(0))]);
+    assert_eq!(ins.uses(), vec![rA(GPR(1))]);
+}
+
+#[test]
+fn test_ins_psq_lx() {
+    let ins = Ins::new(0x1000000C, 0x8000_0000u32);
+    assert_eq!(ins.op, PsqLx);
+    assert_eq!(
+        ins.fields(),
+        vec![
+            frD(FPR(0)),
+            rA(GPR(0)),
+            rB(GPR(0)),
+            ps_W(OpaqueU(0)),
+            ps_l(GQR(0))
+        ]
+    );
+    assert_eq!(ins.defs(), vec![frD(FPR(0))]);
+    assert_eq!(ins.uses(), vec![rB(GPR(0))]);
 }
 
 /*
