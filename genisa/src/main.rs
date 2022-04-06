@@ -182,15 +182,6 @@ pub(crate) struct Mnemonic {
     modifiers: Vec<String>,
     args: Vec<String>,
     condition: String,
-    #[serde(rename = "match")]
-    matcher: Vec<MatchField>,
-}
-
-#[derive(Deserialize, Default)]
-#[serde(default)]
-pub(crate) struct MatchField {
-    arg: String,
-    value: u32,
 }
 
 #[derive(Deserialize, Default)]
@@ -431,34 +422,14 @@ impl Isa {
             if let Some(mnemonics) = mnemonics_by_opcode.get(&opcode.name) {
                 let mut simplified_conditions = Vec::new();
                 for mnemonic in mnemonics {
-                    if mnemonic.matcher.is_empty() && mnemonic.condition.is_empty() {
+                    if mnemonic.condition.is_empty() {
                         continue; // TODO else branch
                     }
-                    // Emit if condition.
                     simplified_conditions.push(quote!(if));
-                    for (i, condition) in mnemonic.matcher.iter().enumerate() {
-                        if i > 0 {
-                            simplified_conditions.push(quote!(&&));
-                        }
-                        // Express value from opcode.
-                        let field: &Field = field_by_name.get(&condition.arg).ok_or_else(|| {
-                            Error::from(format!("undefined field {}", &condition.arg))
-                        })?;
-                        simplified_conditions.push(field.express_value_self());
-                        // Equate with literal.
-                        let lit_int =
-                            LitInt::new(&format!("{}", condition.value), Span::call_site());
-                        simplified_conditions.push(quote!(== #lit_int));
-                    }
-                    if !mnemonic.condition.is_empty() {
-                        if mnemonic.matcher.len() > 0 {
-                            simplified_conditions.push(quote!(&&));
-                        }
-                        simplified_conditions.push(compile_mnemonic_condition(
-                            &field_by_name,
-                            &mnemonic.condition,
-                        )?);
-                    }
+                    simplified_conditions.push(compile_mnemonic_condition(
+                        &field_by_name,
+                        &mnemonic.condition,
+                    )?);
                     // Emit branch.
                     let mnemonic_lit = LitStr::new(&mnemonic.name, Span::call_site());
                     // Extract modifier bits.
