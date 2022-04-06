@@ -1,3 +1,4 @@
+use std::collections::HashMap;
 use std::iter::FromIterator;
 use std::ops::Range;
 
@@ -5,7 +6,6 @@ use itertools::Itertools;
 use proc_macro2::{Ident, Literal, Span, TokenStream, TokenTree};
 use quote::quote;
 use serde::{Deserialize, Deserializer};
-use std::collections::HashMap;
 use syn::LitInt;
 
 macro_rules! token_stream {
@@ -195,7 +195,7 @@ impl Isa {
             .map(|opcode| {
                 let variant = opcode.variant_identifier()?;
                 let literal =
-                    Literal::string(&opcode.name.strip_suffix(".").unwrap_or(&opcode.name));
+                    Literal::string(opcode.name.strip_suffix('.').unwrap_or(&opcode.name));
                 Ok(quote! {
                     Opcode::#variant => #literal,
                 })
@@ -325,7 +325,7 @@ impl Isa {
             let set_modifiers = token_stream!(set_modifiers);
             modifier_match_arms.push(quote! {
                 Opcode::#ident => {
-                    let mut m: Modifiers = std::default::Default::default();
+                    let mut m = Modifiers::default();
                     #set_modifiers
                     m
                 }
@@ -419,9 +419,18 @@ impl Isa {
 
                 fn _modifiers(&self) -> Modifiers {
                     match self.op {
-                        Opcode::Illegal => std::default::Default::default(),
+                        Opcode::Illegal => Modifiers::default(),
                         #modifier_match_arms
                         _ => todo!()
+                    }
+                }
+
+                fn _simplified(self) -> SimplifiedIns {
+                    SimplifiedIns {
+                        mnemonic: self.op.mnemonic(),
+                        modifiers: self._modifiers(),
+                        args: vec![],
+                        ins: self,
                     }
                 }
             }
