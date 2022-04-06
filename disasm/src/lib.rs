@@ -3,19 +3,20 @@ use std::ops::Range;
 
 use num_traits::{AsPrimitive, PrimInt};
 
-use ppc750cl_macros::{fields, ins_impl, opcodes};
-
 pub use crate::iter::{disasm_iter, DisasmIterator};
 
 pub mod formatter;
 mod iter;
+mod generated;
+use generated::*;
 
 pub mod prelude {
     pub use crate::formatter::FormattedIns;
-    pub use crate::Field;
     pub use crate::Field::*;
     pub use crate::Ins;
     pub use crate::Opcode::*;
+    pub use crate::Modifiers;
+    pub use crate::SimplifiedIns;
     pub use crate::{
         Bit, BranchDest, CRBit, CRField, Offset, OpaqueU, Simm, Uimm, FPR, GPR, GQR, SPR, SR,
     };
@@ -165,9 +166,6 @@ impl Display for Argument {
     }
 }
 
-// Generate the Field enum and impls.
-fields!();
-
 impl Field {
     pub fn argument(&self) -> Option<Argument> {
         match self {
@@ -236,10 +234,6 @@ impl std::fmt::Display for Modifiers {
         Ok(())
     }
 }
-
-// Generate the Opcode enum and impls.
-// TODO This could be made more readable with a derive over an empty enum.
-opcodes!();
 
 impl Opcode {
     /// Detects the opcode of a machine code instruction.
@@ -319,8 +313,6 @@ impl Ins {
         bits(self.code, range)
     }
 }
-
-ins_impl!();
 
 /// A simplified PowerPC 750CL instruction.
 pub struct SimplifiedIns {

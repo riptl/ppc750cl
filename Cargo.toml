@@ -3,8 +3,8 @@ members = [
     "disasm",
     "disasm-py",
     "dol",
-    "macros",
     "fuzz",
+    "genisa",
     "flow-graph",
     "rand",
 ]

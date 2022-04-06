@@ -325,7 +325,6 @@ name = "ppc750cl"
 version = "0.1.1"
 dependencies = [
  "num-traits",
- "ppc750cl-macros",
  "serde",
 ]
 
@@ -350,7 +349,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "ppc750cl-macros"
+name = "ppc750cl-genisa"
 version = "0.1.1"
 dependencies = [
  "itertools",

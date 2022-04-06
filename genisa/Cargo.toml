@@ -1,19 +1,17 @@
 [package]
-name = "ppc750cl-macros"
+name = "ppc750cl-genisa"
 version = "0.1.1"
-edition = "2018"
+edition = "2021"
 authors = ["Richard Patel <me@terorie.dev>"]
 license = "GPL-3.0-or-later"
-description = "Auxiliary procedural macros for the ppc750cl disassembler"
+description = "Rust code generator for ppc750cl"
 repository = "https://github.com/terorie/ppc750cl"
 
-[lib]
-proc-macro = true
 
 [dependencies]
-itertools = "0.10.1"
+itertools = "0.10"
 proc-macro2 = "1.0"
 quote = "1.0"
+syn = { version = "1.0" }
 serde = { version = "1.0", features = ["derive"] }
 serde_yaml = "0.8"
-syn = { version = "1.0", features = ["full", "parsing"] }

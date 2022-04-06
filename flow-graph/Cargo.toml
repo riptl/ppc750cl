@@ -1,7 +1,7 @@
 [package]
 name = "ppc750cl-flow-graph"
 version = "0.1.1"
-edition = "2018"
+edition = "2021"
 authors = ["riidefi <riidefi@rii.dev>", "Richard Patel <me@terorie.dev>"]
 license = "GPL-3.0-or-later"
 description = "Control flow graph analysis for PowerPC 750CL"

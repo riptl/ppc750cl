@@ -1,6 +1,8 @@
 use std::collections::HashMap;
-use std::iter::FromIterator;
+use std::fs::File;
+use std::io::Write;
 use std::ops::Range;
+use std::process::{Command, Stdio};
 
 use itertools::Itertools;
 use proc_macro2::{Ident, Literal, Span, TokenStream, TokenTree};
@@ -14,13 +16,58 @@ macro_rules! token_stream {
     };
 }
 
+fn main() {
+    if let Err(err) = _main() {
+        eprintln!("{}", err);
+        std::process::exit(1);
+    }
+}
+
+fn _main() -> Result<()> {
+    let isa = load_isa()?;
+
+    let mut unformatted_code = Vec::<u8>::new();
+    writeln!(&mut unformatted_code, "{}", quote! {
+        use crate::prelude::*;
+    })?;
+    writeln!(&mut unformatted_code, "{}", isa.gen_opcode_enum()?)?;
+    writeln!(&mut unformatted_code, "{}", isa.gen_field_enum()?)?;
+    writeln!(&mut unformatted_code, "{}", isa.gen_ins_impl()?)?;
+
+    let formatted_code = rustfmt(unformatted_code);
+    File::create("./disasm/src/generated.rs")?
+        .write_all(&formatted_code)?;
+
+    Ok(())
+}
+
+fn rustfmt(code: Vec<u8>) -> Vec<u8> {
+    let mut rustfmt = Command::new("rustfmt")
+        .stdin(Stdio::piped())
+        .stdout(Stdio::piped())
+        .spawn()
+        .expect("failed to spawn rustfmt");
+
+    let mut stdin = rustfmt.stdin.take().unwrap();
+    std::thread::spawn(move || {
+        let _ = stdin.write_all(&code);
+    });
+
+    let rustfmt_res = rustfmt.wait_with_output().expect("failed to run rustfmt");
+    if !rustfmt_res.status.success() {
+        panic!("rustfmt failed");
+    }
+
+    rustfmt_res.stdout
+}
+
 #[derive(Default)]
 pub(crate) struct BitRange(Range<u8>);
 
 impl<'de> Deserialize<'de> for BitRange {
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: Deserializer<'de>,
+    fn deserialize<D>(deserializer: D) -> std::result::Result<Self, D::Error>
+        where
+            D: Deserializer<'de>,
     {
         let range_str: String = Deserialize::deserialize(deserializer)?;
         if let Some((start_str, stop_str)) = range_str.split_once("..") {
@@ -115,7 +162,7 @@ pub(crate) struct Opcode {
 }
 
 impl Opcode {
-    fn variant_identifier(&self) -> syn::Result<TokenTree> {
+    fn variant_identifier(&self) -> Result<TokenTree> {
         to_rust_variant(&self.name)
     }
 }
@@ -153,19 +200,25 @@ pub(crate) struct Isa {
     mnemonics: Vec<Mnemonic>,
 }
 
+fn load_isa() -> Result<Isa> {
+    let yaml_file = File::open("isa.yaml")?;
+    let isa: Isa = serde_yaml::from_reader(yaml_file)?;
+    Ok(isa)
+}
+
 impl Isa {
-    pub(crate) fn gen_opcode_enum(&self) -> syn::Result<TokenStream> {
+    fn gen_opcode_enum(&self) -> Result<TokenStream> {
         // Create enum variants.
         let enum_variants = self
             .opcodes
             .iter()
-            .map(|opcode| -> syn::Result<TokenStream> {
+            .map(|opcode| -> Result<TokenStream> {
                 let ident = opcode.variant_identifier()?;
                 Ok(quote! {
                     #ident,
                 })
             })
-            .try_collect::<TokenStream, Vec<TokenStream>, syn::Error>()?;
+            .try_collect::<TokenStream, Vec<TokenStream>, Error>()?;
         let enum_variants = token_stream!(enum_variants);
 
         // Create functions.
@@ -187,7 +240,7 @@ impl Isa {
         Ok(opcode_enum)
     }
 
-    fn gen_mnemonic_fn(&self) -> syn::Result<TokenStream> {
+    fn gen_mnemonic_fn(&self) -> Result<TokenStream> {
         // Create match arms.
         let match_arms = self
             .opcodes
@@ -200,11 +253,11 @@ impl Isa {
                     Opcode::#variant => #literal,
                 })
             })
-            .try_collect::<TokenStream, Vec<TokenStream>, syn::Error>()?;
+            .try_collect::<TokenStream, Vec<TokenStream>, Error>()?;
         let match_arms = token_stream!(match_arms);
         // Create final function.
         let mnemonic_fn = quote! {
-            fn _mnemonic(self) -> &'static str {
+            pub(crate) fn _mnemonic(self) -> &'static str {
                 match self {
                     Opcode::Illegal => "<illegal>",
                     #match_arms
@@ -214,7 +267,7 @@ impl Isa {
         Ok(mnemonic_fn)
     }
 
-    pub(crate) fn gen_opcode_detect(&self) -> syn::Result<TokenStream> {
+    pub(crate) fn gen_opcode_detect(&self) -> Result<TokenStream> {
         // Generate if chain.
         let if_chain = self
             .opcodes
@@ -231,11 +284,11 @@ impl Isa {
                     }
                 })
             })
-            .try_collect::<TokenStream, Vec<TokenStream>, syn::Error>()?;
+            .try_collect::<TokenStream, Vec<TokenStream>, Error>()?;
         let if_chain = token_stream!(if_chain);
         // Generate function.
         let func = quote! {
-            fn _detect(code: u32) -> Self {
+            pub(crate) fn _detect(code: u32) -> Self {
                 #if_chain
                 Opcode::Illegal
             }
@@ -243,7 +296,7 @@ impl Isa {
         Ok(func)
     }
 
-    pub(crate) fn gen_field_enum(&self) -> syn::Result<TokenStream> {
+    pub(crate) fn gen_field_enum(&self) -> Result<TokenStream> {
         // Create enum variants.
         let mut enum_variants = Vec::new();
         for field in &self.fields {
@@ -255,6 +308,7 @@ impl Isa {
 
         // Create final enum.
         let field_enum = quote! {
+            #[allow(non_camel_case_types)]
             #[derive(Debug, Copy, Clone, Eq, PartialEq)]
             pub enum Field {
                 #enum_variants
@@ -263,7 +317,8 @@ impl Isa {
         Ok(field_enum)
     }
 
-    pub(crate) fn gen_ins_impl(&self) -> syn::Result<TokenStream> {
+
+    pub(crate) fn gen_ins_impl(&self) -> Result<TokenStream> {
         // Map fields by name.
         let mut field_by_name = HashMap::<String, &Field>::new();
         for field in &self.fields {
@@ -280,7 +335,7 @@ impl Isa {
             let mut fields = Vec::new();
             for arg in &opcode.args {
                 let field: &Field = field_by_name.get(arg).ok_or_else(|| {
-                    syn::Error::new(Span::call_site(), format!("undefined field {}", arg))
+                    Error::from(format!("undefined field {}", arg))
                 })?;
                 let variant = field.construct_variant_self();
                 fields.extend(quote! { #variant, })
@@ -301,10 +356,7 @@ impl Isa {
                     "AA" => quote! { m.aa = self.bit(30); },
                     "LK" => quote! { m.lk = self.bit(31); },
                     _ => {
-                        return Err(syn::Error::new(
-                            Span::call_site(),
-                            format!("unsupported modifier {}", modifier),
-                        ))
+                        return Err(format!("unsupported modifier {}", modifier).into());
                     }
                 })
             }
@@ -315,10 +367,7 @@ impl Isa {
                     "AA" => quote! { m.aa = true; },
                     "LK" => quote! { m.lk = true; },
                     _ => {
-                        return Err(syn::Error::new(
-                            Span::call_site(),
-                            format!("unsupported modifier {}", modifier),
-                        ))
+                        return Err(format!("unsupported modifier {}", modifier).into());
                     }
                 })
             }
@@ -393,39 +442,38 @@ impl Isa {
         // Generate final fields function.
         let ins_impl = quote! {
             impl Ins {
-                fn _fields(&self) -> Vec<Field> {
+                pub(crate) fn _fields(&self) -> Vec<Field> {
                     match self.op {
                         Opcode::Illegal => vec![],
                         #field_match_arms
-                        _ => todo!()
                     }
                 }
 
-                fn _defs(&self) -> Vec<Field> {
+                #[allow(unused_mut)]
+                pub(crate) fn _defs(&self) -> Vec<Field> {
                     match self.op {
                         Opcode::Illegal => vec![],
                         #def_match_arms
-                        _ => todo!()
                     }
                 }
 
-                fn _uses(&self) -> Vec<Field> {
+                #[allow(unused_mut)]
+                pub(crate) fn _uses(&self) -> Vec<Field> {
                     match self.op {
                         Opcode::Illegal => vec![],
                         #use_match_arms
-                        _ => todo!()
                     }
                 }
 
-                fn _modifiers(&self) -> Modifiers {
+                #[allow(unused_mut)]
+                pub(crate) fn _modifiers(&self) -> Modifiers {
                     match self.op {
                         Opcode::Illegal => Modifiers::default(),
                         #modifier_match_arms
-                        _ => todo!()
                     }
                 }
 
-                fn _simplified(self) -> SimplifiedIns {
+                pub(crate) fn _simplified(self) -> SimplifiedIns {
                     SimplifiedIns {
                         mnemonic: self.op.mnemonic(),
                         modifiers: self._modifiers(),
@@ -444,15 +492,15 @@ fn to_rust_ident(key: &str) -> TokenTree {
     TokenTree::Ident(Ident::new(&key.replace(".", "_"), Span::call_site()))
 }
 
-/// Converts the given key into a struct variant key.
-fn to_rust_variant(key: &str) -> syn::Result<TokenTree> {
+/// Converts the given key into an enum variant key.
+fn to_rust_variant(key: &str) -> Result<TokenTree> {
     Ok(TokenTree::Ident(Ident::new(
-        &to_rust_variant_str(key).map_err(|e| syn::Error::new(Span::call_site(), e))?,
+        &to_rust_variant_str(key)?,
         Span::call_site(),
     )))
 }
 
-fn to_rust_variant_str(key: &str) -> Result<String, String> {
+fn to_rust_variant_str(key: &str) -> Result<String> {
     let mut s = String::new();
     let mut chars = key.chars();
     loop {
@@ -464,7 +512,7 @@ fn to_rust_variant_str(key: &str) -> Result<String, String> {
         s.push(match c {
             'a'..='z' => c.to_ascii_uppercase(),
             'A'..='Z' => c,
-            _ => return Err(format!("invalid identifier: {}", key)),
+            _ => return Err(format!("invalid identifier: {}", key).into()),
         });
         loop {
             let c = match chars.next() {
@@ -478,8 +526,11 @@ fn to_rust_variant_str(key: &str) -> Result<String, String> {
                     s.push('_');
                     break;
                 }
-                _ => return Err(format!("invalid character in opcode name: {}", key)),
+                _ => return Err(format!("invalid character in opcode name: {}", key).into()),
             }
         }
     }
 }
+
+type Error = Box<dyn std::error::Error>;
+type Result<T> = std::result::Result<T, Error>;
