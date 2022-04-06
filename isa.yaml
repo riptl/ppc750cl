@@ -1956,28 +1956,18 @@ mnemonics:
   - name: lis
     opcode: addis
     args: [ rD, uimm ]
-    match:
-      - arg: rA
-        value: 0
+    condition: rA == 0
   - name: li
     opcode: addi
     args: [ rD, simm ]
-    match:
-      - arg: rA
-        value: 0
+    condition: rA == 0
   - name: mr
     opcode: or
     args: [ rA, rS ]
     condition: rS == rB
   - name: nop
     opcode: ori
-    match:
-      - arg: rA
-        value: 0
-      - arg: rS
-        value: 0
-      - arg: uimm
-        value: 0
+    condition: rA == 0 && rS == 0 && uimm == 0
 
   # Rotates/Shifts
   - name: clrlwi
@@ -2033,180 +2023,122 @@ mnemonics:
   - name: twgti
     opcode: twi
     args: [ rA, simm ]
-    match:
-      - arg: TO
-        value: 8
+    condition: TO == 8
   - name: twllei
     opcode: twi
     args: [ rA, simm ]
-    match:
-      - arg: TO
-        value: 6
+    condition: TO == 6
   - name: twui
     args: [ rA, simm ]
-    match:
-      - arg: TO
-        value: 31
+    condition: TO == 31
   # Branches
   - name: blr
     opcode: bclr
-    match:
-      - arg: BO
-        value: 20
-      - arg: BI
-        value: 0
+    condition: BO == 20 && BI == 0
 
   # Move to special-purpose register
   - name: mtxer
     opcode: mtspr
     args: [ rS ]
-    match:
-      - arg: spr
-        value: 1
+    condition: spr == 1
   - name: mtlr
     opcode: mtspr
     args: [ rS ]
-    match:
-      - arg: spr
-        value: 8
+    condition: spr == 8
   - name: mtctr
     opcode: mtspr
     args: [ rS ]
-    match:
-      - arg: spr
-        value: 9
+    condition: spr == 9
   - name: mtdsisr
     opcode: mtspr
     args: [ rS ]
-    match:
-      - arg: spr
-        value: 18
+    condition: spr == 18
   - name: mtdbatu
     opcode: mtspr
     args: [ rS ]
-    match:
-      - arg: spr
-        value: 397
+    condition: spr == 397
   - name: mttdu
     opcode: mtspr
     args: [ rS ]
-    match:
-      - arg: spr
-        value: 571
+    condition: spr == 571
 
   # Move from special-purpose register
   - name: mfxer
     opcode: mfspr
     args: [ rD ]
-    match:
-      - arg: spr
-        value: 1
+    condition: spr == 1
   - name: mflr
     opcode: mfspr
     args: [ rD ]
-    match:
-      - arg: spr
-        value: 8
+    condition: spr == 8
   - name: mfctr
     opcode: mfspr
     args: [ rD ]
-    match:
-      - arg: spr
-        value: 9
+    condition: spr == 9
   - name: mfdsisr
     opcode: mfspr
     args: [ rD ]
-    match:
-      - arg: spr
-        value: 18
+    condition: spr == 18
   - name: mfdbatu
     opcode: mfspr
     args: [ rD ]
-    match:
-      - arg: spr
-        value: 397
+    condition: spr == 397
   - name: mftdu
     opcode: mfspr
     args: [ rD ]
-    match:
-      - arg: spr
-        value: 571
+    condition: spr == 571
 
   # Branch Conditional
   - name: blt
     opcode: bc
     modifiers: [ AA, LK ]
     args: [ crfS, BD ]
-    match:
-      - arg: BO
-        value: 12
+    condition: BO == 12
   - name: ble
     opcode: bc
     modifiers: [ AA, LK ]
     args: [ crfS, BD ]
-    match:
-      - arg: BO
-        value: 4
+    condition: BO == 4
   - name: beq
     opcode: bc
     modifiers: [ AA, LK ]
     args: [ crfS, BD ]
-    match:
-      - arg: BO
-        value: 12
+    condition: BO == 12
   - name: bge
     opcode: bc
     modifiers: [ AA, LK ]
     args: [ crfS, BD ]
-    match:
-      - arg: BO
-        value: 4
+    condition: BO == 4
   - name: bgt
     opcode: bc
     modifiers: [ AA, LK ]
     args: [ crfS, BD ]
-    match:
-      - arg: BO
-        value: 12
+    condition: BO == 12
   - name: bne
     opcode: bc
     modifiers: [ AA, LK ]
     args: [ crfS, BD ]
-    match:
-      - arg: BO
-        value: 4
+    condition: BO == 4
   - name: bso
     opcode: bc
     modifiers: [ AA, LK ]
     args: [ crfS, BD ]
-    match:
-      - arg: BO
-        value: 12
+    condition: BO == 12
   - name: bns
     opcode: bc
     modifiers: [ AA, LK ]
     args: [ crfS, BD ]
-    match:
-      - arg: BO
-        value: 4
+    condition: BO == 4
   - name: bdnz
     opcode: bc
     modifiers: [ AA, LK ]
     args: [ BD ]
-    match:
-      - arg: BO
-        value: 16
-      - arg: BI
-        value: 0
+    condition: BO == 16 && BI == 0
   - name: bdz
     opcode: bc
     modifiers: [ AA, LK ]
     args: [ BD ]
-    match:
-      - arg: BO
-        value: 18
-      - arg: BI
-        value: 0
+    condition: BO == 18 && BI == 0
   # TODO support conditional bd...
 
   # Branch Conditional to Count Register
@@ -2214,113 +2146,81 @@ mnemonics:
     opcode: bcctr
     modifiers: [ LK ]
     args: [ crfS, BD ]
-    match:
-      - arg: BO
-        value: 12
+    condition: BO == 12
   - name: blectr
     opcode: bcctr
     modifiers: [ LK ]
     args: [ crfS, BD ]
-    match:
-      - arg: BO
-        value: 4
+    condition: BO == 4
   - name: beqctr
     opcode: bcctr
     modifiers: [ LK ]
     args: [ crfS, BD ]
-    match:
-      - arg: BO
-        value: 12
+    condition: BO == 12
   - name: bgectr
     opcode: bcctr
     modifiers: [ LK ]
     args: [ crfS, BD ]
-    match:
-      - arg: BO
-        value: 4
+    condition: BO == 4
   - name: bgtctr
     opcode: bcctr
     modifiers: [ LK ]
     args: [ crfS, BD ]
-    match:
-      - arg: BO
-        value: 12
+    condition: BO == 12
   - name: bnectr
     opcode: bcctr
     modifiers: [ LK ]
     args: [ crfS, BD ]
-    match:
-      - arg: BO
-        value: 4
+    condition: BO == 4
   - name: bsoctr
     opcode: bcctr
     modifiers: [ LK ]
     args: [ crfS, BD ]
-    match:
-      - arg: BO
-        value: 12
+    condition: BO == 12
   - name: bnsctr
     opcode: bcctr
     modifiers: [ LK ]
     args: [ crfS, BD ]
-    match:
-      - arg: BO
-        value: 4
+    condition: BO == 4
 
   # Branch Conditional to Link Register
   - name: bltlr
     opcode: bclr
     modifiers: [ LK ]
     args: [ crfS, BD ]
-    match:
-      - arg: BO
-        value: 12
+    condition: BO == 12
   - name: blelr
     opcode: bclr
     modifiers: [ LK ]
     args: [ crfS, BD ]
-    match:
-      - arg: BO
-        value: 4
+    condition: BO == 4
   - name: beqlr
     opcode: bclr
     modifiers: [ LK ]
     args: [ crfS, BD ]
-    match:
-      - arg: BO
-        value: 12
+    condition: BO == 12
   - name: bgelr
     opcode: bclr
     modifiers: [ LK ]
     args: [ crfS, BD ]
-    match:
-      - arg: BO
-        value: 4
+    condition: BO == 4
   - name: bgtlr
     opcode: bclr
     modifiers: [ LK ]
     args: [ crfS, BD ]
-    match:
-      - arg: BO
-        value: 12
+    condition: BO == 12
   - name: bnelr
     opcode: bclr
     modifiers: [ LK ]
     args: [ crfS, BD ]
-    match:
-      - arg: BO
-        value: 4
+    condition: BO == 4
   - name: bsolr
     opcode: bclr
     modifiers: [ LK ]
     args: [ crfS, BD ]
-    match:
-      - arg: BO
-        value: 12
+    condition: BO == 12
   - name: bnslr
     opcode: bclr
     modifiers: [ LK ]
     args: [ crfS, BD ]
-    match:
-      - arg: BO
-        value: 4
+    condition: BO == 4

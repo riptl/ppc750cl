@@ -606,10 +606,6 @@ pub(crate) struct ModifiersExpr {
 }
 
 impl ModifiersExpr {
-    fn new() -> Self {
-        Self::default()
-    }
-
     fn build(&self) -> Result<TokenStream> {
         if self.modifiers.is_empty() && self.side_effects.is_empty() {
             return Ok(Self::build_empty());
