@@ -8,7 +8,7 @@ pub use crate::iter::{disasm_iter, DisasmIterator};
 pub mod formatter;
 mod generated;
 mod iter;
-use generated::*;
+pub use generated::*;
 
 pub mod prelude {
     pub use crate::formatter::FormattedIns;
