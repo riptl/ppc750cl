@@ -109,10 +109,11 @@ impl Field {
     }
 
     fn express_value(&self, code: TokenStream) -> TokenStream {
-        let mask_stop = self.bits.0.end;
-        let mask_size = self.bits.0.len();
+        let shift = 32 - self.bits.0.end;
+        let mask = (1u32 << self.bits.0.len()) - 1;
+        let mask = LitInt::new(&format!("0x{:x}", mask), Span::call_site());
         quote! {
-            (((#code) >> (32 - #mask_stop)) & ((1 << #mask_size) - 1))
+            ((#code >> #shift) & #mask)
         }
     }
 

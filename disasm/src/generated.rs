@@ -1170,2301 +1170,1051 @@ impl Ins {
         match self.op {
             Opcode::Illegal => vec![],
             Opcode::Add => vec![
-                Field::rD(GPR(
-                    (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::rA(GPR(
-                    (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::rB(GPR(
-                    (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                )),
+                Field::rD(GPR(((self.code >> 21u8) & 0x1f) as _)),
+                Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
+                Field::rB(GPR(((self.code >> 11u8) & 0x1f) as _)),
             ],
             Opcode::Addc => vec![
-                Field::rD(GPR(
-                    (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::rA(GPR(
-                    (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::rB(GPR(
-                    (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                )),
+                Field::rD(GPR(((self.code >> 21u8) & 0x1f) as _)),
+                Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
+                Field::rB(GPR(((self.code >> 11u8) & 0x1f) as _)),
             ],
             Opcode::Adde => vec![
-                Field::rD(GPR(
-                    (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::rA(GPR(
-                    (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::rB(GPR(
-                    (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                )),
+                Field::rD(GPR(((self.code >> 21u8) & 0x1f) as _)),
+                Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
+                Field::rB(GPR(((self.code >> 11u8) & 0x1f) as _)),
             ],
             Opcode::Addi => vec![
-                Field::rD(GPR(
-                    (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::rA(GPR(
-                    (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::simm(Simm(
-                    (((self.code) >> (32 - 32u8)) & ((1 << 16usize) - 1)) as _,
-                )),
+                Field::rD(GPR(((self.code >> 21u8) & 0x1f) as _)),
+                Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
+                Field::simm(Simm(((self.code >> 0u8) & 0xffff) as _)),
             ],
             Opcode::Addic => vec![
-                Field::rD(GPR(
-                    (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::rA(GPR(
-                    (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::simm(Simm(
-                    (((self.code) >> (32 - 32u8)) & ((1 << 16usize) - 1)) as _,
-                )),
+                Field::rD(GPR(((self.code >> 21u8) & 0x1f) as _)),
+                Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
+                Field::simm(Simm(((self.code >> 0u8) & 0xffff) as _)),
             ],
             Opcode::Addic_ => vec![
-                Field::rD(GPR(
-                    (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::rA(GPR(
-                    (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::simm(Simm(
-                    (((self.code) >> (32 - 32u8)) & ((1 << 16usize) - 1)) as _,
-                )),
+                Field::rD(GPR(((self.code >> 21u8) & 0x1f) as _)),
+                Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
+                Field::simm(Simm(((self.code >> 0u8) & 0xffff) as _)),
             ],
             Opcode::Addis => vec![
-                Field::rD(GPR(
-                    (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::rA(GPR(
-                    (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::uimm(Uimm(
-                    (((self.code) >> (32 - 32u8)) & ((1 << 16usize) - 1)) as _,
-                )),
+                Field::rD(GPR(((self.code >> 21u8) & 0x1f) as _)),
+                Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
+                Field::uimm(Uimm(((self.code >> 0u8) & 0xffff) as _)),
             ],
             Opcode::Addme => vec![
-                Field::rD(GPR(
-                    (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::rA(GPR(
-                    (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                )),
+                Field::rD(GPR(((self.code >> 21u8) & 0x1f) as _)),
+                Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
             ],
             Opcode::Addze => vec![
-                Field::rD(GPR(
-                    (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::rA(GPR(
-                    (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                )),
+                Field::rD(GPR(((self.code >> 21u8) & 0x1f) as _)),
+                Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
             ],
             Opcode::And => vec![
-                Field::rA(GPR(
-                    (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::rS(GPR(
-                    (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::rB(GPR(
-                    (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                )),
+                Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
+                Field::rS(GPR(((self.code >> 21u8) & 0x1f) as _)),
+                Field::rB(GPR(((self.code >> 11u8) & 0x1f) as _)),
             ],
             Opcode::Andc => vec![
-                Field::rA(GPR(
-                    (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::rS(GPR(
-                    (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::rB(GPR(
-                    (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                )),
+                Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
+                Field::rS(GPR(((self.code >> 21u8) & 0x1f) as _)),
+                Field::rB(GPR(((self.code >> 11u8) & 0x1f) as _)),
             ],
             Opcode::Andi_ => vec![
-                Field::rA(GPR(
-                    (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::rS(GPR(
-                    (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::uimm(Uimm(
-                    (((self.code) >> (32 - 32u8)) & ((1 << 16usize) - 1)) as _,
-                )),
+                Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
+                Field::rS(GPR(((self.code >> 21u8) & 0x1f) as _)),
+                Field::uimm(Uimm(((self.code >> 0u8) & 0xffff) as _)),
             ],
             Opcode::Andis_ => vec![
-                Field::rA(GPR(
-                    (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::rS(GPR(
-                    (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::uimm(Uimm(
-                    (((self.code) >> (32 - 32u8)) & ((1 << 16usize) - 1)) as _,
-                )),
+                Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
+                Field::rS(GPR(((self.code >> 21u8) & 0x1f) as _)),
+                Field::uimm(Uimm(((self.code >> 0u8) & 0xffff) as _)),
             ],
-            Opcode::B => vec![Field::LI(BranchDest(
-                (((self.code) >> (32 - 30u8)) & ((1 << 24usize) - 1)) as _,
-            ))],
+            Opcode::B => vec![Field::LI(BranchDest(((self.code >> 2u8) & 0xffffff) as _))],
             Opcode::Bc => vec![
-                Field::BO(OpaqueU(
-                    (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _,
-                )),
-                Field::BI(OpaqueU(
-                    (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _,
-                )),
-                Field::BD(BranchDest(
-                    (((self.code) >> (32 - 30u8)) & ((1 << 14usize) - 1)) as _,
-                )),
+                Field::BO(OpaqueU(((self.code >> 21u8) & 0x1f) as _)),
+                Field::BI(OpaqueU(((self.code >> 16u8) & 0x1f) as _)),
+                Field::BD(BranchDest(((self.code >> 2u8) & 0x3fff) as _)),
             ],
             Opcode::Bcctr => vec![
-                Field::BO(OpaqueU(
-                    (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _,
-                )),
-                Field::BI(OpaqueU(
-                    (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _,
-                )),
+                Field::BO(OpaqueU(((self.code >> 21u8) & 0x1f) as _)),
+                Field::BI(OpaqueU(((self.code >> 16u8) & 0x1f) as _)),
             ],
             Opcode::Bclr => vec![
-                Field::BO(OpaqueU(
-                    (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _,
-                )),
-                Field::BI(OpaqueU(
-                    (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _,
-                )),
+                Field::BO(OpaqueU(((self.code >> 21u8) & 0x1f) as _)),
+                Field::BI(OpaqueU(((self.code >> 16u8) & 0x1f) as _)),
             ],
             Opcode::Cmp => vec![
-                Field::crfD(CRBit(
-                    (((self.code) >> (32 - 9u8)) & ((1 << 3usize) - 1)) as _,
-                )),
-                Field::rA(GPR(
-                    (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::rB(GPR(
-                    (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                )),
+                Field::crfD(CRBit(((self.code >> 23u8) & 0x7) as _)),
+                Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
+                Field::rB(GPR(((self.code >> 11u8) & 0x1f) as _)),
             ],
             Opcode::Cmpi => vec![
-                Field::crfD(CRBit(
-                    (((self.code) >> (32 - 9u8)) & ((1 << 3usize) - 1)) as _,
-                )),
-                Field::rA(GPR(
-                    (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::simm(Simm(
-                    (((self.code) >> (32 - 32u8)) & ((1 << 16usize) - 1)) as _,
-                )),
+                Field::crfD(CRBit(((self.code >> 23u8) & 0x7) as _)),
+                Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
+                Field::simm(Simm(((self.code >> 0u8) & 0xffff) as _)),
             ],
             Opcode::Cmpl => vec![
-                Field::crfD(CRBit(
-                    (((self.code) >> (32 - 9u8)) & ((1 << 3usize) - 1)) as _,
-                )),
-                Field::rA(GPR(
-                    (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::rB(GPR(
-                    (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                )),
+                Field::crfD(CRBit(((self.code >> 23u8) & 0x7) as _)),
+                Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
+                Field::rB(GPR(((self.code >> 11u8) & 0x1f) as _)),
             ],
             Opcode::Cmpli => vec![
-                Field::crfD(CRBit(
-                    (((self.code) >> (32 - 9u8)) & ((1 << 3usize) - 1)) as _,
-                )),
-                Field::rA(GPR(
-                    (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::uimm(Uimm(
-                    (((self.code) >> (32 - 32u8)) & ((1 << 16usize) - 1)) as _,
-                )),
+                Field::crfD(CRBit(((self.code >> 23u8) & 0x7) as _)),
+                Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
+                Field::uimm(Uimm(((self.code >> 0u8) & 0xffff) as _)),
             ],
             Opcode::Cntlzw => vec![
-                Field::rA(GPR(
-                    (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::rS(GPR(
-                    (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                )),
+                Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
+                Field::rS(GPR(((self.code >> 21u8) & 0x1f) as _)),
             ],
             Opcode::Crand => vec![
-                Field::crbD(CRField(
-                    (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _,
-                )),
-                Field::crbA(CRField(
-                    (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _,
-                )),
-                Field::crbB(CRField(
-                    (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _,
-                )),
+                Field::crbD(CRField(((self.code >> 21u8) & 0x1f) as _)),
+                Field::crbA(CRField(((self.code >> 16u8) & 0x1f) as _)),
+                Field::crbB(CRField(((self.code >> 11u8) & 0x1f) as _)),
             ],
             Opcode::Crandc => vec![
-                Field::crbD(CRField(
-                    (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _,
-                )),
-                Field::crbA(CRField(
-                    (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _,
-                )),
-                Field::crbB(CRField(
-                    (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _,
-                )),
+                Field::crbD(CRField(((self.code >> 21u8) & 0x1f) as _)),
+                Field::crbA(CRField(((self.code >> 16u8) & 0x1f) as _)),
+                Field::crbB(CRField(((self.code >> 11u8) & 0x1f) as _)),
             ],
             Opcode::Creqv => vec![
-                Field::crbD(CRField(
-                    (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _,
-                )),
-                Field::crbA(CRField(
-                    (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _,
-                )),
-                Field::crbB(CRField(
-                    (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _,
-                )),
+                Field::crbD(CRField(((self.code >> 21u8) & 0x1f) as _)),
+                Field::crbA(CRField(((self.code >> 16u8) & 0x1f) as _)),
+                Field::crbB(CRField(((self.code >> 11u8) & 0x1f) as _)),
             ],
             Opcode::Crnand => vec![
-                Field::crbD(CRField(
-                    (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _,
-                )),
-                Field::crbA(CRField(
-                    (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _,
-                )),
-                Field::crbB(CRField(
-                    (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _,
-                )),
+                Field::crbD(CRField(((self.code >> 21u8) & 0x1f) as _)),
+                Field::crbA(CRField(((self.code >> 16u8) & 0x1f) as _)),
+                Field::crbB(CRField(((self.code >> 11u8) & 0x1f) as _)),
             ],
             Opcode::Crnor => vec![
-                Field::crbD(CRField(
-                    (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _,
-                )),
-                Field::crbA(CRField(
-                    (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _,
-                )),
-                Field::crbB(CRField(
-                    (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _,
-                )),
+                Field::crbD(CRField(((self.code >> 21u8) & 0x1f) as _)),
+                Field::crbA(CRField(((self.code >> 16u8) & 0x1f) as _)),
+                Field::crbB(CRField(((self.code >> 11u8) & 0x1f) as _)),
             ],
             Opcode::Cror => vec![
-                Field::crbD(CRField(
-                    (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _,
-                )),
-                Field::crbA(CRField(
-                    (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _,
-                )),
-                Field::crbB(CRField(
-                    (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _,
-                )),
+                Field::crbD(CRField(((self.code >> 21u8) & 0x1f) as _)),
+                Field::crbA(CRField(((self.code >> 16u8) & 0x1f) as _)),
+                Field::crbB(CRField(((self.code >> 11u8) & 0x1f) as _)),
             ],
             Opcode::Crorc => vec![
-                Field::crbD(CRField(
-                    (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _,
-                )),
-                Field::crbA(CRField(
-                    (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _,
-                )),
-                Field::crbB(CRField(
-                    (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _,
-                )),
+                Field::crbD(CRField(((self.code >> 21u8) & 0x1f) as _)),
+                Field::crbA(CRField(((self.code >> 16u8) & 0x1f) as _)),
+                Field::crbB(CRField(((self.code >> 11u8) & 0x1f) as _)),
             ],
             Opcode::Crxor => vec![
-                Field::crbD(CRField(
-                    (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _,
-                )),
-                Field::crbA(CRField(
-                    (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _,
-                )),
-                Field::crbB(CRField(
-                    (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _,
-                )),
+                Field::crbD(CRField(((self.code >> 21u8) & 0x1f) as _)),
+                Field::crbA(CRField(((self.code >> 16u8) & 0x1f) as _)),
+                Field::crbB(CRField(((self.code >> 11u8) & 0x1f) as _)),
             ],
             Opcode::Dcbf => vec![
-                Field::rA(GPR(
-                    (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::rB(GPR(
-                    (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                )),
+                Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
+                Field::rB(GPR(((self.code >> 11u8) & 0x1f) as _)),
             ],
             Opcode::Dcbi => vec![
-                Field::rA(GPR(
-                    (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::rB(GPR(
-                    (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                )),
+                Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
+                Field::rB(GPR(((self.code >> 11u8) & 0x1f) as _)),
             ],
             Opcode::Dcbst => vec![
-                Field::rA(GPR(
-                    (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::rB(GPR(
-                    (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                )),
+                Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
+                Field::rB(GPR(((self.code >> 11u8) & 0x1f) as _)),
             ],
             Opcode::Dcbt => vec![
-                Field::rA(GPR(
-                    (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::rB(GPR(
-                    (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                )),
+                Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
+                Field::rB(GPR(((self.code >> 11u8) & 0x1f) as _)),
             ],
             Opcode::Dcbtst => vec![
-                Field::rA(GPR(
-                    (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::rB(GPR(
-                    (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                )),
+                Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
+                Field::rB(GPR(((self.code >> 11u8) & 0x1f) as _)),
             ],
             Opcode::Dcbz => vec![
-                Field::rA(GPR(
-                    (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::rB(GPR(
-                    (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                )),
+                Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
+                Field::rB(GPR(((self.code >> 11u8) & 0x1f) as _)),
             ],
             Opcode::DcbzL => vec![
-                Field::rA(GPR(
-                    (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::rB(GPR(
-                    (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                )),
+                Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
+                Field::rB(GPR(((self.code >> 11u8) & 0x1f) as _)),
             ],
             Opcode::Divw => vec![
-                Field::rD(GPR(
-                    (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::rA(GPR(
-                    (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::rB(GPR(
-                    (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                )),
+                Field::rD(GPR(((self.code >> 21u8) & 0x1f) as _)),
+                Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
+                Field::rB(GPR(((self.code >> 11u8) & 0x1f) as _)),
             ],
             Opcode::Divwu => vec![
-                Field::rD(GPR(
-                    (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::rA(GPR(
-                    (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::rB(GPR(
-                    (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                )),
+                Field::rD(GPR(((self.code >> 21u8) & 0x1f) as _)),
+                Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
+                Field::rB(GPR(((self.code >> 11u8) & 0x1f) as _)),
             ],
             Opcode::Eciwx => vec![
-                Field::rD(GPR(
-                    (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::rA(GPR(
-                    (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::rB(GPR(
-                    (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                )),
+                Field::rD(GPR(((self.code >> 21u8) & 0x1f) as _)),
+                Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
+                Field::rB(GPR(((self.code >> 11u8) & 0x1f) as _)),
             ],
             Opcode::Ecowx => vec![
-                Field::rS(GPR(
-                    (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::rA(GPR(
-                    (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::rB(GPR(
-                    (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                )),
+                Field::rS(GPR(((self.code >> 21u8) & 0x1f) as _)),
+                Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
+                Field::rB(GPR(((self.code >> 11u8) & 0x1f) as _)),
             ],
             Opcode::Eieio => vec![],
             Opcode::Eqv => vec![
-                Field::rA(GPR(
-                    (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::rS(GPR(
-                    (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::rB(GPR(
-                    (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                )),
+                Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
+                Field::rS(GPR(((self.code >> 21u8) & 0x1f) as _)),
+                Field::rB(GPR(((self.code >> 11u8) & 0x1f) as _)),
             ],
             Opcode::Extsb => vec![
-                Field::rA(GPR(
-                    (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::rS(GPR(
-                    (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                )),
+                Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
+                Field::rS(GPR(((self.code >> 21u8) & 0x1f) as _)),
             ],
             Opcode::Extsh => vec![
-                Field::rA(GPR(
-                    (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::rS(GPR(
-                    (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                )),
+                Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
+                Field::rS(GPR(((self.code >> 21u8) & 0x1f) as _)),
             ],
             Opcode::Fabs => vec![
-                Field::frD(FPR(
-                    (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::frB(FPR(
-                    (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                )),
+                Field::frD(FPR(((self.code >> 21u8) & 0x1f) as _)),
+                Field::frB(FPR(((self.code >> 11u8) & 0x1f) as _)),
             ],
             Opcode::Fadd => vec![
-                Field::frD(FPR(
-                    (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::frA(FPR(
-                    (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::frB(FPR(
-                    (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                )),
+                Field::frD(FPR(((self.code >> 21u8) & 0x1f) as _)),
+                Field::frA(FPR(((self.code >> 16u8) & 0x1f) as _)),
+                Field::frB(FPR(((self.code >> 11u8) & 0x1f) as _)),
             ],
             Opcode::Fadds => vec![
-                Field::frD(FPR(
-                    (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::frA(FPR(
-                    (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::frB(FPR(
-                    (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                )),
+                Field::frD(FPR(((self.code >> 21u8) & 0x1f) as _)),
+                Field::frA(FPR(((self.code >> 16u8) & 0x1f) as _)),
+                Field::frB(FPR(((self.code >> 11u8) & 0x1f) as _)),
             ],
             Opcode::Fcmpo => vec![
-                Field::crfD(CRBit(
-                    (((self.code) >> (32 - 9u8)) & ((1 << 3usize) - 1)) as _,
-                )),
-                Field::frA(FPR(
-                    (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::frB(FPR(
-                    (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                )),
+                Field::crfD(CRBit(((self.code >> 23u8) & 0x7) as _)),
+                Field::frA(FPR(((self.code >> 16u8) & 0x1f) as _)),
+                Field::frB(FPR(((self.code >> 11u8) & 0x1f) as _)),
             ],
             Opcode::Fcmpu => vec![
-                Field::crfD(CRBit(
-                    (((self.code) >> (32 - 9u8)) & ((1 << 3usize) - 1)) as _,
-                )),
-                Field::frA(FPR(
-                    (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::frB(FPR(
-                    (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                )),
+                Field::crfD(CRBit(((self.code >> 23u8) & 0x7) as _)),
+                Field::frA(FPR(((self.code >> 16u8) & 0x1f) as _)),
+                Field::frB(FPR(((self.code >> 11u8) & 0x1f) as _)),
             ],
             Opcode::Fctiw => vec![
-                Field::frD(FPR(
-                    (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::frB(FPR(
-                    (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                )),
+                Field::frD(FPR(((self.code >> 21u8) & 0x1f) as _)),
+                Field::frB(FPR(((self.code >> 11u8) & 0x1f) as _)),
             ],
             Opcode::Fctiwz => vec![
-                Field::frD(FPR(
-                    (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::frB(FPR(
-                    (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                )),
+                Field::frD(FPR(((self.code >> 21u8) & 0x1f) as _)),
+                Field::frB(FPR(((self.code >> 11u8) & 0x1f) as _)),
             ],
             Opcode::Fdiv => vec![
-                Field::frD(FPR(
-                    (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::frA(FPR(
-                    (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::frB(FPR(
-                    (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                )),
+                Field::frD(FPR(((self.code >> 21u8) & 0x1f) as _)),
+                Field::frA(FPR(((self.code >> 16u8) & 0x1f) as _)),
+                Field::frB(FPR(((self.code >> 11u8) & 0x1f) as _)),
             ],
             Opcode::Fdivs => vec![
-                Field::frD(FPR(
-                    (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::frA(FPR(
-                    (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::frB(FPR(
-                    (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                )),
+                Field::frD(FPR(((self.code >> 21u8) & 0x1f) as _)),
+                Field::frA(FPR(((self.code >> 16u8) & 0x1f) as _)),
+                Field::frB(FPR(((self.code >> 11u8) & 0x1f) as _)),
             ],
             Opcode::Fmadd => vec![
-                Field::frD(FPR(
-                    (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::frA(FPR(
-                    (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::frC(FPR(
-                    (((self.code) >> (32 - 26u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::frB(FPR(
-                    (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                )),
+                Field::frD(FPR(((self.code >> 21u8) & 0x1f) as _)),
+                Field::frA(FPR(((self.code >> 16u8) & 0x1f) as _)),
+                Field::frC(FPR(((self.code >> 6u8) & 0x1f) as _)),
+                Field::frB(FPR(((self.code >> 11u8) & 0x1f) as _)),
             ],
             Opcode::Fmadds => vec![
-                Field::frD(FPR(
-                    (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::frA(FPR(
-                    (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::frC(FPR(
-                    (((self.code) >> (32 - 26u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::frB(FPR(
-                    (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                )),
+                Field::frD(FPR(((self.code >> 21u8) & 0x1f) as _)),
+                Field::frA(FPR(((self.code >> 16u8) & 0x1f) as _)),
+                Field::frC(FPR(((self.code >> 6u8) & 0x1f) as _)),
+                Field::frB(FPR(((self.code >> 11u8) & 0x1f) as _)),
             ],
             Opcode::Fmr => vec![
-                Field::frD(FPR(
-                    (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::frB(FPR(
-                    (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                )),
+                Field::frD(FPR(((self.code >> 21u8) & 0x1f) as _)),
+                Field::frB(FPR(((self.code >> 11u8) & 0x1f) as _)),
             ],
             Opcode::Fmsub => vec![
-                Field::frD(FPR(
-                    (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::frA(FPR(
-                    (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::frC(FPR(
-                    (((self.code) >> (32 - 26u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::frB(FPR(
-                    (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                )),
+                Field::frD(FPR(((self.code >> 21u8) & 0x1f) as _)),
+                Field::frA(FPR(((self.code >> 16u8) & 0x1f) as _)),
+                Field::frC(FPR(((self.code >> 6u8) & 0x1f) as _)),
+                Field::frB(FPR(((self.code >> 11u8) & 0x1f) as _)),
             ],
             Opcode::Fmsubs => vec![
-                Field::frD(FPR(
-                    (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::frA(FPR(
-                    (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::frC(FPR(
-                    (((self.code) >> (32 - 26u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::frB(FPR(
-                    (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                )),
+                Field::frD(FPR(((self.code >> 21u8) & 0x1f) as _)),
+                Field::frA(FPR(((self.code >> 16u8) & 0x1f) as _)),
+                Field::frC(FPR(((self.code >> 6u8) & 0x1f) as _)),
+                Field::frB(FPR(((self.code >> 11u8) & 0x1f) as _)),
             ],
             Opcode::Fmul => vec![
-                Field::frD(FPR(
-                    (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::frA(FPR(
-                    (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::frC(FPR(
-                    (((self.code) >> (32 - 26u8)) & ((1 << 5usize) - 1)) as _
-                )),
+                Field::frD(FPR(((self.code >> 21u8) & 0x1f) as _)),
+                Field::frA(FPR(((self.code >> 16u8) & 0x1f) as _)),
+                Field::frC(FPR(((self.code >> 6u8) & 0x1f) as _)),
             ],
             Opcode::Fmuls => vec![
-                Field::frD(FPR(
-                    (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::frA(FPR(
-                    (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::frC(FPR(
-                    (((self.code) >> (32 - 26u8)) & ((1 << 5usize) - 1)) as _
-                )),
+                Field::frD(FPR(((self.code >> 21u8) & 0x1f) as _)),
+                Field::frA(FPR(((self.code >> 16u8) & 0x1f) as _)),
+                Field::frC(FPR(((self.code >> 6u8) & 0x1f) as _)),
             ],
             Opcode::Fnabs => vec![
-                Field::frD(FPR(
-                    (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::frB(FPR(
-                    (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                )),
+                Field::frD(FPR(((self.code >> 21u8) & 0x1f) as _)),
+                Field::frB(FPR(((self.code >> 11u8) & 0x1f) as _)),
             ],
             Opcode::Fneg => vec![
-                Field::frD(FPR(
-                    (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::frB(FPR(
-                    (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                )),
+                Field::frD(FPR(((self.code >> 21u8) & 0x1f) as _)),
+                Field::frB(FPR(((self.code >> 11u8) & 0x1f) as _)),
             ],
             Opcode::Fnmadd => vec![
-                Field::frD(FPR(
-                    (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::frA(FPR(
-                    (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::frC(FPR(
-                    (((self.code) >> (32 - 26u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::frB(FPR(
-                    (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                )),
+                Field::frD(FPR(((self.code >> 21u8) & 0x1f) as _)),
+                Field::frA(FPR(((self.code >> 16u8) & 0x1f) as _)),
+                Field::frC(FPR(((self.code >> 6u8) & 0x1f) as _)),
+                Field::frB(FPR(((self.code >> 11u8) & 0x1f) as _)),
             ],
             Opcode::Fnmadds => vec![
-                Field::frD(FPR(
-                    (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::frA(FPR(
-                    (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::frC(FPR(
-                    (((self.code) >> (32 - 26u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::frB(FPR(
-                    (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                )),
+                Field::frD(FPR(((self.code >> 21u8) & 0x1f) as _)),
+                Field::frA(FPR(((self.code >> 16u8) & 0x1f) as _)),
+                Field::frC(FPR(((self.code >> 6u8) & 0x1f) as _)),
+                Field::frB(FPR(((self.code >> 11u8) & 0x1f) as _)),
             ],
             Opcode::Fnmsub => vec![
-                Field::frD(FPR(
-                    (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::frA(FPR(
-                    (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::frC(FPR(
-                    (((self.code) >> (32 - 26u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::frB(FPR(
-                    (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                )),
+                Field::frD(FPR(((self.code >> 21u8) & 0x1f) as _)),
+                Field::frA(FPR(((self.code >> 16u8) & 0x1f) as _)),
+                Field::frC(FPR(((self.code >> 6u8) & 0x1f) as _)),
+                Field::frB(FPR(((self.code >> 11u8) & 0x1f) as _)),
             ],
             Opcode::Fnmsubs => vec![
-                Field::frD(FPR(
-                    (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::frA(FPR(
-                    (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::frC(FPR(
-                    (((self.code) >> (32 - 26u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::frB(FPR(
-                    (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                )),
+                Field::frD(FPR(((self.code >> 21u8) & 0x1f) as _)),
+                Field::frA(FPR(((self.code >> 16u8) & 0x1f) as _)),
+                Field::frC(FPR(((self.code >> 6u8) & 0x1f) as _)),
+                Field::frB(FPR(((self.code >> 11u8) & 0x1f) as _)),
             ],
             Opcode::Fres => vec![
-                Field::frD(FPR(
-                    (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::frB(FPR(
-                    (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                )),
+                Field::frD(FPR(((self.code >> 21u8) & 0x1f) as _)),
+                Field::frB(FPR(((self.code >> 11u8) & 0x1f) as _)),
             ],
             Opcode::Frsp => vec![
-                Field::frD(FPR(
-                    (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::frB(FPR(
-                    (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                )),
+                Field::frD(FPR(((self.code >> 21u8) & 0x1f) as _)),
+                Field::frB(FPR(((self.code >> 11u8) & 0x1f) as _)),
             ],
             Opcode::Frsqrte => vec![
-                Field::frD(FPR(
-                    (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::frB(FPR(
-                    (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                )),
+                Field::frD(FPR(((self.code >> 21u8) & 0x1f) as _)),
+                Field::frB(FPR(((self.code >> 11u8) & 0x1f) as _)),
             ],
             Opcode::Fsel => vec![
-                Field::frD(FPR(
-                    (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::frA(FPR(
-                    (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::frC(FPR(
-                    (((self.code) >> (32 - 26u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::frB(FPR(
-                    (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                )),
+                Field::frD(FPR(((self.code >> 21u8) & 0x1f) as _)),
+                Field::frA(FPR(((self.code >> 16u8) & 0x1f) as _)),
+                Field::frC(FPR(((self.code >> 6u8) & 0x1f) as _)),
+                Field::frB(FPR(((self.code >> 11u8) & 0x1f) as _)),
             ],
             Opcode::Fsub => vec![
-                Field::frD(FPR(
-                    (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::frA(FPR(
-                    (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::frB(FPR(
-                    (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                )),
+                Field::frD(FPR(((self.code >> 21u8) & 0x1f) as _)),
+                Field::frA(FPR(((self.code >> 16u8) & 0x1f) as _)),
+                Field::frB(FPR(((self.code >> 11u8) & 0x1f) as _)),
             ],
             Opcode::Fsubs => vec![
-                Field::frD(FPR(
-                    (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::frA(FPR(
-                    (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::frB(FPR(
-                    (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                )),
+                Field::frD(FPR(((self.code >> 21u8) & 0x1f) as _)),
+                Field::frA(FPR(((self.code >> 16u8) & 0x1f) as _)),
+                Field::frB(FPR(((self.code >> 11u8) & 0x1f) as _)),
             ],
             Opcode::Icbi => vec![
-                Field::rA(GPR(
-                    (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::rB(GPR(
-                    (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                )),
+                Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
+                Field::rB(GPR(((self.code >> 11u8) & 0x1f) as _)),
             ],
             Opcode::Isync => vec![],
             Opcode::Lbz => vec![
-                Field::rD(GPR(
-                    (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::offset(Offset(
-                    (((self.code) >> (32 - 32u8)) & ((1 << 16usize) - 1)) as _,
-                )),
-                Field::rA(GPR(
-                    (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                )),
+                Field::rD(GPR(((self.code >> 21u8) & 0x1f) as _)),
+                Field::offset(Offset(((self.code >> 0u8) & 0xffff) as _)),
+                Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
             ],
             Opcode::Lbzu => vec![
-                Field::rD(GPR(
-                    (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::offset(Offset(
-                    (((self.code) >> (32 - 32u8)) & ((1 << 16usize) - 1)) as _,
-                )),
-                Field::rA(GPR(
-                    (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                )),
+                Field::rD(GPR(((self.code >> 21u8) & 0x1f) as _)),
+                Field::offset(Offset(((self.code >> 0u8) & 0xffff) as _)),
+                Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
             ],
             Opcode::Lbzux => vec![
-                Field::rD(GPR(
-                    (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::rA(GPR(
-                    (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::rB(GPR(
-                    (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                )),
+                Field::rD(GPR(((self.code >> 21u8) & 0x1f) as _)),
+                Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
+                Field::rB(GPR(((self.code >> 11u8) & 0x1f) as _)),
             ],
             Opcode::Lbzx => vec![
-                Field::rD(GPR(
-                    (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::rA(GPR(
-                    (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::rB(GPR(
-                    (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                )),
+                Field::rD(GPR(((self.code >> 21u8) & 0x1f) as _)),
+                Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
+                Field::rB(GPR(((self.code >> 11u8) & 0x1f) as _)),
             ],
             Opcode::Lfd => vec![
-                Field::frD(FPR(
-                    (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::offset(Offset(
-                    (((self.code) >> (32 - 32u8)) & ((1 << 16usize) - 1)) as _,
-                )),
-                Field::rA(GPR(
-                    (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                )),
+                Field::frD(FPR(((self.code >> 21u8) & 0x1f) as _)),
+                Field::offset(Offset(((self.code >> 0u8) & 0xffff) as _)),
+                Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
             ],
             Opcode::Lfdu => vec![
-                Field::frD(FPR(
-                    (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::offset(Offset(
-                    (((self.code) >> (32 - 32u8)) & ((1 << 16usize) - 1)) as _,
-                )),
-                Field::rA(GPR(
-                    (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                )),
+                Field::frD(FPR(((self.code >> 21u8) & 0x1f) as _)),
+                Field::offset(Offset(((self.code >> 0u8) & 0xffff) as _)),
+                Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
             ],
             Opcode::Lfdux => vec![
-                Field::frD(FPR(
-                    (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::rA(GPR(
-                    (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::rB(GPR(
-                    (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                )),
+                Field::frD(FPR(((self.code >> 21u8) & 0x1f) as _)),
+                Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
+                Field::rB(GPR(((self.code >> 11u8) & 0x1f) as _)),
             ],
             Opcode::Lfdx => vec![
-                Field::frD(FPR(
-                    (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::rA(GPR(
-                    (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::rB(GPR(
-                    (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                )),
+                Field::frD(FPR(((self.code >> 21u8) & 0x1f) as _)),
+                Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
+                Field::rB(GPR(((self.code >> 11u8) & 0x1f) as _)),
             ],
             Opcode::Lfs => vec![
-                Field::frD(FPR(
-                    (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::offset(Offset(
-                    (((self.code) >> (32 - 32u8)) & ((1 << 16usize) - 1)) as _,
-                )),
-                Field::rA(GPR(
-                    (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                )),
+                Field::frD(FPR(((self.code >> 21u8) & 0x1f) as _)),
+                Field::offset(Offset(((self.code >> 0u8) & 0xffff) as _)),
+                Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
             ],
             Opcode::Lfsu => vec![
-                Field::frD(FPR(
-                    (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::offset(Offset(
-                    (((self.code) >> (32 - 32u8)) & ((1 << 16usize) - 1)) as _,
-                )),
-                Field::rA(GPR(
-                    (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                )),
+                Field::frD(FPR(((self.code >> 21u8) & 0x1f) as _)),
+                Field::offset(Offset(((self.code >> 0u8) & 0xffff) as _)),
+                Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
             ],
             Opcode::Lfsux => vec![
-                Field::frD(FPR(
-                    (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::rA(GPR(
-                    (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::rB(GPR(
-                    (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                )),
+                Field::frD(FPR(((self.code >> 21u8) & 0x1f) as _)),
+                Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
+                Field::rB(GPR(((self.code >> 11u8) & 0x1f) as _)),
             ],
             Opcode::Lfsx => vec![
-                Field::frD(FPR(
-                    (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::rA(GPR(
-                    (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::rB(GPR(
-                    (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                )),
+                Field::frD(FPR(((self.code >> 21u8) & 0x1f) as _)),
+                Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
+                Field::rB(GPR(((self.code >> 11u8) & 0x1f) as _)),
             ],
             Opcode::Lha => vec![
-                Field::rD(GPR(
-                    (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::offset(Offset(
-                    (((self.code) >> (32 - 32u8)) & ((1 << 16usize) - 1)) as _,
-                )),
-                Field::rA(GPR(
-                    (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                )),
+                Field::rD(GPR(((self.code >> 21u8) & 0x1f) as _)),
+                Field::offset(Offset(((self.code >> 0u8) & 0xffff) as _)),
+                Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
             ],
             Opcode::Lhau => vec![
-                Field::rD(GPR(
-                    (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::offset(Offset(
-                    (((self.code) >> (32 - 32u8)) & ((1 << 16usize) - 1)) as _,
-                )),
-                Field::rA(GPR(
-                    (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                )),
+                Field::rD(GPR(((self.code >> 21u8) & 0x1f) as _)),
+                Field::offset(Offset(((self.code >> 0u8) & 0xffff) as _)),
+                Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
             ],
             Opcode::Lhaux => vec![
-                Field::rD(GPR(
-                    (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::rA(GPR(
-                    (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::rB(GPR(
-                    (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                )),
+                Field::rD(GPR(((self.code >> 21u8) & 0x1f) as _)),
+                Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
+                Field::rB(GPR(((self.code >> 11u8) & 0x1f) as _)),
             ],
             Opcode::Lhax => vec![
-                Field::rD(GPR(
-                    (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::rA(GPR(
-                    (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::rB(GPR(
-                    (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                )),
+                Field::rD(GPR(((self.code >> 21u8) & 0x1f) as _)),
+                Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
+                Field::rB(GPR(((self.code >> 11u8) & 0x1f) as _)),
             ],
             Opcode::Lhbrx => vec![
-                Field::rD(GPR(
-                    (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::rA(GPR(
-                    (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::rB(GPR(
-                    (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                )),
+                Field::rD(GPR(((self.code >> 21u8) & 0x1f) as _)),
+                Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
+                Field::rB(GPR(((self.code >> 11u8) & 0x1f) as _)),
             ],
             Opcode::Lhz => vec![
-                Field::rD(GPR(
-                    (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::offset(Offset(
-                    (((self.code) >> (32 - 32u8)) & ((1 << 16usize) - 1)) as _,
-                )),
-                Field::rA(GPR(
-                    (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                )),
+                Field::rD(GPR(((self.code >> 21u8) & 0x1f) as _)),
+                Field::offset(Offset(((self.code >> 0u8) & 0xffff) as _)),
+                Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
             ],
             Opcode::Lhzu => vec![
-                Field::rD(GPR(
-                    (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::offset(Offset(
-                    (((self.code) >> (32 - 32u8)) & ((1 << 16usize) - 1)) as _,
-                )),
-                Field::rA(GPR(
-                    (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                )),
+                Field::rD(GPR(((self.code >> 21u8) & 0x1f) as _)),
+                Field::offset(Offset(((self.code >> 0u8) & 0xffff) as _)),
+                Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
             ],
             Opcode::Lhzux => vec![
-                Field::rD(GPR(
-                    (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::rA(GPR(
-                    (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::rB(GPR(
-                    (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                )),
+                Field::rD(GPR(((self.code >> 21u8) & 0x1f) as _)),
+                Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
+                Field::rB(GPR(((self.code >> 11u8) & 0x1f) as _)),
             ],
             Opcode::Lhzx => vec![
-                Field::rD(GPR(
-                    (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::rA(GPR(
-                    (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::rB(GPR(
-                    (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                )),
+                Field::rD(GPR(((self.code >> 21u8) & 0x1f) as _)),
+                Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
+                Field::rB(GPR(((self.code >> 11u8) & 0x1f) as _)),
             ],
             Opcode::Lmw => vec![
-                Field::rD(GPR(
-                    (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::offset(Offset(
-                    (((self.code) >> (32 - 32u8)) & ((1 << 16usize) - 1)) as _,
-                )),
-                Field::rA(GPR(
-                    (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                )),
+                Field::rD(GPR(((self.code >> 21u8) & 0x1f) as _)),
+                Field::offset(Offset(((self.code >> 0u8) & 0xffff) as _)),
+                Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
             ],
             Opcode::Lswi => vec![
-                Field::rD(GPR(
-                    (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::rA(GPR(
-                    (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::NB(OpaqueU(
-                    (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _,
-                )),
+                Field::rD(GPR(((self.code >> 21u8) & 0x1f) as _)),
+                Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
+                Field::NB(OpaqueU(((self.code >> 11u8) & 0x1f) as _)),
             ],
             Opcode::Lswx => vec![
-                Field::rD(GPR(
-                    (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::rA(GPR(
-                    (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::rB(GPR(
-                    (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                )),
+                Field::rD(GPR(((self.code >> 21u8) & 0x1f) as _)),
+                Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
+                Field::rB(GPR(((self.code >> 11u8) & 0x1f) as _)),
             ],
             Opcode::Lwarx => vec![
-                Field::rD(GPR(
-                    (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::rA(GPR(
-                    (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::rB(GPR(
-                    (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                )),
+                Field::rD(GPR(((self.code >> 21u8) & 0x1f) as _)),
+                Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
+                Field::rB(GPR(((self.code >> 11u8) & 0x1f) as _)),
             ],
             Opcode::Lwbrx => vec![
-                Field::rD(GPR(
-                    (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::rA(GPR(
-                    (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::rB(GPR(
-                    (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                )),
+                Field::rD(GPR(((self.code >> 21u8) & 0x1f) as _)),
+                Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
+                Field::rB(GPR(((self.code >> 11u8) & 0x1f) as _)),
             ],
             Opcode::Lwz => vec![
-                Field::rD(GPR(
-                    (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::offset(Offset(
-                    (((self.code) >> (32 - 32u8)) & ((1 << 16usize) - 1)) as _,
-                )),
-                Field::rA(GPR(
-                    (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                )),
+                Field::rD(GPR(((self.code >> 21u8) & 0x1f) as _)),
+                Field::offset(Offset(((self.code >> 0u8) & 0xffff) as _)),
+                Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
             ],
             Opcode::Lwzu => vec![
-                Field::rD(GPR(
-                    (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::offset(Offset(
-                    (((self.code) >> (32 - 32u8)) & ((1 << 16usize) - 1)) as _,
-                )),
-                Field::rA(GPR(
-                    (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                )),
+                Field::rD(GPR(((self.code >> 21u8) & 0x1f) as _)),
+                Field::offset(Offset(((self.code >> 0u8) & 0xffff) as _)),
+                Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
             ],
             Opcode::Lwzux => vec![
-                Field::rD(GPR(
-                    (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::rA(GPR(
-                    (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::rB(GPR(
-                    (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                )),
+                Field::rD(GPR(((self.code >> 21u8) & 0x1f) as _)),
+                Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
+                Field::rB(GPR(((self.code >> 11u8) & 0x1f) as _)),
             ],
             Opcode::Lwzx => vec![
-                Field::rD(GPR(
-                    (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::rA(GPR(
-                    (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::rB(GPR(
-                    (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                )),
+                Field::rD(GPR(((self.code >> 21u8) & 0x1f) as _)),
+                Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
+                Field::rB(GPR(((self.code >> 11u8) & 0x1f) as _)),
             ],
             Opcode::Mcrf => vec![
-                Field::crfD(CRBit(
-                    (((self.code) >> (32 - 9u8)) & ((1 << 3usize) - 1)) as _,
-                )),
-                Field::crfS(CRBit(
-                    (((self.code) >> (32 - 14u8)) & ((1 << 3usize) - 1)) as _,
-                )),
+                Field::crfD(CRBit(((self.code >> 23u8) & 0x7) as _)),
+                Field::crfS(CRBit(((self.code >> 18u8) & 0x7) as _)),
             ],
             Opcode::Mcrfs => vec![
-                Field::crfD(CRBit(
-                    (((self.code) >> (32 - 9u8)) & ((1 << 3usize) - 1)) as _,
-                )),
-                Field::crfS(CRBit(
-                    (((self.code) >> (32 - 14u8)) & ((1 << 3usize) - 1)) as _,
-                )),
+                Field::crfD(CRBit(((self.code >> 23u8) & 0x7) as _)),
+                Field::crfS(CRBit(((self.code >> 18u8) & 0x7) as _)),
             ],
-            Opcode::Mcrxr => vec![Field::crfD(CRBit(
-                (((self.code) >> (32 - 9u8)) & ((1 << 3usize) - 1)) as _,
-            ))],
-            Opcode::Mfcr => vec![Field::crfD(CRBit(
-                (((self.code) >> (32 - 9u8)) & ((1 << 3usize) - 1)) as _,
-            ))],
-            Opcode::Mffs => vec![Field::crfD(CRBit(
-                (((self.code) >> (32 - 9u8)) & ((1 << 3usize) - 1)) as _,
-            ))],
-            Opcode::Mfmsr => vec![Field::rD(GPR(
-                (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _,
-            ))],
+            Opcode::Mcrxr => vec![Field::crfD(CRBit(((self.code >> 23u8) & 0x7) as _))],
+            Opcode::Mfcr => vec![Field::crfD(CRBit(((self.code >> 23u8) & 0x7) as _))],
+            Opcode::Mffs => vec![Field::crfD(CRBit(((self.code >> 23u8) & 0x7) as _))],
+            Opcode::Mfmsr => vec![Field::rD(GPR(((self.code >> 21u8) & 0x1f) as _))],
             Opcode::Mfspr => vec![
-                Field::rD(GPR(
-                    (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::spr(SPR(
-                    (((self.code) >> (32 - 21u8)) & ((1 << 10usize) - 1)) as _
-                )),
+                Field::rD(GPR(((self.code >> 21u8) & 0x1f) as _)),
+                Field::spr(SPR(((self.code >> 11u8) & 0x3ff) as _)),
             ],
             Opcode::Mfsr => vec![
-                Field::rD(GPR(
-                    (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::sr(SR((((self.code) >> (32 - 16u8)) & ((1 << 4usize) - 1)) as _)),
+                Field::rD(GPR(((self.code >> 21u8) & 0x1f) as _)),
+                Field::sr(SR(((self.code >> 16u8) & 0xf) as _)),
             ],
             Opcode::Mfsrin => vec![
-                Field::rD(GPR(
-                    (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::rB(GPR(
-                    (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                )),
+                Field::rD(GPR(((self.code >> 21u8) & 0x1f) as _)),
+                Field::rB(GPR(((self.code >> 11u8) & 0x1f) as _)),
             ],
             Opcode::Mftb => vec![
-                Field::rD(GPR(
-                    (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::tbr(OpaqueU(
-                    (((self.code) >> (32 - 21u8)) & ((1 << 10usize) - 1)) as _,
-                )),
+                Field::rD(GPR(((self.code >> 21u8) & 0x1f) as _)),
+                Field::tbr(OpaqueU(((self.code >> 11u8) & 0x3ff) as _)),
             ],
             Opcode::Mtcrf => vec![
-                Field::crm(OpaqueU(
-                    (((self.code) >> (32 - 20u8)) & ((1 << 8usize) - 1)) as _,
-                )),
-                Field::rS(GPR(
-                    (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                )),
+                Field::crm(OpaqueU(((self.code >> 12u8) & 0xff) as _)),
+                Field::rS(GPR(((self.code >> 21u8) & 0x1f) as _)),
             ],
-            Opcode::Mtfsb0 => vec![Field::crbD(CRField(
-                (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _,
-            ))],
-            Opcode::Mtfsb1 => vec![Field::crbD(CRField(
-                (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _,
-            ))],
+            Opcode::Mtfsb0 => vec![Field::crbD(CRField(((self.code >> 21u8) & 0x1f) as _))],
+            Opcode::Mtfsb1 => vec![Field::crbD(CRField(((self.code >> 21u8) & 0x1f) as _))],
             Opcode::Mtfsf => vec![
-                Field::mtfsf_FM(OpaqueU(
-                    (((self.code) >> (32 - 15u8)) & ((1 << 8usize) - 1)) as _,
-                )),
-                Field::frB(FPR(
-                    (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                )),
+                Field::mtfsf_FM(OpaqueU(((self.code >> 17u8) & 0xff) as _)),
+                Field::frB(FPR(((self.code >> 11u8) & 0x1f) as _)),
             ],
             Opcode::Mtfsfi => vec![
-                Field::crfD(CRBit(
-                    (((self.code) >> (32 - 9u8)) & ((1 << 3usize) - 1)) as _,
-                )),
-                Field::mtfsf_IMM(OpaqueU(
-                    (((self.code) >> (32 - 20u8)) & ((1 << 4usize) - 1)) as _,
-                )),
+                Field::crfD(CRBit(((self.code >> 23u8) & 0x7) as _)),
+                Field::mtfsf_IMM(OpaqueU(((self.code >> 12u8) & 0xf) as _)),
             ],
-            Opcode::Mtmsr => vec![Field::rS(GPR(
-                (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _,
-            ))],
+            Opcode::Mtmsr => vec![Field::rS(GPR(((self.code >> 21u8) & 0x1f) as _))],
             Opcode::Mtspr => vec![
-                Field::spr(SPR(
-                    (((self.code) >> (32 - 21u8)) & ((1 << 10usize) - 1)) as _
-                )),
-                Field::rS(GPR(
-                    (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                )),
+                Field::spr(SPR(((self.code >> 11u8) & 0x3ff) as _)),
+                Field::rS(GPR(((self.code >> 21u8) & 0x1f) as _)),
             ],
             Opcode::Mtsr => vec![
-                Field::sr(SR((((self.code) >> (32 - 16u8)) & ((1 << 4usize) - 1)) as _)),
-                Field::rS(GPR(
-                    (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                )),
+                Field::sr(SR(((self.code >> 16u8) & 0xf) as _)),
+                Field::rS(GPR(((self.code >> 21u8) & 0x1f) as _)),
             ],
             Opcode::Mtsrin => vec![
-                Field::rS(GPR(
-                    (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::rB(GPR(
-                    (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                )),
+                Field::rS(GPR(((self.code >> 21u8) & 0x1f) as _)),
+                Field::rB(GPR(((self.code >> 11u8) & 0x1f) as _)),
             ],
             Opcode::Mulhw => vec![
-                Field::rD(GPR(
-                    (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::rA(GPR(
-                    (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::rB(GPR(
-                    (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                )),
+                Field::rD(GPR(((self.code >> 21u8) & 0x1f) as _)),
+                Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
+                Field::rB(GPR(((self.code >> 11u8) & 0x1f) as _)),
             ],
             Opcode::Mulhwu => vec![
-                Field::rD(GPR(
-                    (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::rA(GPR(
-                    (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::rB(GPR(
-                    (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                )),
+                Field::rD(GPR(((self.code >> 21u8) & 0x1f) as _)),
+                Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
+                Field::rB(GPR(((self.code >> 11u8) & 0x1f) as _)),
             ],
             Opcode::Mulli => vec![
-                Field::rD(GPR(
-                    (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::rA(GPR(
-                    (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::simm(Simm(
-                    (((self.code) >> (32 - 32u8)) & ((1 << 16usize) - 1)) as _,
-                )),
+                Field::rD(GPR(((self.code >> 21u8) & 0x1f) as _)),
+                Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
+                Field::simm(Simm(((self.code >> 0u8) & 0xffff) as _)),
             ],
             Opcode::Mullw => vec![
-                Field::rD(GPR(
-                    (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::rA(GPR(
-                    (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::rB(GPR(
-                    (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                )),
+                Field::rD(GPR(((self.code >> 21u8) & 0x1f) as _)),
+                Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
+                Field::rB(GPR(((self.code >> 11u8) & 0x1f) as _)),
             ],
             Opcode::Nand => vec![
-                Field::rA(GPR(
-                    (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::rS(GPR(
-                    (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::rB(GPR(
-                    (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                )),
+                Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
+                Field::rS(GPR(((self.code >> 21u8) & 0x1f) as _)),
+                Field::rB(GPR(((self.code >> 11u8) & 0x1f) as _)),
             ],
             Opcode::Neg => vec![
-                Field::rD(GPR(
-                    (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::rA(GPR(
-                    (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                )),
+                Field::rD(GPR(((self.code >> 21u8) & 0x1f) as _)),
+                Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
             ],
             Opcode::Nor => vec![
-                Field::rA(GPR(
-                    (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::rS(GPR(
-                    (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::rB(GPR(
-                    (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                )),
+                Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
+                Field::rS(GPR(((self.code >> 21u8) & 0x1f) as _)),
+                Field::rB(GPR(((self.code >> 11u8) & 0x1f) as _)),
             ],
             Opcode::Or => vec![
-                Field::rA(GPR(
-                    (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::rS(GPR(
-                    (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::rB(GPR(
-                    (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                )),
+                Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
+                Field::rS(GPR(((self.code >> 21u8) & 0x1f) as _)),
+                Field::rB(GPR(((self.code >> 11u8) & 0x1f) as _)),
             ],
             Opcode::Orc => vec![
-                Field::rA(GPR(
-                    (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::rS(GPR(
-                    (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::rB(GPR(
-                    (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                )),
+                Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
+                Field::rS(GPR(((self.code >> 21u8) & 0x1f) as _)),
+                Field::rB(GPR(((self.code >> 11u8) & 0x1f) as _)),
             ],
             Opcode::Ori => vec![
-                Field::rA(GPR(
-                    (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::rS(GPR(
-                    (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::uimm(Uimm(
-                    (((self.code) >> (32 - 32u8)) & ((1 << 16usize) - 1)) as _,
-                )),
+                Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
+                Field::rS(GPR(((self.code >> 21u8) & 0x1f) as _)),
+                Field::uimm(Uimm(((self.code >> 0u8) & 0xffff) as _)),
             ],
             Opcode::Oris => vec![
-                Field::rA(GPR(
-                    (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::rS(GPR(
-                    (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::uimm(Uimm(
-                    (((self.code) >> (32 - 32u8)) & ((1 << 16usize) - 1)) as _,
-                )),
+                Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
+                Field::rS(GPR(((self.code >> 21u8) & 0x1f) as _)),
+                Field::uimm(Uimm(((self.code >> 0u8) & 0xffff) as _)),
             ],
             Opcode::PsqL => vec![
-                Field::frD(FPR(
-                    (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::offset(Offset(
-                    (((self.code) >> (32 - 32u8)) & ((1 << 16usize) - 1)) as _,
-                )),
-                Field::rA(GPR(
-                    (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::ps_W(OpaqueU(
-                    (((self.code) >> (32 - 16u8)) & ((1 << 0usize) - 1)) as _,
-                )),
-                Field::ps_l(GQR(
-                    (((self.code) >> (32 - 20u8)) & ((1 << 3usize) - 1)) as _
-                )),
+                Field::frD(FPR(((self.code >> 21u8) & 0x1f) as _)),
+                Field::offset(Offset(((self.code >> 0u8) & 0xffff) as _)),
+                Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
+                Field::ps_W(OpaqueU(((self.code >> 16u8) & 0x0) as _)),
+                Field::ps_l(GQR(((self.code >> 12u8) & 0x7) as _)),
             ],
             Opcode::PsqLu => vec![
-                Field::frD(FPR(
-                    (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::offset(Offset(
-                    (((self.code) >> (32 - 32u8)) & ((1 << 16usize) - 1)) as _,
-                )),
-                Field::rA(GPR(
-                    (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::ps_W(OpaqueU(
-                    (((self.code) >> (32 - 16u8)) & ((1 << 0usize) - 1)) as _,
-                )),
-                Field::ps_l(GQR(
-                    (((self.code) >> (32 - 20u8)) & ((1 << 3usize) - 1)) as _
-                )),
+                Field::frD(FPR(((self.code >> 21u8) & 0x1f) as _)),
+                Field::offset(Offset(((self.code >> 0u8) & 0xffff) as _)),
+                Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
+                Field::ps_W(OpaqueU(((self.code >> 16u8) & 0x0) as _)),
+                Field::ps_l(GQR(((self.code >> 12u8) & 0x7) as _)),
             ],
             Opcode::PsqLux => vec![
-                Field::frD(FPR(
-                    (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::rA(GPR(
-                    (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::rB(GPR(
-                    (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::ps_W(OpaqueU(
-                    (((self.code) >> (32 - 16u8)) & ((1 << 0usize) - 1)) as _,
-                )),
-                Field::ps_l(GQR(
-                    (((self.code) >> (32 - 20u8)) & ((1 << 3usize) - 1)) as _
-                )),
+                Field::frD(FPR(((self.code >> 21u8) & 0x1f) as _)),
+                Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
+                Field::rB(GPR(((self.code >> 11u8) & 0x1f) as _)),
+                Field::ps_W(OpaqueU(((self.code >> 16u8) & 0x0) as _)),
+                Field::ps_l(GQR(((self.code >> 12u8) & 0x7) as _)),
             ],
             Opcode::PsqLx => vec![
-                Field::frD(FPR(
-                    (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::rA(GPR(
-                    (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::rB(GPR(
-                    (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::ps_W(OpaqueU(
-                    (((self.code) >> (32 - 16u8)) & ((1 << 0usize) - 1)) as _,
-                )),
-                Field::ps_l(GQR(
-                    (((self.code) >> (32 - 20u8)) & ((1 << 3usize) - 1)) as _
-                )),
+                Field::frD(FPR(((self.code >> 21u8) & 0x1f) as _)),
+                Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
+                Field::rB(GPR(((self.code >> 11u8) & 0x1f) as _)),
+                Field::ps_W(OpaqueU(((self.code >> 16u8) & 0x0) as _)),
+                Field::ps_l(GQR(((self.code >> 12u8) & 0x7) as _)),
             ],
             Opcode::PsqSt => vec![
-                Field::frS(FPR(
-                    (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::offset(Offset(
-                    (((self.code) >> (32 - 32u8)) & ((1 << 16usize) - 1)) as _,
-                )),
-                Field::rA(GPR(
-                    (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::ps_W(OpaqueU(
-                    (((self.code) >> (32 - 16u8)) & ((1 << 0usize) - 1)) as _,
-                )),
-                Field::ps_l(GQR(
-                    (((self.code) >> (32 - 20u8)) & ((1 << 3usize) - 1)) as _
-                )),
+                Field::frS(FPR(((self.code >> 21u8) & 0x1f) as _)),
+                Field::offset(Offset(((self.code >> 0u8) & 0xffff) as _)),
+                Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
+                Field::ps_W(OpaqueU(((self.code >> 16u8) & 0x0) as _)),
+                Field::ps_l(GQR(((self.code >> 12u8) & 0x7) as _)),
             ],
             Opcode::PsqStu => vec![
-                Field::frS(FPR(
-                    (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::offset(Offset(
-                    (((self.code) >> (32 - 32u8)) & ((1 << 16usize) - 1)) as _,
-                )),
-                Field::rA(GPR(
-                    (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::ps_W(OpaqueU(
-                    (((self.code) >> (32 - 16u8)) & ((1 << 0usize) - 1)) as _,
-                )),
-                Field::ps_l(GQR(
-                    (((self.code) >> (32 - 20u8)) & ((1 << 3usize) - 1)) as _
-                )),
+                Field::frS(FPR(((self.code >> 21u8) & 0x1f) as _)),
+                Field::offset(Offset(((self.code >> 0u8) & 0xffff) as _)),
+                Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
+                Field::ps_W(OpaqueU(((self.code >> 16u8) & 0x0) as _)),
+                Field::ps_l(GQR(((self.code >> 12u8) & 0x7) as _)),
             ],
             Opcode::PsqStux => vec![
-                Field::frS(FPR(
-                    (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::rA(GPR(
-                    (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::rB(GPR(
-                    (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::ps_W(OpaqueU(
-                    (((self.code) >> (32 - 16u8)) & ((1 << 0usize) - 1)) as _,
-                )),
-                Field::ps_l(GQR(
-                    (((self.code) >> (32 - 20u8)) & ((1 << 3usize) - 1)) as _
-                )),
+                Field::frS(FPR(((self.code >> 21u8) & 0x1f) as _)),
+                Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
+                Field::rB(GPR(((self.code >> 11u8) & 0x1f) as _)),
+                Field::ps_W(OpaqueU(((self.code >> 16u8) & 0x0) as _)),
+                Field::ps_l(GQR(((self.code >> 12u8) & 0x7) as _)),
             ],
             Opcode::PsqStx => vec![
-                Field::frS(FPR(
-                    (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::rA(GPR(
-                    (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::rB(GPR(
-                    (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::ps_W(OpaqueU(
-                    (((self.code) >> (32 - 16u8)) & ((1 << 0usize) - 1)) as _,
-                )),
-                Field::ps_l(GQR(
-                    (((self.code) >> (32 - 20u8)) & ((1 << 3usize) - 1)) as _
-                )),
+                Field::frS(FPR(((self.code >> 21u8) & 0x1f) as _)),
+                Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
+                Field::rB(GPR(((self.code >> 11u8) & 0x1f) as _)),
+                Field::ps_W(OpaqueU(((self.code >> 16u8) & 0x0) as _)),
+                Field::ps_l(GQR(((self.code >> 12u8) & 0x7) as _)),
             ],
             Opcode::PsAbs => vec![
-                Field::frD(FPR(
-                    (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::frA(FPR(
-                    (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::frB(FPR(
-                    (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                )),
+                Field::frD(FPR(((self.code >> 21u8) & 0x1f) as _)),
+                Field::frA(FPR(((self.code >> 16u8) & 0x1f) as _)),
+                Field::frB(FPR(((self.code >> 11u8) & 0x1f) as _)),
             ],
             Opcode::PsAdd => vec![
-                Field::frD(FPR(
-                    (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::frA(FPR(
-                    (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::frB(FPR(
-                    (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                )),
+                Field::frD(FPR(((self.code >> 21u8) & 0x1f) as _)),
+                Field::frA(FPR(((self.code >> 16u8) & 0x1f) as _)),
+                Field::frB(FPR(((self.code >> 11u8) & 0x1f) as _)),
             ],
             Opcode::PsCmpo0 => vec![
-                Field::crfD(CRBit(
-                    (((self.code) >> (32 - 9u8)) & ((1 << 3usize) - 1)) as _,
-                )),
-                Field::frA(FPR(
-                    (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::frB(FPR(
-                    (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                )),
+                Field::crfD(CRBit(((self.code >> 23u8) & 0x7) as _)),
+                Field::frA(FPR(((self.code >> 16u8) & 0x1f) as _)),
+                Field::frB(FPR(((self.code >> 11u8) & 0x1f) as _)),
             ],
             Opcode::PsCmpo1 => vec![
-                Field::crfD(CRBit(
-                    (((self.code) >> (32 - 9u8)) & ((1 << 3usize) - 1)) as _,
-                )),
-                Field::frA(FPR(
-                    (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::frB(FPR(
-                    (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                )),
+                Field::crfD(CRBit(((self.code >> 23u8) & 0x7) as _)),
+                Field::frA(FPR(((self.code >> 16u8) & 0x1f) as _)),
+                Field::frB(FPR(((self.code >> 11u8) & 0x1f) as _)),
             ],
             Opcode::PsCmpu0 => vec![
-                Field::crfD(CRBit(
-                    (((self.code) >> (32 - 9u8)) & ((1 << 3usize) - 1)) as _,
-                )),
-                Field::frA(FPR(
-                    (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::frB(FPR(
-                    (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                )),
+                Field::crfD(CRBit(((self.code >> 23u8) & 0x7) as _)),
+                Field::frA(FPR(((self.code >> 16u8) & 0x1f) as _)),
+                Field::frB(FPR(((self.code >> 11u8) & 0x1f) as _)),
             ],
             Opcode::PsCmpu1 => vec![
-                Field::crfD(CRBit(
-                    (((self.code) >> (32 - 9u8)) & ((1 << 3usize) - 1)) as _,
-                )),
-                Field::frA(FPR(
-                    (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::frB(FPR(
-                    (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                )),
+                Field::crfD(CRBit(((self.code >> 23u8) & 0x7) as _)),
+                Field::frA(FPR(((self.code >> 16u8) & 0x1f) as _)),
+                Field::frB(FPR(((self.code >> 11u8) & 0x1f) as _)),
             ],
             Opcode::PsDiv => vec![
-                Field::frD(FPR(
-                    (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::frA(FPR(
-                    (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::frB(FPR(
-                    (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                )),
+                Field::frD(FPR(((self.code >> 21u8) & 0x1f) as _)),
+                Field::frA(FPR(((self.code >> 16u8) & 0x1f) as _)),
+                Field::frB(FPR(((self.code >> 11u8) & 0x1f) as _)),
             ],
             Opcode::PsMadd => vec![
-                Field::frD(FPR(
-                    (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::frA(FPR(
-                    (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::frC(FPR(
-                    (((self.code) >> (32 - 26u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::frB(FPR(
-                    (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                )),
+                Field::frD(FPR(((self.code >> 21u8) & 0x1f) as _)),
+                Field::frA(FPR(((self.code >> 16u8) & 0x1f) as _)),
+                Field::frC(FPR(((self.code >> 6u8) & 0x1f) as _)),
+                Field::frB(FPR(((self.code >> 11u8) & 0x1f) as _)),
             ],
             Opcode::PsMadds0 => vec![
-                Field::frD(FPR(
-                    (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::frA(FPR(
-                    (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::frC(FPR(
-                    (((self.code) >> (32 - 26u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::frB(FPR(
-                    (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                )),
+                Field::frD(FPR(((self.code >> 21u8) & 0x1f) as _)),
+                Field::frA(FPR(((self.code >> 16u8) & 0x1f) as _)),
+                Field::frC(FPR(((self.code >> 6u8) & 0x1f) as _)),
+                Field::frB(FPR(((self.code >> 11u8) & 0x1f) as _)),
             ],
             Opcode::PsMadds1 => vec![
-                Field::frD(FPR(
-                    (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::frA(FPR(
-                    (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::frC(FPR(
-                    (((self.code) >> (32 - 26u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::frB(FPR(
-                    (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                )),
+                Field::frD(FPR(((self.code >> 21u8) & 0x1f) as _)),
+                Field::frA(FPR(((self.code >> 16u8) & 0x1f) as _)),
+                Field::frC(FPR(((self.code >> 6u8) & 0x1f) as _)),
+                Field::frB(FPR(((self.code >> 11u8) & 0x1f) as _)),
             ],
             Opcode::PsMerge00 => vec![
-                Field::frD(FPR(
-                    (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::frA(FPR(
-                    (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::frB(FPR(
-                    (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                )),
+                Field::frD(FPR(((self.code >> 21u8) & 0x1f) as _)),
+                Field::frA(FPR(((self.code >> 16u8) & 0x1f) as _)),
+                Field::frB(FPR(((self.code >> 11u8) & 0x1f) as _)),
             ],
             Opcode::PsMerge01 => vec![
-                Field::frD(FPR(
-                    (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::frA(FPR(
-                    (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::frB(FPR(
-                    (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                )),
+                Field::frD(FPR(((self.code >> 21u8) & 0x1f) as _)),
+                Field::frA(FPR(((self.code >> 16u8) & 0x1f) as _)),
+                Field::frB(FPR(((self.code >> 11u8) & 0x1f) as _)),
             ],
             Opcode::PsMerge10 => vec![
-                Field::frD(FPR(
-                    (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::frA(FPR(
-                    (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::frB(FPR(
-                    (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                )),
+                Field::frD(FPR(((self.code >> 21u8) & 0x1f) as _)),
+                Field::frA(FPR(((self.code >> 16u8) & 0x1f) as _)),
+                Field::frB(FPR(((self.code >> 11u8) & 0x1f) as _)),
             ],
             Opcode::PsMerge11 => vec![
-                Field::frD(FPR(
-                    (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::frA(FPR(
-                    (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::frB(FPR(
-                    (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                )),
+                Field::frD(FPR(((self.code >> 21u8) & 0x1f) as _)),
+                Field::frA(FPR(((self.code >> 16u8) & 0x1f) as _)),
+                Field::frB(FPR(((self.code >> 11u8) & 0x1f) as _)),
             ],
             Opcode::PsMr => vec![
-                Field::frD(FPR(
-                    (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::frA(FPR(
-                    (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::frB(FPR(
-                    (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                )),
+                Field::frD(FPR(((self.code >> 21u8) & 0x1f) as _)),
+                Field::frA(FPR(((self.code >> 16u8) & 0x1f) as _)),
+                Field::frB(FPR(((self.code >> 11u8) & 0x1f) as _)),
             ],
             Opcode::PsMsub => vec![
-                Field::frD(FPR(
-                    (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::frA(FPR(
-                    (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::frC(FPR(
-                    (((self.code) >> (32 - 26u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::frB(FPR(
-                    (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                )),
+                Field::frD(FPR(((self.code >> 21u8) & 0x1f) as _)),
+                Field::frA(FPR(((self.code >> 16u8) & 0x1f) as _)),
+                Field::frC(FPR(((self.code >> 6u8) & 0x1f) as _)),
+                Field::frB(FPR(((self.code >> 11u8) & 0x1f) as _)),
             ],
             Opcode::PsMul => vec![
-                Field::frD(FPR(
-                    (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::frA(FPR(
-                    (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::frC(FPR(
-                    (((self.code) >> (32 - 26u8)) & ((1 << 5usize) - 1)) as _
-                )),
+                Field::frD(FPR(((self.code >> 21u8) & 0x1f) as _)),
+                Field::frA(FPR(((self.code >> 16u8) & 0x1f) as _)),
+                Field::frC(FPR(((self.code >> 6u8) & 0x1f) as _)),
             ],
             Opcode::PsMuls0 => vec![
-                Field::frD(FPR(
-                    (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::frA(FPR(
-                    (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::frC(FPR(
-                    (((self.code) >> (32 - 26u8)) & ((1 << 5usize) - 1)) as _
-                )),
+                Field::frD(FPR(((self.code >> 21u8) & 0x1f) as _)),
+                Field::frA(FPR(((self.code >> 16u8) & 0x1f) as _)),
+                Field::frC(FPR(((self.code >> 6u8) & 0x1f) as _)),
             ],
             Opcode::PsMuls1 => vec![
-                Field::frD(FPR(
-                    (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::frA(FPR(
-                    (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::frC(FPR(
-                    (((self.code) >> (32 - 26u8)) & ((1 << 5usize) - 1)) as _
-                )),
+                Field::frD(FPR(((self.code >> 21u8) & 0x1f) as _)),
+                Field::frA(FPR(((self.code >> 16u8) & 0x1f) as _)),
+                Field::frC(FPR(((self.code >> 6u8) & 0x1f) as _)),
             ],
             Opcode::PsNabs => vec![
-                Field::frD(FPR(
-                    (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::frB(FPR(
-                    (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                )),
+                Field::frD(FPR(((self.code >> 21u8) & 0x1f) as _)),
+                Field::frB(FPR(((self.code >> 11u8) & 0x1f) as _)),
             ],
             Opcode::PsNeg => vec![
-                Field::frD(FPR(
-                    (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::frB(FPR(
-                    (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                )),
+                Field::frD(FPR(((self.code >> 21u8) & 0x1f) as _)),
+                Field::frB(FPR(((self.code >> 11u8) & 0x1f) as _)),
             ],
             Opcode::PsNmadd => vec![
-                Field::frD(FPR(
-                    (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::frA(FPR(
-                    (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::frC(FPR(
-                    (((self.code) >> (32 - 26u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::frB(FPR(
-                    (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                )),
+                Field::frD(FPR(((self.code >> 21u8) & 0x1f) as _)),
+                Field::frA(FPR(((self.code >> 16u8) & 0x1f) as _)),
+                Field::frC(FPR(((self.code >> 6u8) & 0x1f) as _)),
+                Field::frB(FPR(((self.code >> 11u8) & 0x1f) as _)),
             ],
             Opcode::PsNmsub => vec![
-                Field::frD(FPR(
-                    (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::frA(FPR(
-                    (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::frC(FPR(
-                    (((self.code) >> (32 - 26u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::frB(FPR(
-                    (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                )),
+                Field::frD(FPR(((self.code >> 21u8) & 0x1f) as _)),
+                Field::frA(FPR(((self.code >> 16u8) & 0x1f) as _)),
+                Field::frC(FPR(((self.code >> 6u8) & 0x1f) as _)),
+                Field::frB(FPR(((self.code >> 11u8) & 0x1f) as _)),
             ],
             Opcode::PsRes => vec![
-                Field::frD(FPR(
-                    (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::frB(FPR(
-                    (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                )),
+                Field::frD(FPR(((self.code >> 21u8) & 0x1f) as _)),
+                Field::frB(FPR(((self.code >> 11u8) & 0x1f) as _)),
             ],
             Opcode::PsRsqrte => vec![
-                Field::frD(FPR(
-                    (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::frB(FPR(
-                    (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                )),
+                Field::frD(FPR(((self.code >> 21u8) & 0x1f) as _)),
+                Field::frB(FPR(((self.code >> 11u8) & 0x1f) as _)),
             ],
             Opcode::PsSel => vec![
-                Field::frD(FPR(
-                    (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::frA(FPR(
-                    (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::frC(FPR(
-                    (((self.code) >> (32 - 26u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::frB(FPR(
-                    (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                )),
+                Field::frD(FPR(((self.code >> 21u8) & 0x1f) as _)),
+                Field::frA(FPR(((self.code >> 16u8) & 0x1f) as _)),
+                Field::frC(FPR(((self.code >> 6u8) & 0x1f) as _)),
+                Field::frB(FPR(((self.code >> 11u8) & 0x1f) as _)),
             ],
             Opcode::PsSub => vec![
-                Field::frD(FPR(
-                    (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::frA(FPR(
-                    (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::frB(FPR(
-                    (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                )),
+                Field::frD(FPR(((self.code >> 21u8) & 0x1f) as _)),
+                Field::frA(FPR(((self.code >> 16u8) & 0x1f) as _)),
+                Field::frB(FPR(((self.code >> 11u8) & 0x1f) as _)),
             ],
             Opcode::PsSum0 => vec![
-                Field::frD(FPR(
-                    (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::frA(FPR(
-                    (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::frC(FPR(
-                    (((self.code) >> (32 - 26u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::frB(FPR(
-                    (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                )),
+                Field::frD(FPR(((self.code >> 21u8) & 0x1f) as _)),
+                Field::frA(FPR(((self.code >> 16u8) & 0x1f) as _)),
+                Field::frC(FPR(((self.code >> 6u8) & 0x1f) as _)),
+                Field::frB(FPR(((self.code >> 11u8) & 0x1f) as _)),
             ],
             Opcode::PsSum1 => vec![
-                Field::frD(FPR(
-                    (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::frA(FPR(
-                    (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::frC(FPR(
-                    (((self.code) >> (32 - 26u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::frB(FPR(
-                    (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                )),
+                Field::frD(FPR(((self.code >> 21u8) & 0x1f) as _)),
+                Field::frA(FPR(((self.code >> 16u8) & 0x1f) as _)),
+                Field::frC(FPR(((self.code >> 6u8) & 0x1f) as _)),
+                Field::frB(FPR(((self.code >> 11u8) & 0x1f) as _)),
             ],
             Opcode::Rfi => vec![],
             Opcode::Rlwimi => vec![
-                Field::rA(GPR(
-                    (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::rS(GPR(
-                    (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::SH(OpaqueU(
-                    (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _,
-                )),
-                Field::MB(OpaqueU(
-                    (((self.code) >> (32 - 26u8)) & ((1 << 5usize) - 1)) as _,
-                )),
-                Field::ME(OpaqueU(
-                    (((self.code) >> (32 - 31u8)) & ((1 << 5usize) - 1)) as _,
-                )),
+                Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
+                Field::rS(GPR(((self.code >> 21u8) & 0x1f) as _)),
+                Field::SH(OpaqueU(((self.code >> 11u8) & 0x1f) as _)),
+                Field::MB(OpaqueU(((self.code >> 6u8) & 0x1f) as _)),
+                Field::ME(OpaqueU(((self.code >> 1u8) & 0x1f) as _)),
             ],
             Opcode::Rlwinm => vec![
-                Field::rA(GPR(
-                    (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::rS(GPR(
-                    (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::SH(OpaqueU(
-                    (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _,
-                )),
-                Field::MB(OpaqueU(
-                    (((self.code) >> (32 - 26u8)) & ((1 << 5usize) - 1)) as _,
-                )),
-                Field::ME(OpaqueU(
-                    (((self.code) >> (32 - 31u8)) & ((1 << 5usize) - 1)) as _,
-                )),
+                Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
+                Field::rS(GPR(((self.code >> 21u8) & 0x1f) as _)),
+                Field::SH(OpaqueU(((self.code >> 11u8) & 0x1f) as _)),
+                Field::MB(OpaqueU(((self.code >> 6u8) & 0x1f) as _)),
+                Field::ME(OpaqueU(((self.code >> 1u8) & 0x1f) as _)),
             ],
             Opcode::Rlwnm => vec![
-                Field::rA(GPR(
-                    (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::rS(GPR(
-                    (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::rB(GPR(
-                    (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::MB(OpaqueU(
-                    (((self.code) >> (32 - 26u8)) & ((1 << 5usize) - 1)) as _,
-                )),
-                Field::ME(OpaqueU(
-                    (((self.code) >> (32 - 31u8)) & ((1 << 5usize) - 1)) as _,
-                )),
+                Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
+                Field::rS(GPR(((self.code >> 21u8) & 0x1f) as _)),
+                Field::rB(GPR(((self.code >> 11u8) & 0x1f) as _)),
+                Field::MB(OpaqueU(((self.code >> 6u8) & 0x1f) as _)),
+                Field::ME(OpaqueU(((self.code >> 1u8) & 0x1f) as _)),
             ],
             Opcode::Sc => vec![],
             Opcode::Slw => vec![
-                Field::rA(GPR(
-                    (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::rS(GPR(
-                    (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::rB(GPR(
-                    (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                )),
+                Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
+                Field::rS(GPR(((self.code >> 21u8) & 0x1f) as _)),
+                Field::rB(GPR(((self.code >> 11u8) & 0x1f) as _)),
             ],
             Opcode::Sraw => vec![
-                Field::rA(GPR(
-                    (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::rS(GPR(
-                    (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::rB(GPR(
-                    (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                )),
+                Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
+                Field::rS(GPR(((self.code >> 21u8) & 0x1f) as _)),
+                Field::rB(GPR(((self.code >> 11u8) & 0x1f) as _)),
             ],
             Opcode::Srawi => vec![
-                Field::rA(GPR(
-                    (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::rS(GPR(
-                    (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::SH(OpaqueU(
-                    (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _,
-                )),
+                Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
+                Field::rS(GPR(((self.code >> 21u8) & 0x1f) as _)),
+                Field::SH(OpaqueU(((self.code >> 11u8) & 0x1f) as _)),
             ],
             Opcode::Srw => vec![
-                Field::rS(GPR(
-                    (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::rA(GPR(
-                    (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::rB(GPR(
-                    (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                )),
+                Field::rS(GPR(((self.code >> 21u8) & 0x1f) as _)),
+                Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
+                Field::rB(GPR(((self.code >> 11u8) & 0x1f) as _)),
             ],
             Opcode::Stb => vec![
-                Field::rS(GPR(
-                    (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::offset(Offset(
-                    (((self.code) >> (32 - 32u8)) & ((1 << 16usize) - 1)) as _,
-                )),
-                Field::rA(GPR(
-                    (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                )),
+                Field::rS(GPR(((self.code >> 21u8) & 0x1f) as _)),
+                Field::offset(Offset(((self.code >> 0u8) & 0xffff) as _)),
+                Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
             ],
             Opcode::Stbu => vec![
-                Field::rS(GPR(
-                    (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::offset(Offset(
-                    (((self.code) >> (32 - 32u8)) & ((1 << 16usize) - 1)) as _,
-                )),
-                Field::rA(GPR(
-                    (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                )),
+                Field::rS(GPR(((self.code >> 21u8) & 0x1f) as _)),
+                Field::offset(Offset(((self.code >> 0u8) & 0xffff) as _)),
+                Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
             ],
             Opcode::Stbux => vec![
-                Field::rS(GPR(
-                    (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::rA(GPR(
-                    (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::rB(GPR(
-                    (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                )),
+                Field::rS(GPR(((self.code >> 21u8) & 0x1f) as _)),
+                Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
+                Field::rB(GPR(((self.code >> 11u8) & 0x1f) as _)),
             ],
             Opcode::Stbx => vec![
-                Field::rS(GPR(
-                    (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::rA(GPR(
-                    (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::rB(GPR(
-                    (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                )),
+                Field::rS(GPR(((self.code >> 21u8) & 0x1f) as _)),
+                Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
+                Field::rB(GPR(((self.code >> 11u8) & 0x1f) as _)),
             ],
             Opcode::Stfd => vec![
-                Field::rS(GPR(
-                    (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::offset(Offset(
-                    (((self.code) >> (32 - 32u8)) & ((1 << 16usize) - 1)) as _,
-                )),
-                Field::rA(GPR(
-                    (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                )),
+                Field::rS(GPR(((self.code >> 21u8) & 0x1f) as _)),
+                Field::offset(Offset(((self.code >> 0u8) & 0xffff) as _)),
+                Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
             ],
             Opcode::Stfdu => vec![
-                Field::rS(GPR(
-                    (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::offset(Offset(
-                    (((self.code) >> (32 - 32u8)) & ((1 << 16usize) - 1)) as _,
-                )),
-                Field::rA(GPR(
-                    (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                )),
+                Field::rS(GPR(((self.code >> 21u8) & 0x1f) as _)),
+                Field::offset(Offset(((self.code >> 0u8) & 0xffff) as _)),
+                Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
             ],
             Opcode::Stfdux => vec![
-                Field::frS(FPR(
-                    (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::rA(GPR(
-                    (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::rB(GPR(
-                    (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                )),
+                Field::frS(FPR(((self.code >> 21u8) & 0x1f) as _)),
+                Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
+                Field::rB(GPR(((self.code >> 11u8) & 0x1f) as _)),
             ],
             Opcode::Stfdx => vec![
-                Field::frS(FPR(
-                    (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::rA(GPR(
-                    (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::rB(GPR(
-                    (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                )),
+                Field::frS(FPR(((self.code >> 21u8) & 0x1f) as _)),
+                Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
+                Field::rB(GPR(((self.code >> 11u8) & 0x1f) as _)),
             ],
             Opcode::Stfiwx => vec![
-                Field::frS(FPR(
-                    (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::rA(GPR(
-                    (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::rB(GPR(
-                    (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                )),
+                Field::frS(FPR(((self.code >> 21u8) & 0x1f) as _)),
+                Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
+                Field::rB(GPR(((self.code >> 11u8) & 0x1f) as _)),
             ],
             Opcode::Stfs => vec![
-                Field::rS(GPR(
-                    (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::offset(Offset(
-                    (((self.code) >> (32 - 32u8)) & ((1 << 16usize) - 1)) as _,
-                )),
-                Field::rA(GPR(
-                    (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                )),
+                Field::rS(GPR(((self.code >> 21u8) & 0x1f) as _)),
+                Field::offset(Offset(((self.code >> 0u8) & 0xffff) as _)),
+                Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
             ],
             Opcode::Stfsu => vec![
-                Field::rS(GPR(
-                    (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::offset(Offset(
-                    (((self.code) >> (32 - 32u8)) & ((1 << 16usize) - 1)) as _,
-                )),
-                Field::rA(GPR(
-                    (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                )),
+                Field::rS(GPR(((self.code >> 21u8) & 0x1f) as _)),
+                Field::offset(Offset(((self.code >> 0u8) & 0xffff) as _)),
+                Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
             ],
             Opcode::Stfsux => vec![
-                Field::frS(FPR(
-                    (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::rA(GPR(
-                    (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::rB(GPR(
-                    (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                )),
+                Field::frS(FPR(((self.code >> 21u8) & 0x1f) as _)),
+                Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
+                Field::rB(GPR(((self.code >> 11u8) & 0x1f) as _)),
             ],
             Opcode::Stfsx => vec![
-                Field::frS(FPR(
-                    (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::rA(GPR(
-                    (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::rB(GPR(
-                    (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                )),
+                Field::frS(FPR(((self.code >> 21u8) & 0x1f) as _)),
+                Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
+                Field::rB(GPR(((self.code >> 11u8) & 0x1f) as _)),
             ],
             Opcode::Sth => vec![
-                Field::rS(GPR(
-                    (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::offset(Offset(
-                    (((self.code) >> (32 - 32u8)) & ((1 << 16usize) - 1)) as _,
-                )),
-                Field::rA(GPR(
-                    (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                )),
+                Field::rS(GPR(((self.code >> 21u8) & 0x1f) as _)),
+                Field::offset(Offset(((self.code >> 0u8) & 0xffff) as _)),
+                Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
             ],
             Opcode::Sthbrx => vec![
-                Field::rS(GPR(
-                    (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::rA(GPR(
-                    (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::rB(GPR(
-                    (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                )),
+                Field::rS(GPR(((self.code >> 21u8) & 0x1f) as _)),
+                Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
+                Field::rB(GPR(((self.code >> 11u8) & 0x1f) as _)),
             ],
             Opcode::Sthu => vec![
-                Field::rS(GPR(
-                    (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::offset(Offset(
-                    (((self.code) >> (32 - 32u8)) & ((1 << 16usize) - 1)) as _,
-                )),
-                Field::rA(GPR(
-                    (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                )),
+                Field::rS(GPR(((self.code >> 21u8) & 0x1f) as _)),
+                Field::offset(Offset(((self.code >> 0u8) & 0xffff) as _)),
+                Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
             ],
             Opcode::Sthux => vec![
-                Field::rS(GPR(
-                    (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::rA(GPR(
-                    (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::rB(GPR(
-                    (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                )),
+                Field::rS(GPR(((self.code >> 21u8) & 0x1f) as _)),
+                Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
+                Field::rB(GPR(((self.code >> 11u8) & 0x1f) as _)),
             ],
             Opcode::Sthx => vec![
-                Field::rS(GPR(
-                    (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::rA(GPR(
-                    (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::rB(GPR(
-                    (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                )),
+                Field::rS(GPR(((self.code >> 21u8) & 0x1f) as _)),
+                Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
+                Field::rB(GPR(((self.code >> 11u8) & 0x1f) as _)),
             ],
             Opcode::Stmw => vec![
-                Field::rS(GPR(
-                    (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::offset(Offset(
-                    (((self.code) >> (32 - 32u8)) & ((1 << 16usize) - 1)) as _,
-                )),
-                Field::rA(GPR(
-                    (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                )),
+                Field::rS(GPR(((self.code >> 21u8) & 0x1f) as _)),
+                Field::offset(Offset(((self.code >> 0u8) & 0xffff) as _)),
+                Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
             ],
             Opcode::Stswi => vec![
-                Field::rS(GPR(
-                    (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::rA(GPR(
-                    (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::NB(OpaqueU(
-                    (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _,
-                )),
+                Field::rS(GPR(((self.code >> 21u8) & 0x1f) as _)),
+                Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
+                Field::NB(OpaqueU(((self.code >> 11u8) & 0x1f) as _)),
             ],
             Opcode::Stswx => vec![
-                Field::rS(GPR(
-                    (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::rA(GPR(
-                    (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::rB(GPR(
-                    (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                )),
+                Field::rS(GPR(((self.code >> 21u8) & 0x1f) as _)),
+                Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
+                Field::rB(GPR(((self.code >> 11u8) & 0x1f) as _)),
             ],
             Opcode::Stw => vec![
-                Field::rS(GPR(
-                    (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::offset(Offset(
-                    (((self.code) >> (32 - 32u8)) & ((1 << 16usize) - 1)) as _,
-                )),
-                Field::rA(GPR(
-                    (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                )),
+                Field::rS(GPR(((self.code >> 21u8) & 0x1f) as _)),
+                Field::offset(Offset(((self.code >> 0u8) & 0xffff) as _)),
+                Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
             ],
             Opcode::Stwbrx => vec![
-                Field::rS(GPR(
-                    (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::rA(GPR(
-                    (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::rB(GPR(
-                    (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                )),
+                Field::rS(GPR(((self.code >> 21u8) & 0x1f) as _)),
+                Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
+                Field::rB(GPR(((self.code >> 11u8) & 0x1f) as _)),
             ],
             Opcode::Stwcx_ => vec![
-                Field::rS(GPR(
-                    (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::rA(GPR(
-                    (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::rB(GPR(
-                    (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                )),
+                Field::rS(GPR(((self.code >> 21u8) & 0x1f) as _)),
+                Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
+                Field::rB(GPR(((self.code >> 11u8) & 0x1f) as _)),
             ],
             Opcode::Stwu => vec![
-                Field::rS(GPR(
-                    (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::offset(Offset(
-                    (((self.code) >> (32 - 32u8)) & ((1 << 16usize) - 1)) as _,
-                )),
-                Field::rA(GPR(
-                    (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                )),
+                Field::rS(GPR(((self.code >> 21u8) & 0x1f) as _)),
+                Field::offset(Offset(((self.code >> 0u8) & 0xffff) as _)),
+                Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
             ],
             Opcode::Stwux => vec![
-                Field::rS(GPR(
-                    (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::rA(GPR(
-                    (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::rB(GPR(
-                    (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                )),
+                Field::rS(GPR(((self.code >> 21u8) & 0x1f) as _)),
+                Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
+                Field::rB(GPR(((self.code >> 11u8) & 0x1f) as _)),
             ],
             Opcode::Stwx => vec![
-                Field::rS(GPR(
-                    (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::rA(GPR(
-                    (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::rB(GPR(
-                    (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                )),
+                Field::rS(GPR(((self.code >> 21u8) & 0x1f) as _)),
+                Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
+                Field::rB(GPR(((self.code >> 11u8) & 0x1f) as _)),
             ],
             Opcode::Subf => vec![
-                Field::rD(GPR(
-                    (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::rA(GPR(
-                    (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::rB(GPR(
-                    (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                )),
+                Field::rD(GPR(((self.code >> 21u8) & 0x1f) as _)),
+                Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
+                Field::rB(GPR(((self.code >> 11u8) & 0x1f) as _)),
             ],
             Opcode::Subfc => vec![
-                Field::rD(GPR(
-                    (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::rA(GPR(
-                    (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::rB(GPR(
-                    (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                )),
+                Field::rD(GPR(((self.code >> 21u8) & 0x1f) as _)),
+                Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
+                Field::rB(GPR(((self.code >> 11u8) & 0x1f) as _)),
             ],
             Opcode::Subfe => vec![
-                Field::rD(GPR(
-                    (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::rA(GPR(
-                    (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::rB(GPR(
-                    (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                )),
+                Field::rD(GPR(((self.code >> 21u8) & 0x1f) as _)),
+                Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
+                Field::rB(GPR(((self.code >> 11u8) & 0x1f) as _)),
             ],
             Opcode::Subfic => vec![
-                Field::rD(GPR(
-                    (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::rA(GPR(
-                    (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::simm(Simm(
-                    (((self.code) >> (32 - 32u8)) & ((1 << 16usize) - 1)) as _,
-                )),
+                Field::rD(GPR(((self.code >> 21u8) & 0x1f) as _)),
+                Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
+                Field::simm(Simm(((self.code >> 0u8) & 0xffff) as _)),
             ],
             Opcode::Subfme => vec![
-                Field::rD(GPR(
-                    (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::rA(GPR(
-                    (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                )),
+                Field::rD(GPR(((self.code >> 21u8) & 0x1f) as _)),
+                Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
             ],
             Opcode::Subfze => vec![
-                Field::rD(GPR(
-                    (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::rA(GPR(
-                    (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                )),
+                Field::rD(GPR(((self.code >> 21u8) & 0x1f) as _)),
+                Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
             ],
             Opcode::Sync => vec![],
-            Opcode::Tlbie => vec![Field::rB(GPR(
-                (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _,
-            ))],
+            Opcode::Tlbie => vec![Field::rB(GPR(((self.code >> 11u8) & 0x1f) as _))],
             Opcode::Tlbsync => vec![],
             Opcode::Tw => vec![
-                Field::TO(OpaqueU(
-                    (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _,
-                )),
-                Field::rA(GPR(
-                    (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::rB(GPR(
-                    (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                )),
+                Field::TO(OpaqueU(((self.code >> 21u8) & 0x1f) as _)),
+                Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
+                Field::rB(GPR(((self.code >> 11u8) & 0x1f) as _)),
             ],
             Opcode::Twi => vec![
-                Field::TO(OpaqueU(
-                    (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _,
-                )),
-                Field::rA(GPR(
-                    (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::simm(Simm(
-                    (((self.code) >> (32 - 32u8)) & ((1 << 16usize) - 1)) as _,
-                )),
+                Field::TO(OpaqueU(((self.code >> 21u8) & 0x1f) as _)),
+                Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
+                Field::simm(Simm(((self.code >> 0u8) & 0xffff) as _)),
             ],
             Opcode::Xor => vec![
-                Field::rA(GPR(
-                    (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::rS(GPR(
-                    (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::rB(GPR(
-                    (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                )),
+                Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
+                Field::rS(GPR(((self.code >> 21u8) & 0x1f) as _)),
+                Field::rB(GPR(((self.code >> 11u8) & 0x1f) as _)),
             ],
             Opcode::Xori => vec![
-                Field::rA(GPR(
-                    (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::rS(GPR(
-                    (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::uimm(Uimm(
-                    (((self.code) >> (32 - 32u8)) & ((1 << 16usize) - 1)) as _,
-                )),
+                Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
+                Field::rS(GPR(((self.code >> 21u8) & 0x1f) as _)),
+                Field::uimm(Uimm(((self.code >> 0u8) & 0xffff) as _)),
             ],
             Opcode::Xoris => vec![
-                Field::rA(GPR(
-                    (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::rS(GPR(
-                    (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::uimm(Uimm(
-                    (((self.code) >> (32 - 32u8)) & ((1 << 16usize) - 1)) as _,
-                )),
+                Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
+                Field::rS(GPR(((self.code >> 21u8) & 0x1f) as _)),
+                Field::uimm(Uimm(((self.code >> 0u8) & 0xffff) as _)),
             ],
         }
     }
@@ -3472,88 +2222,36 @@ impl Ins {
     pub(crate) fn _defs(&self) -> Vec<Field> {
         match self.op {
             Opcode::Illegal => vec![],
-            Opcode::Add => vec![Field::rD(GPR(
-                (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _,
-            ))],
-            Opcode::Addc => vec![Field::rD(GPR(
-                (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _,
-            ))],
-            Opcode::Adde => vec![Field::rD(GPR(
-                (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _,
-            ))],
-            Opcode::Addi => vec![Field::rD(GPR(
-                (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _,
-            ))],
-            Opcode::Addic => vec![Field::rD(GPR(
-                (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _,
-            ))],
-            Opcode::Addic_ => vec![Field::rD(GPR(
-                (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-            ))],
-            Opcode::Addis => vec![Field::rD(GPR(
-                (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _,
-            ))],
-            Opcode::Addme => vec![Field::rD(GPR(
-                (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _,
-            ))],
-            Opcode::Addze => vec![Field::rD(GPR(
-                (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _,
-            ))],
-            Opcode::And => vec![Field::rA(GPR(
-                (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _,
-            ))],
-            Opcode::Andc => vec![Field::rA(GPR(
-                (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _,
-            ))],
-            Opcode::Andi_ => vec![Field::rA(GPR(
-                (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _,
-            ))],
-            Opcode::Andis_ => vec![Field::rA(GPR(
-                (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-            ))],
+            Opcode::Add => vec![Field::rD(GPR(((self.code >> 21u8) & 0x1f) as _))],
+            Opcode::Addc => vec![Field::rD(GPR(((self.code >> 21u8) & 0x1f) as _))],
+            Opcode::Adde => vec![Field::rD(GPR(((self.code >> 21u8) & 0x1f) as _))],
+            Opcode::Addi => vec![Field::rD(GPR(((self.code >> 21u8) & 0x1f) as _))],
+            Opcode::Addic => vec![Field::rD(GPR(((self.code >> 21u8) & 0x1f) as _))],
+            Opcode::Addic_ => vec![Field::rD(GPR(((self.code >> 21u8) & 0x1f) as _))],
+            Opcode::Addis => vec![Field::rD(GPR(((self.code >> 21u8) & 0x1f) as _))],
+            Opcode::Addme => vec![Field::rD(GPR(((self.code >> 21u8) & 0x1f) as _))],
+            Opcode::Addze => vec![Field::rD(GPR(((self.code >> 21u8) & 0x1f) as _))],
+            Opcode::And => vec![Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _))],
+            Opcode::Andc => vec![Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _))],
+            Opcode::Andi_ => vec![Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _))],
+            Opcode::Andis_ => vec![Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _))],
             Opcode::B => vec![],
             Opcode::Bc => vec![],
             Opcode::Bcctr => vec![],
             Opcode::Bclr => vec![],
-            Opcode::Cmp => vec![Field::crfD(CRBit(
-                (((self.code) >> (32 - 9u8)) & ((1 << 3usize) - 1)) as _,
-            ))],
-            Opcode::Cmpi => vec![Field::crfD(CRBit(
-                (((self.code) >> (32 - 9u8)) & ((1 << 3usize) - 1)) as _,
-            ))],
-            Opcode::Cmpl => vec![Field::crfD(CRBit(
-                (((self.code) >> (32 - 9u8)) & ((1 << 3usize) - 1)) as _,
-            ))],
-            Opcode::Cmpli => vec![Field::crfD(CRBit(
-                (((self.code) >> (32 - 9u8)) & ((1 << 3usize) - 1)) as _,
-            ))],
-            Opcode::Cntlzw => vec![Field::rA(GPR(
-                (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-            ))],
-            Opcode::Crand => vec![Field::crbD(CRField(
-                (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _,
-            ))],
-            Opcode::Crandc => vec![Field::crbD(CRField(
-                (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _,
-            ))],
-            Opcode::Creqv => vec![Field::crbD(CRField(
-                (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _,
-            ))],
-            Opcode::Crnand => vec![Field::crbD(CRField(
-                (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _,
-            ))],
-            Opcode::Crnor => vec![Field::crbD(CRField(
-                (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _,
-            ))],
-            Opcode::Cror => vec![Field::crbD(CRField(
-                (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _,
-            ))],
-            Opcode::Crorc => vec![Field::crbD(CRField(
-                (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _,
-            ))],
-            Opcode::Crxor => vec![Field::crbD(CRField(
-                (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _,
-            ))],
+            Opcode::Cmp => vec![Field::crfD(CRBit(((self.code >> 23u8) & 0x7) as _))],
+            Opcode::Cmpi => vec![Field::crfD(CRBit(((self.code >> 23u8) & 0x7) as _))],
+            Opcode::Cmpl => vec![Field::crfD(CRBit(((self.code >> 23u8) & 0x7) as _))],
+            Opcode::Cmpli => vec![Field::crfD(CRBit(((self.code >> 23u8) & 0x7) as _))],
+            Opcode::Cntlzw => vec![Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _))],
+            Opcode::Crand => vec![Field::crbD(CRField(((self.code >> 21u8) & 0x1f) as _))],
+            Opcode::Crandc => vec![Field::crbD(CRField(((self.code >> 21u8) & 0x1f) as _))],
+            Opcode::Creqv => vec![Field::crbD(CRField(((self.code >> 21u8) & 0x1f) as _))],
+            Opcode::Crnand => vec![Field::crbD(CRField(((self.code >> 21u8) & 0x1f) as _))],
+            Opcode::Crnor => vec![Field::crbD(CRField(((self.code >> 21u8) & 0x1f) as _))],
+            Opcode::Cror => vec![Field::crbD(CRField(((self.code >> 21u8) & 0x1f) as _))],
+            Opcode::Crorc => vec![Field::crbD(CRField(((self.code >> 21u8) & 0x1f) as _))],
+            Opcode::Crxor => vec![Field::crbD(CRField(((self.code >> 21u8) & 0x1f) as _))],
             Opcode::Dcbf => vec![],
             Opcode::Dcbi => vec![],
             Opcode::Dcbst => vec![],
@@ -3561,516 +2259,212 @@ impl Ins {
             Opcode::Dcbtst => vec![],
             Opcode::Dcbz => vec![],
             Opcode::DcbzL => vec![],
-            Opcode::Divw => vec![Field::rD(GPR(
-                (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _,
-            ))],
-            Opcode::Divwu => vec![Field::rD(GPR(
-                (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _,
-            ))],
-            Opcode::Eciwx => vec![Field::rD(GPR(
-                (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _,
-            ))],
+            Opcode::Divw => vec![Field::rD(GPR(((self.code >> 21u8) & 0x1f) as _))],
+            Opcode::Divwu => vec![Field::rD(GPR(((self.code >> 21u8) & 0x1f) as _))],
+            Opcode::Eciwx => vec![Field::rD(GPR(((self.code >> 21u8) & 0x1f) as _))],
             Opcode::Ecowx => vec![],
             Opcode::Eieio => vec![],
-            Opcode::Eqv => vec![Field::rA(GPR(
-                (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _,
-            ))],
-            Opcode::Extsb => vec![Field::rA(GPR(
-                (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _,
-            ))],
-            Opcode::Extsh => vec![Field::rA(GPR(
-                (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _,
-            ))],
-            Opcode::Fabs => vec![Field::frD(FPR(
-                (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _,
-            ))],
-            Opcode::Fadd => vec![Field::frD(FPR(
-                (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _,
-            ))],
-            Opcode::Fadds => vec![Field::frD(FPR(
-                (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-            ))],
-            Opcode::Fcmpo => vec![Field::crfD(CRBit(
-                (((self.code) >> (32 - 9u8)) & ((1 << 3usize) - 1)) as _,
-            ))],
-            Opcode::Fcmpu => vec![Field::crfD(CRBit(
-                (((self.code) >> (32 - 9u8)) & ((1 << 3usize) - 1)) as _,
-            ))],
-            Opcode::Fctiw => vec![Field::frD(FPR(
-                (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-            ))],
-            Opcode::Fctiwz => vec![Field::frD(FPR(
-                (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-            ))],
-            Opcode::Fdiv => vec![Field::frD(FPR(
-                (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _,
-            ))],
-            Opcode::Fdivs => vec![Field::frD(FPR(
-                (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-            ))],
-            Opcode::Fmadd => vec![Field::frD(FPR(
-                (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-            ))],
-            Opcode::Fmadds => vec![Field::frD(FPR(
-                (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-            ))],
-            Opcode::Fmr => vec![Field::frD(FPR(
-                (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _,
-            ))],
-            Opcode::Fmsub => vec![Field::frD(FPR(
-                (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-            ))],
-            Opcode::Fmsubs => vec![Field::frD(FPR(
-                (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-            ))],
-            Opcode::Fmul => vec![Field::frD(FPR(
-                (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _,
-            ))],
-            Opcode::Fmuls => vec![Field::frD(FPR(
-                (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-            ))],
-            Opcode::Fnabs => vec![Field::frD(FPR(
-                (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-            ))],
-            Opcode::Fneg => vec![Field::frD(FPR(
-                (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _,
-            ))],
-            Opcode::Fnmadd => vec![Field::frD(FPR(
-                (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-            ))],
-            Opcode::Fnmadds => vec![Field::frD(FPR(
-                (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-            ))],
-            Opcode::Fnmsub => vec![Field::frD(FPR(
-                (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-            ))],
-            Opcode::Fnmsubs => vec![Field::frD(FPR(
-                (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-            ))],
-            Opcode::Fres => vec![Field::frD(FPR(
-                (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _,
-            ))],
-            Opcode::Frsp => vec![Field::frD(FPR(
-                (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _,
-            ))],
-            Opcode::Frsqrte => vec![Field::frD(FPR(
-                (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-            ))],
-            Opcode::Fsel => vec![Field::frD(FPR(
-                (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _,
-            ))],
-            Opcode::Fsub => vec![Field::frD(FPR(
-                (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _,
-            ))],
-            Opcode::Fsubs => vec![Field::frD(FPR(
-                (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-            ))],
+            Opcode::Eqv => vec![Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _))],
+            Opcode::Extsb => vec![Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _))],
+            Opcode::Extsh => vec![Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _))],
+            Opcode::Fabs => vec![Field::frD(FPR(((self.code >> 21u8) & 0x1f) as _))],
+            Opcode::Fadd => vec![Field::frD(FPR(((self.code >> 21u8) & 0x1f) as _))],
+            Opcode::Fadds => vec![Field::frD(FPR(((self.code >> 21u8) & 0x1f) as _))],
+            Opcode::Fcmpo => vec![Field::crfD(CRBit(((self.code >> 23u8) & 0x7) as _))],
+            Opcode::Fcmpu => vec![Field::crfD(CRBit(((self.code >> 23u8) & 0x7) as _))],
+            Opcode::Fctiw => vec![Field::frD(FPR(((self.code >> 21u8) & 0x1f) as _))],
+            Opcode::Fctiwz => vec![Field::frD(FPR(((self.code >> 21u8) & 0x1f) as _))],
+            Opcode::Fdiv => vec![Field::frD(FPR(((self.code >> 21u8) & 0x1f) as _))],
+            Opcode::Fdivs => vec![Field::frD(FPR(((self.code >> 21u8) & 0x1f) as _))],
+            Opcode::Fmadd => vec![Field::frD(FPR(((self.code >> 21u8) & 0x1f) as _))],
+            Opcode::Fmadds => vec![Field::frD(FPR(((self.code >> 21u8) & 0x1f) as _))],
+            Opcode::Fmr => vec![Field::frD(FPR(((self.code >> 21u8) & 0x1f) as _))],
+            Opcode::Fmsub => vec![Field::frD(FPR(((self.code >> 21u8) & 0x1f) as _))],
+            Opcode::Fmsubs => vec![Field::frD(FPR(((self.code >> 21u8) & 0x1f) as _))],
+            Opcode::Fmul => vec![Field::frD(FPR(((self.code >> 21u8) & 0x1f) as _))],
+            Opcode::Fmuls => vec![Field::frD(FPR(((self.code >> 21u8) & 0x1f) as _))],
+            Opcode::Fnabs => vec![Field::frD(FPR(((self.code >> 21u8) & 0x1f) as _))],
+            Opcode::Fneg => vec![Field::frD(FPR(((self.code >> 21u8) & 0x1f) as _))],
+            Opcode::Fnmadd => vec![Field::frD(FPR(((self.code >> 21u8) & 0x1f) as _))],
+            Opcode::Fnmadds => vec![Field::frD(FPR(((self.code >> 21u8) & 0x1f) as _))],
+            Opcode::Fnmsub => vec![Field::frD(FPR(((self.code >> 21u8) & 0x1f) as _))],
+            Opcode::Fnmsubs => vec![Field::frD(FPR(((self.code >> 21u8) & 0x1f) as _))],
+            Opcode::Fres => vec![Field::frD(FPR(((self.code >> 21u8) & 0x1f) as _))],
+            Opcode::Frsp => vec![Field::frD(FPR(((self.code >> 21u8) & 0x1f) as _))],
+            Opcode::Frsqrte => vec![Field::frD(FPR(((self.code >> 21u8) & 0x1f) as _))],
+            Opcode::Fsel => vec![Field::frD(FPR(((self.code >> 21u8) & 0x1f) as _))],
+            Opcode::Fsub => vec![Field::frD(FPR(((self.code >> 21u8) & 0x1f) as _))],
+            Opcode::Fsubs => vec![Field::frD(FPR(((self.code >> 21u8) & 0x1f) as _))],
             Opcode::Icbi => vec![],
             Opcode::Isync => vec![],
-            Opcode::Lbz => vec![Field::rD(GPR(
-                (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _,
-            ))],
+            Opcode::Lbz => vec![Field::rD(GPR(((self.code >> 21u8) & 0x1f) as _))],
             Opcode::Lbzu => vec![
-                Field::rD(GPR(
-                    (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::rA(GPR(
-                    (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                )),
+                Field::rD(GPR(((self.code >> 21u8) & 0x1f) as _)),
+                Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
             ],
             Opcode::Lbzux => vec![
-                Field::rD(GPR(
-                    (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::rA(GPR(
-                    (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                )),
+                Field::rD(GPR(((self.code >> 21u8) & 0x1f) as _)),
+                Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
             ],
-            Opcode::Lbzx => vec![Field::rD(GPR(
-                (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _,
-            ))],
-            Opcode::Lfd => vec![Field::frD(FPR(
-                (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _,
-            ))],
+            Opcode::Lbzx => vec![Field::rD(GPR(((self.code >> 21u8) & 0x1f) as _))],
+            Opcode::Lfd => vec![Field::frD(FPR(((self.code >> 21u8) & 0x1f) as _))],
             Opcode::Lfdu => vec![
-                Field::frD(FPR(
-                    (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::rA(GPR(
-                    (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                )),
+                Field::frD(FPR(((self.code >> 21u8) & 0x1f) as _)),
+                Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
             ],
             Opcode::Lfdux => vec![
-                Field::frD(FPR(
-                    (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::rA(GPR(
-                    (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                )),
+                Field::frD(FPR(((self.code >> 21u8) & 0x1f) as _)),
+                Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
             ],
-            Opcode::Lfdx => vec![Field::frD(FPR(
-                (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _,
-            ))],
-            Opcode::Lfs => vec![Field::frD(FPR(
-                (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _,
-            ))],
+            Opcode::Lfdx => vec![Field::frD(FPR(((self.code >> 21u8) & 0x1f) as _))],
+            Opcode::Lfs => vec![Field::frD(FPR(((self.code >> 21u8) & 0x1f) as _))],
             Opcode::Lfsu => vec![
-                Field::frD(FPR(
-                    (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::rA(GPR(
-                    (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                )),
+                Field::frD(FPR(((self.code >> 21u8) & 0x1f) as _)),
+                Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
             ],
             Opcode::Lfsux => vec![
-                Field::frD(FPR(
-                    (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::rA(GPR(
-                    (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                )),
+                Field::frD(FPR(((self.code >> 21u8) & 0x1f) as _)),
+                Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
             ],
-            Opcode::Lfsx => vec![Field::frD(FPR(
-                (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _,
-            ))],
-            Opcode::Lha => vec![Field::rD(GPR(
-                (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _,
-            ))],
+            Opcode::Lfsx => vec![Field::frD(FPR(((self.code >> 21u8) & 0x1f) as _))],
+            Opcode::Lha => vec![Field::rD(GPR(((self.code >> 21u8) & 0x1f) as _))],
             Opcode::Lhau => vec![
-                Field::rD(GPR(
-                    (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::rA(GPR(
-                    (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                )),
+                Field::rD(GPR(((self.code >> 21u8) & 0x1f) as _)),
+                Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
             ],
             Opcode::Lhaux => vec![
-                Field::rD(GPR(
-                    (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::rA(GPR(
-                    (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                )),
+                Field::rD(GPR(((self.code >> 21u8) & 0x1f) as _)),
+                Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
             ],
-            Opcode::Lhax => vec![Field::rD(GPR(
-                (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _,
-            ))],
-            Opcode::Lhbrx => vec![Field::rD(GPR(
-                (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _,
-            ))],
-            Opcode::Lhz => vec![Field::rD(GPR(
-                (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _,
-            ))],
+            Opcode::Lhax => vec![Field::rD(GPR(((self.code >> 21u8) & 0x1f) as _))],
+            Opcode::Lhbrx => vec![Field::rD(GPR(((self.code >> 21u8) & 0x1f) as _))],
+            Opcode::Lhz => vec![Field::rD(GPR(((self.code >> 21u8) & 0x1f) as _))],
             Opcode::Lhzu => vec![
-                Field::rD(GPR(
-                    (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::rA(GPR(
-                    (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                )),
+                Field::rD(GPR(((self.code >> 21u8) & 0x1f) as _)),
+                Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
             ],
             Opcode::Lhzux => vec![
-                Field::rD(GPR(
-                    (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::rA(GPR(
-                    (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                )),
+                Field::rD(GPR(((self.code >> 21u8) & 0x1f) as _)),
+                Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
             ],
-            Opcode::Lhzx => vec![Field::rD(GPR(
-                (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _,
-            ))],
-            Opcode::Lmw => vec![Field::rD(GPR(
-                (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _,
-            ))],
-            Opcode::Lswi => vec![Field::rD(GPR(
-                (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _,
-            ))],
-            Opcode::Lswx => vec![Field::rD(GPR(
-                (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _,
-            ))],
-            Opcode::Lwarx => vec![Field::rD(GPR(
-                (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _,
-            ))],
-            Opcode::Lwbrx => vec![Field::rD(GPR(
-                (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _,
-            ))],
-            Opcode::Lwz => vec![Field::rD(GPR(
-                (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _,
-            ))],
+            Opcode::Lhzx => vec![Field::rD(GPR(((self.code >> 21u8) & 0x1f) as _))],
+            Opcode::Lmw => vec![Field::rD(GPR(((self.code >> 21u8) & 0x1f) as _))],
+            Opcode::Lswi => vec![Field::rD(GPR(((self.code >> 21u8) & 0x1f) as _))],
+            Opcode::Lswx => vec![Field::rD(GPR(((self.code >> 21u8) & 0x1f) as _))],
+            Opcode::Lwarx => vec![Field::rD(GPR(((self.code >> 21u8) & 0x1f) as _))],
+            Opcode::Lwbrx => vec![Field::rD(GPR(((self.code >> 21u8) & 0x1f) as _))],
+            Opcode::Lwz => vec![Field::rD(GPR(((self.code >> 21u8) & 0x1f) as _))],
             Opcode::Lwzu => vec![
-                Field::rD(GPR(
-                    (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::rA(GPR(
-                    (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                )),
+                Field::rD(GPR(((self.code >> 21u8) & 0x1f) as _)),
+                Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
             ],
             Opcode::Lwzux => vec![
-                Field::rD(GPR(
-                    (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::rA(GPR(
-                    (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                )),
+                Field::rD(GPR(((self.code >> 21u8) & 0x1f) as _)),
+                Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
             ],
-            Opcode::Lwzx => vec![Field::rD(GPR(
-                (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _,
-            ))],
-            Opcode::Mcrf => vec![Field::crfD(CRBit(
-                (((self.code) >> (32 - 9u8)) & ((1 << 3usize) - 1)) as _,
-            ))],
-            Opcode::Mcrfs => vec![Field::crfD(CRBit(
-                (((self.code) >> (32 - 9u8)) & ((1 << 3usize) - 1)) as _,
-            ))],
+            Opcode::Lwzx => vec![Field::rD(GPR(((self.code >> 21u8) & 0x1f) as _))],
+            Opcode::Mcrf => vec![Field::crfD(CRBit(((self.code >> 23u8) & 0x7) as _))],
+            Opcode::Mcrfs => vec![Field::crfD(CRBit(((self.code >> 23u8) & 0x7) as _))],
             Opcode::Mcrxr => vec![
-                Field::crfD(CRBit(
-                    (((self.code) >> (32 - 9u8)) & ((1 << 3usize) - 1)) as _,
-                )),
+                Field::crfD(CRBit(((self.code >> 23u8) & 0x7) as _)),
                 Field::xer,
             ],
-            Opcode::Mfcr => vec![Field::crfD(CRBit(
-                (((self.code) >> (32 - 9u8)) & ((1 << 3usize) - 1)) as _,
-            ))],
-            Opcode::Mffs => vec![Field::crfD(CRBit(
-                (((self.code) >> (32 - 9u8)) & ((1 << 3usize) - 1)) as _,
-            ))],
-            Opcode::Mfmsr => vec![Field::rD(GPR(
-                (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _,
-            ))],
-            Opcode::Mfspr => vec![Field::rD(GPR(
-                (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _,
-            ))],
-            Opcode::Mfsr => vec![Field::rD(GPR(
-                (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _,
-            ))],
-            Opcode::Mfsrin => vec![Field::rD(GPR(
-                (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-            ))],
-            Opcode::Mftb => vec![Field::rD(GPR(
-                (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _,
-            ))],
+            Opcode::Mfcr => vec![Field::crfD(CRBit(((self.code >> 23u8) & 0x7) as _))],
+            Opcode::Mffs => vec![Field::crfD(CRBit(((self.code >> 23u8) & 0x7) as _))],
+            Opcode::Mfmsr => vec![Field::rD(GPR(((self.code >> 21u8) & 0x1f) as _))],
+            Opcode::Mfspr => vec![Field::rD(GPR(((self.code >> 21u8) & 0x1f) as _))],
+            Opcode::Mfsr => vec![Field::rD(GPR(((self.code >> 21u8) & 0x1f) as _))],
+            Opcode::Mfsrin => vec![Field::rD(GPR(((self.code >> 21u8) & 0x1f) as _))],
+            Opcode::Mftb => vec![Field::rD(GPR(((self.code >> 21u8) & 0x1f) as _))],
             Opcode::Mtcrf => vec![],
-            Opcode::Mtfsb0 => vec![Field::crbD(CRField(
-                (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _,
-            ))],
-            Opcode::Mtfsb1 => vec![Field::crbD(CRField(
-                (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _,
-            ))],
+            Opcode::Mtfsb0 => vec![Field::crbD(CRField(((self.code >> 21u8) & 0x1f) as _))],
+            Opcode::Mtfsb1 => vec![Field::crbD(CRField(((self.code >> 21u8) & 0x1f) as _))],
             Opcode::Mtfsf => vec![],
-            Opcode::Mtfsfi => vec![Field::crfD(CRBit(
-                (((self.code) >> (32 - 9u8)) & ((1 << 3usize) - 1)) as _,
-            ))],
+            Opcode::Mtfsfi => vec![Field::crfD(CRBit(((self.code >> 23u8) & 0x7) as _))],
             Opcode::Mtmsr => vec![],
             Opcode::Mtspr => vec![],
             Opcode::Mtsr => vec![],
             Opcode::Mtsrin => vec![],
-            Opcode::Mulhw => vec![Field::rD(GPR(
-                (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _,
-            ))],
-            Opcode::Mulhwu => vec![Field::rD(GPR(
-                (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-            ))],
-            Opcode::Mulli => vec![Field::rD(GPR(
-                (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _,
-            ))],
-            Opcode::Mullw => vec![Field::rD(GPR(
-                (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _,
-            ))],
-            Opcode::Nand => vec![Field::rA(GPR(
-                (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _,
-            ))],
-            Opcode::Neg => vec![Field::rD(GPR(
-                (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _,
-            ))],
-            Opcode::Nor => vec![Field::rA(GPR(
-                (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _,
-            ))],
-            Opcode::Or => vec![Field::rA(GPR(
-                (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _,
-            ))],
-            Opcode::Orc => vec![Field::rA(GPR(
-                (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _,
-            ))],
-            Opcode::Ori => vec![Field::rA(GPR(
-                (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _,
-            ))],
-            Opcode::Oris => vec![Field::rA(GPR(
-                (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _,
-            ))],
-            Opcode::PsqL => vec![Field::frD(FPR(
-                (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _,
-            ))],
+            Opcode::Mulhw => vec![Field::rD(GPR(((self.code >> 21u8) & 0x1f) as _))],
+            Opcode::Mulhwu => vec![Field::rD(GPR(((self.code >> 21u8) & 0x1f) as _))],
+            Opcode::Mulli => vec![Field::rD(GPR(((self.code >> 21u8) & 0x1f) as _))],
+            Opcode::Mullw => vec![Field::rD(GPR(((self.code >> 21u8) & 0x1f) as _))],
+            Opcode::Nand => vec![Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _))],
+            Opcode::Neg => vec![Field::rD(GPR(((self.code >> 21u8) & 0x1f) as _))],
+            Opcode::Nor => vec![Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _))],
+            Opcode::Or => vec![Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _))],
+            Opcode::Orc => vec![Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _))],
+            Opcode::Ori => vec![Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _))],
+            Opcode::Oris => vec![Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _))],
+            Opcode::PsqL => vec![Field::frD(FPR(((self.code >> 21u8) & 0x1f) as _))],
             Opcode::PsqLu => vec![
-                Field::frD(FPR(
-                    (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::rA(GPR(
-                    (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                )),
+                Field::frD(FPR(((self.code >> 21u8) & 0x1f) as _)),
+                Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
             ],
             Opcode::PsqLux => vec![
-                Field::frD(FPR(
-                    (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                )),
-                Field::rA(GPR(
-                    (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                )),
+                Field::frD(FPR(((self.code >> 21u8) & 0x1f) as _)),
+                Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
             ],
-            Opcode::PsqLx => vec![Field::frD(FPR(
-                (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-            ))],
+            Opcode::PsqLx => vec![Field::frD(FPR(((self.code >> 21u8) & 0x1f) as _))],
             Opcode::PsqSt => vec![],
-            Opcode::PsqStu => vec![Field::rA(GPR(
-                (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-            ))],
-            Opcode::PsqStux => vec![Field::rA(GPR(
-                (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-            ))],
+            Opcode::PsqStu => vec![Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _))],
+            Opcode::PsqStux => vec![Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _))],
             Opcode::PsqStx => vec![],
-            Opcode::PsAbs => vec![Field::frD(FPR(
-                (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-            ))],
-            Opcode::PsAdd => vec![Field::frD(FPR(
-                (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-            ))],
-            Opcode::PsCmpo0 => vec![Field::crfD(CRBit(
-                (((self.code) >> (32 - 9u8)) & ((1 << 3usize) - 1)) as _,
-            ))],
-            Opcode::PsCmpo1 => vec![Field::crfD(CRBit(
-                (((self.code) >> (32 - 9u8)) & ((1 << 3usize) - 1)) as _,
-            ))],
-            Opcode::PsCmpu0 => vec![Field::crfD(CRBit(
-                (((self.code) >> (32 - 9u8)) & ((1 << 3usize) - 1)) as _,
-            ))],
-            Opcode::PsCmpu1 => vec![Field::crfD(CRBit(
-                (((self.code) >> (32 - 9u8)) & ((1 << 3usize) - 1)) as _,
-            ))],
-            Opcode::PsDiv => vec![Field::frD(FPR(
-                (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-            ))],
-            Opcode::PsMadd => vec![Field::frD(FPR(
-                (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-            ))],
-            Opcode::PsMadds0 => vec![Field::frD(FPR(
-                (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-            ))],
-            Opcode::PsMadds1 => vec![Field::frD(FPR(
-                (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-            ))],
-            Opcode::PsMerge00 => vec![Field::frD(FPR(
-                (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-            ))],
-            Opcode::PsMerge01 => vec![Field::frD(FPR(
-                (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-            ))],
-            Opcode::PsMerge10 => vec![Field::frD(FPR(
-                (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-            ))],
-            Opcode::PsMerge11 => vec![Field::frD(FPR(
-                (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-            ))],
-            Opcode::PsMr => vec![Field::frD(FPR(
-                (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _,
-            ))],
-            Opcode::PsMsub => vec![Field::frD(FPR(
-                (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-            ))],
-            Opcode::PsMul => vec![Field::frD(FPR(
-                (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-            ))],
-            Opcode::PsMuls0 => vec![Field::frD(FPR(
-                (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-            ))],
-            Opcode::PsMuls1 => vec![Field::frD(FPR(
-                (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-            ))],
-            Opcode::PsNabs => vec![Field::frD(FPR(
-                (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-            ))],
-            Opcode::PsNeg => vec![Field::frD(FPR(
-                (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-            ))],
-            Opcode::PsNmadd => vec![Field::frD(FPR(
-                (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-            ))],
-            Opcode::PsNmsub => vec![Field::frD(FPR(
-                (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-            ))],
-            Opcode::PsRes => vec![Field::frD(FPR(
-                (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-            ))],
-            Opcode::PsRsqrte => vec![Field::frD(FPR(
-                (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-            ))],
-            Opcode::PsSel => vec![Field::frD(FPR(
-                (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-            ))],
-            Opcode::PsSub => vec![Field::frD(FPR(
-                (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-            ))],
-            Opcode::PsSum0 => vec![Field::frD(FPR(
-                (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-            ))],
-            Opcode::PsSum1 => vec![Field::frD(FPR(
-                (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-            ))],
+            Opcode::PsAbs => vec![Field::frD(FPR(((self.code >> 21u8) & 0x1f) as _))],
+            Opcode::PsAdd => vec![Field::frD(FPR(((self.code >> 21u8) & 0x1f) as _))],
+            Opcode::PsCmpo0 => vec![Field::crfD(CRBit(((self.code >> 23u8) & 0x7) as _))],
+            Opcode::PsCmpo1 => vec![Field::crfD(CRBit(((self.code >> 23u8) & 0x7) as _))],
+            Opcode::PsCmpu0 => vec![Field::crfD(CRBit(((self.code >> 23u8) & 0x7) as _))],
+            Opcode::PsCmpu1 => vec![Field::crfD(CRBit(((self.code >> 23u8) & 0x7) as _))],
+            Opcode::PsDiv => vec![Field::frD(FPR(((self.code >> 21u8) & 0x1f) as _))],
+            Opcode::PsMadd => vec![Field::frD(FPR(((self.code >> 21u8) & 0x1f) as _))],
+            Opcode::PsMadds0 => vec![Field::frD(FPR(((self.code >> 21u8) & 0x1f) as _))],
+            Opcode::PsMadds1 => vec![Field::frD(FPR(((self.code >> 21u8) & 0x1f) as _))],
+            Opcode::PsMerge00 => vec![Field::frD(FPR(((self.code >> 21u8) & 0x1f) as _))],
+            Opcode::PsMerge01 => vec![Field::frD(FPR(((self.code >> 21u8) & 0x1f) as _))],
+            Opcode::PsMerge10 => vec![Field::frD(FPR(((self.code >> 21u8) & 0x1f) as _))],
+            Opcode::PsMerge11 => vec![Field::frD(FPR(((self.code >> 21u8) & 0x1f) as _))],
+            Opcode::PsMr => vec![Field::frD(FPR(((self.code >> 21u8) & 0x1f) as _))],
+            Opcode::PsMsub => vec![Field::frD(FPR(((self.code >> 21u8) & 0x1f) as _))],
+            Opcode::PsMul => vec![Field::frD(FPR(((self.code >> 21u8) & 0x1f) as _))],
+            Opcode::PsMuls0 => vec![Field::frD(FPR(((self.code >> 21u8) & 0x1f) as _))],
+            Opcode::PsMuls1 => vec![Field::frD(FPR(((self.code >> 21u8) & 0x1f) as _))],
+            Opcode::PsNabs => vec![Field::frD(FPR(((self.code >> 21u8) & 0x1f) as _))],
+            Opcode::PsNeg => vec![Field::frD(FPR(((self.code >> 21u8) & 0x1f) as _))],
+            Opcode::PsNmadd => vec![Field::frD(FPR(((self.code >> 21u8) & 0x1f) as _))],
+            Opcode::PsNmsub => vec![Field::frD(FPR(((self.code >> 21u8) & 0x1f) as _))],
+            Opcode::PsRes => vec![Field::frD(FPR(((self.code >> 21u8) & 0x1f) as _))],
+            Opcode::PsRsqrte => vec![Field::frD(FPR(((self.code >> 21u8) & 0x1f) as _))],
+            Opcode::PsSel => vec![Field::frD(FPR(((self.code >> 21u8) & 0x1f) as _))],
+            Opcode::PsSub => vec![Field::frD(FPR(((self.code >> 21u8) & 0x1f) as _))],
+            Opcode::PsSum0 => vec![Field::frD(FPR(((self.code >> 21u8) & 0x1f) as _))],
+            Opcode::PsSum1 => vec![Field::frD(FPR(((self.code >> 21u8) & 0x1f) as _))],
             Opcode::Rfi => vec![],
-            Opcode::Rlwimi => vec![Field::rA(GPR(
-                (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-            ))],
-            Opcode::Rlwinm => vec![Field::rA(GPR(
-                (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-            ))],
-            Opcode::Rlwnm => vec![Field::rA(GPR(
-                (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _,
-            ))],
+            Opcode::Rlwimi => vec![Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _))],
+            Opcode::Rlwinm => vec![Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _))],
+            Opcode::Rlwnm => vec![Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _))],
             Opcode::Sc => vec![],
-            Opcode::Slw => vec![Field::rA(GPR(
-                (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _,
-            ))],
-            Opcode::Sraw => vec![Field::rA(GPR(
-                (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _,
-            ))],
-            Opcode::Srawi => vec![Field::rA(GPR(
-                (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _,
-            ))],
-            Opcode::Srw => vec![Field::rA(GPR(
-                (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _,
-            ))],
+            Opcode::Slw => vec![Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _))],
+            Opcode::Sraw => vec![Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _))],
+            Opcode::Srawi => vec![Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _))],
+            Opcode::Srw => vec![Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _))],
             Opcode::Stb => vec![],
-            Opcode::Stbu => vec![Field::rA(GPR(
-                (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _,
-            ))],
-            Opcode::Stbux => vec![Field::rA(GPR(
-                (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _,
-            ))],
+            Opcode::Stbu => vec![Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _))],
+            Opcode::Stbux => vec![Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _))],
             Opcode::Stbx => vec![],
             Opcode::Stfd => vec![],
-            Opcode::Stfdu => vec![Field::rA(GPR(
-                (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _,
-            ))],
-            Opcode::Stfdux => vec![Field::rA(GPR(
-                (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-            ))],
+            Opcode::Stfdu => vec![Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _))],
+            Opcode::Stfdux => vec![Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _))],
             Opcode::Stfdx => vec![],
             Opcode::Stfiwx => vec![],
             Opcode::Stfs => vec![],
-            Opcode::Stfsu => vec![Field::rA(GPR(
-                (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _,
-            ))],
-            Opcode::Stfsux => vec![Field::rA(GPR(
-                (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-            ))],
+            Opcode::Stfsu => vec![Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _))],
+            Opcode::Stfsux => vec![Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _))],
             Opcode::Stfsx => vec![],
             Opcode::Sth => vec![],
             Opcode::Sthbrx => vec![],
-            Opcode::Sthu => vec![Field::rA(GPR(
-                (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _,
-            ))],
-            Opcode::Sthux => vec![Field::rA(GPR(
-                (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _,
-            ))],
+            Opcode::Sthu => vec![Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _))],
+            Opcode::Sthux => vec![Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _))],
             Opcode::Sthx => vec![],
             Opcode::Stmw => vec![],
             Opcode::Stswi => vec![],
@@ -4078,45 +2472,23 @@ impl Ins {
             Opcode::Stw => vec![],
             Opcode::Stwbrx => vec![],
             Opcode::Stwcx_ => vec![],
-            Opcode::Stwu => vec![Field::rA(GPR(
-                (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _,
-            ))],
-            Opcode::Stwux => vec![Field::rA(GPR(
-                (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _,
-            ))],
+            Opcode::Stwu => vec![Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _))],
+            Opcode::Stwux => vec![Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _))],
             Opcode::Stwx => vec![],
-            Opcode::Subf => vec![Field::rD(GPR(
-                (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _,
-            ))],
-            Opcode::Subfc => vec![Field::rD(GPR(
-                (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _,
-            ))],
-            Opcode::Subfe => vec![Field::rD(GPR(
-                (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _,
-            ))],
-            Opcode::Subfic => vec![Field::rD(GPR(
-                (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-            ))],
-            Opcode::Subfme => vec![Field::rD(GPR(
-                (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-            ))],
-            Opcode::Subfze => vec![Field::rD(GPR(
-                (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-            ))],
+            Opcode::Subf => vec![Field::rD(GPR(((self.code >> 21u8) & 0x1f) as _))],
+            Opcode::Subfc => vec![Field::rD(GPR(((self.code >> 21u8) & 0x1f) as _))],
+            Opcode::Subfe => vec![Field::rD(GPR(((self.code >> 21u8) & 0x1f) as _))],
+            Opcode::Subfic => vec![Field::rD(GPR(((self.code >> 21u8) & 0x1f) as _))],
+            Opcode::Subfme => vec![Field::rD(GPR(((self.code >> 21u8) & 0x1f) as _))],
+            Opcode::Subfze => vec![Field::rD(GPR(((self.code >> 21u8) & 0x1f) as _))],
             Opcode::Sync => vec![],
             Opcode::Tlbie => vec![],
             Opcode::Tlbsync => vec![],
             Opcode::Tw => vec![],
             Opcode::Twi => vec![],
-            Opcode::Xor => vec![Field::rA(GPR(
-                (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _,
-            ))],
-            Opcode::Xori => vec![Field::rA(GPR(
-                (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _,
-            ))],
-            Opcode::Xoris => vec![Field::rA(GPR(
-                (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _,
-            ))],
+            Opcode::Xor => vec![Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _))],
+            Opcode::Xori => vec![Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _))],
+            Opcode::Xoris => vec![Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _))],
         }
     }
     #[allow(unused_mut)]
@@ -4125,111 +2497,75 @@ impl Ins {
             Opcode::Illegal => vec![],
             Opcode::Add => {
                 let mut uses = vec![
-                    Field::rA(GPR(
-                        (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                    )),
-                    Field::rB(GPR(
-                        (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                    )),
+                    Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
+                    Field::rB(GPR(((self.code >> 11u8) & 0x1f) as _)),
                 ];
                 uses
             }
             Opcode::Addc => {
                 let mut uses = vec![
-                    Field::rA(GPR(
-                        (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                    )),
-                    Field::rB(GPR(
-                        (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                    )),
+                    Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
+                    Field::rB(GPR(((self.code >> 11u8) & 0x1f) as _)),
                 ];
                 uses
             }
             Opcode::Adde => {
                 let mut uses = vec![
-                    Field::rA(GPR(
-                        (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                    )),
-                    Field::rB(GPR(
-                        (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                    )),
+                    Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
+                    Field::rB(GPR(((self.code >> 11u8) & 0x1f) as _)),
                 ];
                 uses
             }
             Opcode::Addi => {
                 let mut uses = vec![];
-                if (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) != 0 {
-                    uses.push(Field::rA(GPR(
-                        (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _,
-                    )));
+                if ((self.code >> 16u8) & 0x1f) != 0 {
+                    uses.push(Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)));
                 }
                 uses
             }
             Opcode::Addic => {
-                let mut uses = vec![Field::rA(GPR((((self.code) >> (32 - 16u8))
-                    & ((1 << 5usize) - 1))
-                    as _))];
+                let mut uses = vec![Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _))];
                 uses
             }
             Opcode::Addic_ => {
-                let mut uses = vec![Field::rA(GPR((((self.code) >> (32 - 16u8))
-                    & ((1 << 5usize) - 1))
-                    as _))];
+                let mut uses = vec![Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _))];
                 uses
             }
             Opcode::Addis => {
                 let mut uses = vec![];
-                if (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) != 0 {
-                    uses.push(Field::rA(GPR(
-                        (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _,
-                    )));
+                if ((self.code >> 16u8) & 0x1f) != 0 {
+                    uses.push(Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)));
                 }
                 uses
             }
             Opcode::Addme => {
-                let mut uses = vec![Field::rA(GPR((((self.code) >> (32 - 16u8))
-                    & ((1 << 5usize) - 1))
-                    as _))];
+                let mut uses = vec![Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _))];
                 uses
             }
             Opcode::Addze => {
-                let mut uses = vec![Field::rA(GPR((((self.code) >> (32 - 16u8))
-                    & ((1 << 5usize) - 1))
-                    as _))];
+                let mut uses = vec![Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _))];
                 uses
             }
             Opcode::And => {
                 let mut uses = vec![
-                    Field::rS(GPR(
-                        (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                    )),
-                    Field::rB(GPR(
-                        (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                    )),
+                    Field::rS(GPR(((self.code >> 21u8) & 0x1f) as _)),
+                    Field::rB(GPR(((self.code >> 11u8) & 0x1f) as _)),
                 ];
                 uses
             }
             Opcode::Andc => {
                 let mut uses = vec![
-                    Field::rS(GPR(
-                        (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                    )),
-                    Field::rB(GPR(
-                        (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                    )),
+                    Field::rS(GPR(((self.code >> 21u8) & 0x1f) as _)),
+                    Field::rB(GPR(((self.code >> 11u8) & 0x1f) as _)),
                 ];
                 uses
             }
             Opcode::Andi_ => {
-                let mut uses = vec![Field::rB(GPR((((self.code) >> (32 - 21u8))
-                    & ((1 << 5usize) - 1))
-                    as _))];
+                let mut uses = vec![Field::rB(GPR(((self.code >> 11u8) & 0x1f) as _))];
                 uses
             }
             Opcode::Andis_ => {
-                let mut uses = vec![Field::rB(GPR((((self.code) >> (32 - 21u8))
-                    & ((1 << 5usize) - 1))
-                    as _))];
+                let mut uses = vec![Field::rB(GPR(((self.code >> 11u8) & 0x1f) as _))];
                 uses
             }
             Opcode::B => {
@@ -4250,255 +2586,163 @@ impl Ins {
             }
             Opcode::Cmp => {
                 let mut uses = vec![
-                    Field::rA(GPR(
-                        (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                    )),
-                    Field::rB(GPR(
-                        (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                    )),
+                    Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
+                    Field::rB(GPR(((self.code >> 11u8) & 0x1f) as _)),
                 ];
                 uses
             }
             Opcode::Cmpi => {
-                let mut uses = vec![Field::rA(GPR((((self.code) >> (32 - 16u8))
-                    & ((1 << 5usize) - 1))
-                    as _))];
+                let mut uses = vec![Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _))];
                 uses
             }
             Opcode::Cmpl => {
                 let mut uses = vec![
-                    Field::rA(GPR(
-                        (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                    )),
-                    Field::rB(GPR(
-                        (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                    )),
+                    Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
+                    Field::rB(GPR(((self.code >> 11u8) & 0x1f) as _)),
                 ];
                 uses
             }
             Opcode::Cmpli => {
-                let mut uses = vec![Field::rA(GPR((((self.code) >> (32 - 16u8))
-                    & ((1 << 5usize) - 1))
-                    as _))];
+                let mut uses = vec![Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _))];
                 uses
             }
             Opcode::Cntlzw => {
-                let mut uses = vec![Field::rS(GPR((((self.code) >> (32 - 11u8))
-                    & ((1 << 5usize) - 1))
-                    as _))];
+                let mut uses = vec![Field::rS(GPR(((self.code >> 21u8) & 0x1f) as _))];
                 uses
             }
             Opcode::Crand => {
                 let mut uses = vec![
-                    Field::crbA(CRField(
-                        (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _,
-                    )),
-                    Field::crbB(CRField(
-                        (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _,
-                    )),
+                    Field::crbA(CRField(((self.code >> 16u8) & 0x1f) as _)),
+                    Field::crbB(CRField(((self.code >> 11u8) & 0x1f) as _)),
                 ];
                 uses
             }
             Opcode::Crandc => {
                 let mut uses = vec![
-                    Field::crbA(CRField(
-                        (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _,
-                    )),
-                    Field::crbB(CRField(
-                        (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _,
-                    )),
+                    Field::crbA(CRField(((self.code >> 16u8) & 0x1f) as _)),
+                    Field::crbB(CRField(((self.code >> 11u8) & 0x1f) as _)),
                 ];
                 uses
             }
             Opcode::Creqv => {
                 let mut uses = vec![
-                    Field::crbA(CRField(
-                        (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _,
-                    )),
-                    Field::crbB(CRField(
-                        (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _,
-                    )),
+                    Field::crbA(CRField(((self.code >> 16u8) & 0x1f) as _)),
+                    Field::crbB(CRField(((self.code >> 11u8) & 0x1f) as _)),
                 ];
                 uses
             }
             Opcode::Crnand => {
                 let mut uses = vec![
-                    Field::crbA(CRField(
-                        (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _,
-                    )),
-                    Field::crbB(CRField(
-                        (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _,
-                    )),
+                    Field::crbA(CRField(((self.code >> 16u8) & 0x1f) as _)),
+                    Field::crbB(CRField(((self.code >> 11u8) & 0x1f) as _)),
                 ];
                 uses
             }
             Opcode::Crnor => {
                 let mut uses = vec![
-                    Field::crbA(CRField(
-                        (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _,
-                    )),
-                    Field::crbB(CRField(
-                        (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _,
-                    )),
+                    Field::crbA(CRField(((self.code >> 16u8) & 0x1f) as _)),
+                    Field::crbB(CRField(((self.code >> 11u8) & 0x1f) as _)),
                 ];
                 uses
             }
             Opcode::Cror => {
                 let mut uses = vec![
-                    Field::crbA(CRField(
-                        (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _,
-                    )),
-                    Field::crbB(CRField(
-                        (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _,
-                    )),
+                    Field::crbA(CRField(((self.code >> 16u8) & 0x1f) as _)),
+                    Field::crbB(CRField(((self.code >> 11u8) & 0x1f) as _)),
                 ];
                 uses
             }
             Opcode::Crorc => {
                 let mut uses = vec![
-                    Field::crbA(CRField(
-                        (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _,
-                    )),
-                    Field::crbB(CRField(
-                        (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _,
-                    )),
+                    Field::crbA(CRField(((self.code >> 16u8) & 0x1f) as _)),
+                    Field::crbB(CRField(((self.code >> 11u8) & 0x1f) as _)),
                 ];
                 uses
             }
             Opcode::Crxor => {
                 let mut uses = vec![
-                    Field::crbA(CRField(
-                        (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _,
-                    )),
-                    Field::crbB(CRField(
-                        (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _,
-                    )),
+                    Field::crbA(CRField(((self.code >> 16u8) & 0x1f) as _)),
+                    Field::crbB(CRField(((self.code >> 11u8) & 0x1f) as _)),
                 ];
                 uses
             }
             Opcode::Dcbf => {
-                let mut uses = vec![Field::rB(GPR((((self.code) >> (32 - 21u8))
-                    & ((1 << 5usize) - 1))
-                    as _))];
-                if (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) != 0 {
-                    uses.push(Field::rA(GPR(
-                        (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _,
-                    )));
+                let mut uses = vec![Field::rB(GPR(((self.code >> 11u8) & 0x1f) as _))];
+                if ((self.code >> 16u8) & 0x1f) != 0 {
+                    uses.push(Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)));
                 }
                 uses
             }
             Opcode::Dcbi => {
-                let mut uses = vec![Field::rB(GPR((((self.code) >> (32 - 21u8))
-                    & ((1 << 5usize) - 1))
-                    as _))];
-                if (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) != 0 {
-                    uses.push(Field::rA(GPR(
-                        (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _,
-                    )));
+                let mut uses = vec![Field::rB(GPR(((self.code >> 11u8) & 0x1f) as _))];
+                if ((self.code >> 16u8) & 0x1f) != 0 {
+                    uses.push(Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)));
                 }
                 uses
             }
             Opcode::Dcbst => {
-                let mut uses = vec![Field::rB(GPR((((self.code) >> (32 - 21u8))
-                    & ((1 << 5usize) - 1))
-                    as _))];
-                if (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) != 0 {
-                    uses.push(Field::rA(GPR(
-                        (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _,
-                    )));
+                let mut uses = vec![Field::rB(GPR(((self.code >> 11u8) & 0x1f) as _))];
+                if ((self.code >> 16u8) & 0x1f) != 0 {
+                    uses.push(Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)));
                 }
                 uses
             }
             Opcode::Dcbt => {
-                let mut uses = vec![Field::rB(GPR((((self.code) >> (32 - 21u8))
-                    & ((1 << 5usize) - 1))
-                    as _))];
-                if (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) != 0 {
-                    uses.push(Field::rA(GPR(
-                        (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _,
-                    )));
+                let mut uses = vec![Field::rB(GPR(((self.code >> 11u8) & 0x1f) as _))];
+                if ((self.code >> 16u8) & 0x1f) != 0 {
+                    uses.push(Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)));
                 }
                 uses
             }
             Opcode::Dcbtst => {
-                let mut uses = vec![Field::rB(GPR((((self.code) >> (32 - 21u8))
-                    & ((1 << 5usize) - 1))
-                    as _))];
-                if (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) != 0 {
-                    uses.push(Field::rA(GPR(
-                        (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _,
-                    )));
+                let mut uses = vec![Field::rB(GPR(((self.code >> 11u8) & 0x1f) as _))];
+                if ((self.code >> 16u8) & 0x1f) != 0 {
+                    uses.push(Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)));
                 }
                 uses
             }
             Opcode::Dcbz => {
-                let mut uses = vec![Field::rB(GPR((((self.code) >> (32 - 21u8))
-                    & ((1 << 5usize) - 1))
-                    as _))];
-                if (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) != 0 {
-                    uses.push(Field::rA(GPR(
-                        (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _,
-                    )));
+                let mut uses = vec![Field::rB(GPR(((self.code >> 11u8) & 0x1f) as _))];
+                if ((self.code >> 16u8) & 0x1f) != 0 {
+                    uses.push(Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)));
                 }
                 uses
             }
             Opcode::DcbzL => {
-                let mut uses = vec![Field::rB(GPR((((self.code) >> (32 - 21u8))
-                    & ((1 << 5usize) - 1))
-                    as _))];
-                if (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) != 0 {
-                    uses.push(Field::rA(GPR(
-                        (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _,
-                    )));
+                let mut uses = vec![Field::rB(GPR(((self.code >> 11u8) & 0x1f) as _))];
+                if ((self.code >> 16u8) & 0x1f) != 0 {
+                    uses.push(Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)));
                 }
                 uses
             }
             Opcode::Divw => {
                 let mut uses = vec![
-                    Field::rA(GPR(
-                        (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                    )),
-                    Field::rB(GPR(
-                        (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                    )),
+                    Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
+                    Field::rB(GPR(((self.code >> 11u8) & 0x1f) as _)),
                 ];
                 uses
             }
             Opcode::Divwu => {
                 let mut uses = vec![
-                    Field::rA(GPR(
-                        (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                    )),
-                    Field::rB(GPR(
-                        (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                    )),
+                    Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
+                    Field::rB(GPR(((self.code >> 11u8) & 0x1f) as _)),
                 ];
                 uses
             }
             Opcode::Eciwx => {
-                let mut uses = vec![Field::rB(GPR((((self.code) >> (32 - 21u8))
-                    & ((1 << 5usize) - 1))
-                    as _))];
-                if (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) != 0 {
-                    uses.push(Field::rA(GPR(
-                        (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _,
-                    )));
+                let mut uses = vec![Field::rB(GPR(((self.code >> 11u8) & 0x1f) as _))];
+                if ((self.code >> 16u8) & 0x1f) != 0 {
+                    uses.push(Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)));
                 }
                 uses
             }
             Opcode::Ecowx => {
                 let mut uses = vec![
-                    Field::rS(GPR(
-                        (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                    )),
-                    Field::rB(GPR(
-                        (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                    )),
+                    Field::rS(GPR(((self.code >> 21u8) & 0x1f) as _)),
+                    Field::rB(GPR(((self.code >> 11u8) & 0x1f) as _)),
                 ];
-                if (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) != 0 {
-                    uses.push(Field::rA(GPR(
-                        (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _,
-                    )));
+                if ((self.code >> 16u8) & 0x1f) != 0 {
+                    uses.push(Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)));
                 }
                 uses
             }
@@ -4508,325 +2752,201 @@ impl Ins {
             }
             Opcode::Eqv => {
                 let mut uses = vec![
-                    Field::rS(GPR(
-                        (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                    )),
-                    Field::rB(GPR(
-                        (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                    )),
+                    Field::rS(GPR(((self.code >> 21u8) & 0x1f) as _)),
+                    Field::rB(GPR(((self.code >> 11u8) & 0x1f) as _)),
                 ];
                 uses
             }
             Opcode::Extsb => {
-                let mut uses = vec![Field::rS(GPR((((self.code) >> (32 - 11u8))
-                    & ((1 << 5usize) - 1))
-                    as _))];
+                let mut uses = vec![Field::rS(GPR(((self.code >> 21u8) & 0x1f) as _))];
                 uses
             }
             Opcode::Extsh => {
-                let mut uses = vec![Field::rS(GPR((((self.code) >> (32 - 11u8))
-                    & ((1 << 5usize) - 1))
-                    as _))];
+                let mut uses = vec![Field::rS(GPR(((self.code >> 21u8) & 0x1f) as _))];
                 uses
             }
             Opcode::Fabs => {
-                let mut uses = vec![Field::frB(FPR((((self.code) >> (32 - 21u8))
-                    & ((1 << 5usize) - 1))
-                    as _))];
+                let mut uses = vec![Field::frB(FPR(((self.code >> 11u8) & 0x1f) as _))];
                 uses
             }
             Opcode::Fadd => {
                 let mut uses = vec![
-                    Field::frA(FPR(
-                        (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                    )),
-                    Field::frB(FPR(
-                        (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                    )),
+                    Field::frA(FPR(((self.code >> 16u8) & 0x1f) as _)),
+                    Field::frB(FPR(((self.code >> 11u8) & 0x1f) as _)),
                 ];
                 uses
             }
             Opcode::Fadds => {
                 let mut uses = vec![
-                    Field::frA(FPR(
-                        (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                    )),
-                    Field::frB(FPR(
-                        (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                    )),
+                    Field::frA(FPR(((self.code >> 16u8) & 0x1f) as _)),
+                    Field::frB(FPR(((self.code >> 11u8) & 0x1f) as _)),
                 ];
                 uses
             }
             Opcode::Fcmpo => {
                 let mut uses = vec![
-                    Field::frA(FPR(
-                        (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                    )),
-                    Field::frB(FPR(
-                        (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                    )),
+                    Field::frA(FPR(((self.code >> 16u8) & 0x1f) as _)),
+                    Field::frB(FPR(((self.code >> 11u8) & 0x1f) as _)),
                 ];
                 uses
             }
             Opcode::Fcmpu => {
                 let mut uses = vec![
-                    Field::frA(FPR(
-                        (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                    )),
-                    Field::frB(FPR(
-                        (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                    )),
+                    Field::frA(FPR(((self.code >> 16u8) & 0x1f) as _)),
+                    Field::frB(FPR(((self.code >> 11u8) & 0x1f) as _)),
                 ];
                 uses
             }
             Opcode::Fctiw => {
-                let mut uses = vec![Field::frB(FPR((((self.code) >> (32 - 21u8))
-                    & ((1 << 5usize) - 1))
-                    as _))];
+                let mut uses = vec![Field::frB(FPR(((self.code >> 11u8) & 0x1f) as _))];
                 uses
             }
             Opcode::Fctiwz => {
-                let mut uses = vec![Field::frB(FPR((((self.code) >> (32 - 21u8))
-                    & ((1 << 5usize) - 1))
-                    as _))];
+                let mut uses = vec![Field::frB(FPR(((self.code >> 11u8) & 0x1f) as _))];
                 uses
             }
             Opcode::Fdiv => {
                 let mut uses = vec![
-                    Field::frA(FPR(
-                        (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                    )),
-                    Field::frB(FPR(
-                        (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                    )),
+                    Field::frA(FPR(((self.code >> 16u8) & 0x1f) as _)),
+                    Field::frB(FPR(((self.code >> 11u8) & 0x1f) as _)),
                 ];
                 uses
             }
             Opcode::Fdivs => {
                 let mut uses = vec![
-                    Field::frA(FPR(
-                        (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                    )),
-                    Field::frB(FPR(
-                        (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                    )),
+                    Field::frA(FPR(((self.code >> 16u8) & 0x1f) as _)),
+                    Field::frB(FPR(((self.code >> 11u8) & 0x1f) as _)),
                 ];
                 uses
             }
             Opcode::Fmadd => {
                 let mut uses = vec![
-                    Field::frA(FPR(
-                        (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                    )),
-                    Field::frC(FPR(
-                        (((self.code) >> (32 - 26u8)) & ((1 << 5usize) - 1)) as _
-                    )),
-                    Field::frB(FPR(
-                        (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                    )),
+                    Field::frA(FPR(((self.code >> 16u8) & 0x1f) as _)),
+                    Field::frC(FPR(((self.code >> 6u8) & 0x1f) as _)),
+                    Field::frB(FPR(((self.code >> 11u8) & 0x1f) as _)),
                 ];
                 uses
             }
             Opcode::Fmadds => {
                 let mut uses = vec![
-                    Field::frA(FPR(
-                        (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                    )),
-                    Field::frC(FPR(
-                        (((self.code) >> (32 - 26u8)) & ((1 << 5usize) - 1)) as _
-                    )),
-                    Field::frB(FPR(
-                        (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                    )),
+                    Field::frA(FPR(((self.code >> 16u8) & 0x1f) as _)),
+                    Field::frC(FPR(((self.code >> 6u8) & 0x1f) as _)),
+                    Field::frB(FPR(((self.code >> 11u8) & 0x1f) as _)),
                 ];
                 uses
             }
             Opcode::Fmr => {
-                let mut uses = vec![Field::frB(FPR((((self.code) >> (32 - 21u8))
-                    & ((1 << 5usize) - 1))
-                    as _))];
+                let mut uses = vec![Field::frB(FPR(((self.code >> 11u8) & 0x1f) as _))];
                 uses
             }
             Opcode::Fmsub => {
                 let mut uses = vec![
-                    Field::frA(FPR(
-                        (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                    )),
-                    Field::frC(FPR(
-                        (((self.code) >> (32 - 26u8)) & ((1 << 5usize) - 1)) as _
-                    )),
-                    Field::frB(FPR(
-                        (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                    )),
+                    Field::frA(FPR(((self.code >> 16u8) & 0x1f) as _)),
+                    Field::frC(FPR(((self.code >> 6u8) & 0x1f) as _)),
+                    Field::frB(FPR(((self.code >> 11u8) & 0x1f) as _)),
                 ];
                 uses
             }
             Opcode::Fmsubs => {
                 let mut uses = vec![
-                    Field::frA(FPR(
-                        (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                    )),
-                    Field::frC(FPR(
-                        (((self.code) >> (32 - 26u8)) & ((1 << 5usize) - 1)) as _
-                    )),
-                    Field::frB(FPR(
-                        (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                    )),
+                    Field::frA(FPR(((self.code >> 16u8) & 0x1f) as _)),
+                    Field::frC(FPR(((self.code >> 6u8) & 0x1f) as _)),
+                    Field::frB(FPR(((self.code >> 11u8) & 0x1f) as _)),
                 ];
                 uses
             }
             Opcode::Fmul => {
                 let mut uses = vec![
-                    Field::frA(FPR(
-                        (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                    )),
-                    Field::frC(FPR(
-                        (((self.code) >> (32 - 26u8)) & ((1 << 5usize) - 1)) as _
-                    )),
+                    Field::frA(FPR(((self.code >> 16u8) & 0x1f) as _)),
+                    Field::frC(FPR(((self.code >> 6u8) & 0x1f) as _)),
                 ];
                 uses
             }
             Opcode::Fmuls => {
                 let mut uses = vec![
-                    Field::frA(FPR(
-                        (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                    )),
-                    Field::frC(FPR(
-                        (((self.code) >> (32 - 26u8)) & ((1 << 5usize) - 1)) as _
-                    )),
+                    Field::frA(FPR(((self.code >> 16u8) & 0x1f) as _)),
+                    Field::frC(FPR(((self.code >> 6u8) & 0x1f) as _)),
                 ];
                 uses
             }
             Opcode::Fnabs => {
-                let mut uses = vec![Field::frB(FPR((((self.code) >> (32 - 21u8))
-                    & ((1 << 5usize) - 1))
-                    as _))];
+                let mut uses = vec![Field::frB(FPR(((self.code >> 11u8) & 0x1f) as _))];
                 uses
             }
             Opcode::Fneg => {
-                let mut uses = vec![Field::frB(FPR((((self.code) >> (32 - 21u8))
-                    & ((1 << 5usize) - 1))
-                    as _))];
+                let mut uses = vec![Field::frB(FPR(((self.code >> 11u8) & 0x1f) as _))];
                 uses
             }
             Opcode::Fnmadd => {
                 let mut uses = vec![
-                    Field::frA(FPR(
-                        (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                    )),
-                    Field::frC(FPR(
-                        (((self.code) >> (32 - 26u8)) & ((1 << 5usize) - 1)) as _
-                    )),
-                    Field::frB(FPR(
-                        (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                    )),
+                    Field::frA(FPR(((self.code >> 16u8) & 0x1f) as _)),
+                    Field::frC(FPR(((self.code >> 6u8) & 0x1f) as _)),
+                    Field::frB(FPR(((self.code >> 11u8) & 0x1f) as _)),
                 ];
                 uses
             }
             Opcode::Fnmadds => {
                 let mut uses = vec![
-                    Field::frA(FPR(
-                        (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                    )),
-                    Field::frC(FPR(
-                        (((self.code) >> (32 - 26u8)) & ((1 << 5usize) - 1)) as _
-                    )),
-                    Field::frB(FPR(
-                        (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                    )),
+                    Field::frA(FPR(((self.code >> 16u8) & 0x1f) as _)),
+                    Field::frC(FPR(((self.code >> 6u8) & 0x1f) as _)),
+                    Field::frB(FPR(((self.code >> 11u8) & 0x1f) as _)),
                 ];
                 uses
             }
             Opcode::Fnmsub => {
                 let mut uses = vec![
-                    Field::frA(FPR(
-                        (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                    )),
-                    Field::frC(FPR(
-                        (((self.code) >> (32 - 26u8)) & ((1 << 5usize) - 1)) as _
-                    )),
-                    Field::frB(FPR(
-                        (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                    )),
+                    Field::frA(FPR(((self.code >> 16u8) & 0x1f) as _)),
+                    Field::frC(FPR(((self.code >> 6u8) & 0x1f) as _)),
+                    Field::frB(FPR(((self.code >> 11u8) & 0x1f) as _)),
                 ];
                 uses
             }
             Opcode::Fnmsubs => {
                 let mut uses = vec![
-                    Field::frA(FPR(
-                        (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                    )),
-                    Field::frC(FPR(
-                        (((self.code) >> (32 - 26u8)) & ((1 << 5usize) - 1)) as _
-                    )),
-                    Field::frB(FPR(
-                        (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                    )),
+                    Field::frA(FPR(((self.code >> 16u8) & 0x1f) as _)),
+                    Field::frC(FPR(((self.code >> 6u8) & 0x1f) as _)),
+                    Field::frB(FPR(((self.code >> 11u8) & 0x1f) as _)),
                 ];
                 uses
             }
             Opcode::Fres => {
-                let mut uses = vec![Field::frB(FPR((((self.code) >> (32 - 21u8))
-                    & ((1 << 5usize) - 1))
-                    as _))];
+                let mut uses = vec![Field::frB(FPR(((self.code >> 11u8) & 0x1f) as _))];
                 uses
             }
             Opcode::Frsp => {
-                let mut uses = vec![Field::frB(FPR((((self.code) >> (32 - 21u8))
-                    & ((1 << 5usize) - 1))
-                    as _))];
+                let mut uses = vec![Field::frB(FPR(((self.code >> 11u8) & 0x1f) as _))];
                 uses
             }
             Opcode::Frsqrte => {
-                let mut uses = vec![Field::frB(FPR((((self.code) >> (32 - 21u8))
-                    & ((1 << 5usize) - 1))
-                    as _))];
+                let mut uses = vec![Field::frB(FPR(((self.code >> 11u8) & 0x1f) as _))];
                 uses
             }
             Opcode::Fsel => {
                 let mut uses = vec![
-                    Field::frA(FPR(
-                        (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                    )),
-                    Field::frC(FPR(
-                        (((self.code) >> (32 - 26u8)) & ((1 << 5usize) - 1)) as _
-                    )),
-                    Field::frB(FPR(
-                        (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                    )),
+                    Field::frA(FPR(((self.code >> 16u8) & 0x1f) as _)),
+                    Field::frC(FPR(((self.code >> 6u8) & 0x1f) as _)),
+                    Field::frB(FPR(((self.code >> 11u8) & 0x1f) as _)),
                 ];
                 uses
             }
             Opcode::Fsub => {
                 let mut uses = vec![
-                    Field::frA(FPR(
-                        (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                    )),
-                    Field::frB(FPR(
-                        (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                    )),
+                    Field::frA(FPR(((self.code >> 16u8) & 0x1f) as _)),
+                    Field::frB(FPR(((self.code >> 11u8) & 0x1f) as _)),
                 ];
                 uses
             }
             Opcode::Fsubs => {
                 let mut uses = vec![
-                    Field::frA(FPR(
-                        (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                    )),
-                    Field::frB(FPR(
-                        (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                    )),
+                    Field::frA(FPR(((self.code >> 16u8) & 0x1f) as _)),
+                    Field::frB(FPR(((self.code >> 11u8) & 0x1f) as _)),
                 ];
                 uses
             }
             Opcode::Icbi => {
-                let mut uses = vec![Field::rB(GPR((((self.code) >> (32 - 21u8))
-                    & ((1 << 5usize) - 1))
-                    as _))];
-                if (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) != 0 {
-                    uses.push(Field::rA(GPR(
-                        (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _,
-                    )));
+                let mut uses = vec![Field::rB(GPR(((self.code >> 11u8) & 0x1f) as _))];
+                if ((self.code >> 16u8) & 0x1f) != 0 {
+                    uses.push(Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)));
                 }
                 uses
             }
@@ -4835,343 +2955,221 @@ impl Ins {
                 uses
             }
             Opcode::Lbz => {
-                let mut uses = vec![Field::offset(Offset(
-                    (((self.code) >> (32 - 32u8)) & ((1 << 16usize) - 1)) as _,
-                ))];
-                if (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) != 0 {
-                    uses.push(Field::rA(GPR(
-                        (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _,
-                    )));
+                let mut uses = vec![Field::offset(Offset(((self.code >> 0u8) & 0xffff) as _))];
+                if ((self.code >> 16u8) & 0x1f) != 0 {
+                    uses.push(Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)));
                 }
                 uses
             }
             Opcode::Lbzu => {
                 let mut uses = vec![
-                    Field::offset(Offset(
-                        (((self.code) >> (32 - 32u8)) & ((1 << 16usize) - 1)) as _,
-                    )),
-                    Field::rA(GPR(
-                        (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                    )),
+                    Field::offset(Offset(((self.code >> 0u8) & 0xffff) as _)),
+                    Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
                 ];
                 uses
             }
             Opcode::Lbzux => {
                 let mut uses = vec![
-                    Field::rA(GPR(
-                        (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                    )),
-                    Field::rB(GPR(
-                        (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                    )),
+                    Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
+                    Field::rB(GPR(((self.code >> 11u8) & 0x1f) as _)),
                 ];
                 uses
             }
             Opcode::Lbzx => {
-                let mut uses = vec![Field::rB(GPR((((self.code) >> (32 - 21u8))
-                    & ((1 << 5usize) - 1))
-                    as _))];
-                if (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) != 0 {
-                    uses.push(Field::rA(GPR(
-                        (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _,
-                    )));
+                let mut uses = vec![Field::rB(GPR(((self.code >> 11u8) & 0x1f) as _))];
+                if ((self.code >> 16u8) & 0x1f) != 0 {
+                    uses.push(Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)));
                 }
                 uses
             }
             Opcode::Lfd => {
-                let mut uses = vec![Field::offset(Offset(
-                    (((self.code) >> (32 - 32u8)) & ((1 << 16usize) - 1)) as _,
-                ))];
-                if (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) != 0 {
-                    uses.push(Field::rA(GPR(
-                        (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _,
-                    )));
+                let mut uses = vec![Field::offset(Offset(((self.code >> 0u8) & 0xffff) as _))];
+                if ((self.code >> 16u8) & 0x1f) != 0 {
+                    uses.push(Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)));
                 }
                 uses
             }
             Opcode::Lfdu => {
                 let mut uses = vec![
-                    Field::offset(Offset(
-                        (((self.code) >> (32 - 32u8)) & ((1 << 16usize) - 1)) as _,
-                    )),
-                    Field::rA(GPR(
-                        (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                    )),
+                    Field::offset(Offset(((self.code >> 0u8) & 0xffff) as _)),
+                    Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
                 ];
                 uses
             }
             Opcode::Lfdux => {
                 let mut uses = vec![
-                    Field::rA(GPR(
-                        (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                    )),
-                    Field::rB(GPR(
-                        (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                    )),
+                    Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
+                    Field::rB(GPR(((self.code >> 11u8) & 0x1f) as _)),
                 ];
                 uses
             }
             Opcode::Lfdx => {
-                let mut uses = vec![Field::rB(GPR((((self.code) >> (32 - 21u8))
-                    & ((1 << 5usize) - 1))
-                    as _))];
-                if (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) != 0 {
-                    uses.push(Field::rA(GPR(
-                        (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _,
-                    )));
+                let mut uses = vec![Field::rB(GPR(((self.code >> 11u8) & 0x1f) as _))];
+                if ((self.code >> 16u8) & 0x1f) != 0 {
+                    uses.push(Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)));
                 }
                 uses
             }
             Opcode::Lfs => {
-                let mut uses = vec![Field::offset(Offset(
-                    (((self.code) >> (32 - 32u8)) & ((1 << 16usize) - 1)) as _,
-                ))];
-                if (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) != 0 {
-                    uses.push(Field::rA(GPR(
-                        (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _,
-                    )));
+                let mut uses = vec![Field::offset(Offset(((self.code >> 0u8) & 0xffff) as _))];
+                if ((self.code >> 16u8) & 0x1f) != 0 {
+                    uses.push(Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)));
                 }
                 uses
             }
             Opcode::Lfsu => {
                 let mut uses = vec![
-                    Field::offset(Offset(
-                        (((self.code) >> (32 - 32u8)) & ((1 << 16usize) - 1)) as _,
-                    )),
-                    Field::rA(GPR(
-                        (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                    )),
+                    Field::offset(Offset(((self.code >> 0u8) & 0xffff) as _)),
+                    Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
                 ];
                 uses
             }
             Opcode::Lfsux => {
                 let mut uses = vec![
-                    Field::rA(GPR(
-                        (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                    )),
-                    Field::rB(GPR(
-                        (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                    )),
+                    Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
+                    Field::rB(GPR(((self.code >> 11u8) & 0x1f) as _)),
                 ];
                 uses
             }
             Opcode::Lfsx => {
-                let mut uses = vec![Field::rB(GPR((((self.code) >> (32 - 21u8))
-                    & ((1 << 5usize) - 1))
-                    as _))];
-                if (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) != 0 {
-                    uses.push(Field::rA(GPR(
-                        (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _,
-                    )));
+                let mut uses = vec![Field::rB(GPR(((self.code >> 11u8) & 0x1f) as _))];
+                if ((self.code >> 16u8) & 0x1f) != 0 {
+                    uses.push(Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)));
                 }
                 uses
             }
             Opcode::Lha => {
-                let mut uses = vec![Field::offset(Offset(
-                    (((self.code) >> (32 - 32u8)) & ((1 << 16usize) - 1)) as _,
-                ))];
-                if (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) != 0 {
-                    uses.push(Field::rA(GPR(
-                        (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _,
-                    )));
+                let mut uses = vec![Field::offset(Offset(((self.code >> 0u8) & 0xffff) as _))];
+                if ((self.code >> 16u8) & 0x1f) != 0 {
+                    uses.push(Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)));
                 }
                 uses
             }
             Opcode::Lhau => {
                 let mut uses = vec![
-                    Field::offset(Offset(
-                        (((self.code) >> (32 - 32u8)) & ((1 << 16usize) - 1)) as _,
-                    )),
-                    Field::rA(GPR(
-                        (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                    )),
+                    Field::offset(Offset(((self.code >> 0u8) & 0xffff) as _)),
+                    Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
                 ];
                 uses
             }
             Opcode::Lhaux => {
                 let mut uses = vec![
-                    Field::rA(GPR(
-                        (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                    )),
-                    Field::rB(GPR(
-                        (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                    )),
+                    Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
+                    Field::rB(GPR(((self.code >> 11u8) & 0x1f) as _)),
                 ];
                 uses
             }
             Opcode::Lhax => {
-                let mut uses = vec![Field::rB(GPR((((self.code) >> (32 - 21u8))
-                    & ((1 << 5usize) - 1))
-                    as _))];
-                if (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) != 0 {
-                    uses.push(Field::rA(GPR(
-                        (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _,
-                    )));
+                let mut uses = vec![Field::rB(GPR(((self.code >> 11u8) & 0x1f) as _))];
+                if ((self.code >> 16u8) & 0x1f) != 0 {
+                    uses.push(Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)));
                 }
                 uses
             }
             Opcode::Lhbrx => {
-                let mut uses = vec![Field::rB(GPR((((self.code) >> (32 - 21u8))
-                    & ((1 << 5usize) - 1))
-                    as _))];
-                if (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) != 0 {
-                    uses.push(Field::rA(GPR(
-                        (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _,
-                    )));
+                let mut uses = vec![Field::rB(GPR(((self.code >> 11u8) & 0x1f) as _))];
+                if ((self.code >> 16u8) & 0x1f) != 0 {
+                    uses.push(Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)));
                 }
                 uses
             }
             Opcode::Lhz => {
-                let mut uses = vec![Field::offset(Offset(
-                    (((self.code) >> (32 - 32u8)) & ((1 << 16usize) - 1)) as _,
-                ))];
-                if (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) != 0 {
-                    uses.push(Field::rA(GPR(
-                        (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _,
-                    )));
+                let mut uses = vec![Field::offset(Offset(((self.code >> 0u8) & 0xffff) as _))];
+                if ((self.code >> 16u8) & 0x1f) != 0 {
+                    uses.push(Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)));
                 }
                 uses
             }
             Opcode::Lhzu => {
                 let mut uses = vec![
-                    Field::offset(Offset(
-                        (((self.code) >> (32 - 32u8)) & ((1 << 16usize) - 1)) as _,
-                    )),
-                    Field::rA(GPR(
-                        (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                    )),
+                    Field::offset(Offset(((self.code >> 0u8) & 0xffff) as _)),
+                    Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
                 ];
                 uses
             }
             Opcode::Lhzux => {
                 let mut uses = vec![
-                    Field::rA(GPR(
-                        (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                    )),
-                    Field::rB(GPR(
-                        (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                    )),
+                    Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
+                    Field::rB(GPR(((self.code >> 11u8) & 0x1f) as _)),
                 ];
                 uses
             }
             Opcode::Lhzx => {
-                let mut uses = vec![Field::rB(GPR((((self.code) >> (32 - 21u8))
-                    & ((1 << 5usize) - 1))
-                    as _))];
-                if (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) != 0 {
-                    uses.push(Field::rA(GPR(
-                        (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _,
-                    )));
+                let mut uses = vec![Field::rB(GPR(((self.code >> 11u8) & 0x1f) as _))];
+                if ((self.code >> 16u8) & 0x1f) != 0 {
+                    uses.push(Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)));
                 }
                 uses
             }
             Opcode::Lmw => {
-                let mut uses = vec![Field::offset(Offset(
-                    (((self.code) >> (32 - 32u8)) & ((1 << 16usize) - 1)) as _,
-                ))];
-                if (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) != 0 {
-                    uses.push(Field::rA(GPR(
-                        (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _,
-                    )));
+                let mut uses = vec![Field::offset(Offset(((self.code >> 0u8) & 0xffff) as _))];
+                if ((self.code >> 16u8) & 0x1f) != 0 {
+                    uses.push(Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)));
                 }
                 uses
             }
             Opcode::Lswi => {
                 let mut uses = vec![];
-                if (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) != 0 {
-                    uses.push(Field::rA(GPR(
-                        (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _,
-                    )));
+                if ((self.code >> 16u8) & 0x1f) != 0 {
+                    uses.push(Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)));
                 }
                 uses
             }
             Opcode::Lswx => {
-                let mut uses = vec![Field::rB(GPR((((self.code) >> (32 - 21u8))
-                    & ((1 << 5usize) - 1))
-                    as _))];
-                if (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) != 0 {
-                    uses.push(Field::rA(GPR(
-                        (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _,
-                    )));
+                let mut uses = vec![Field::rB(GPR(((self.code >> 11u8) & 0x1f) as _))];
+                if ((self.code >> 16u8) & 0x1f) != 0 {
+                    uses.push(Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)));
                 }
                 uses
             }
             Opcode::Lwarx => {
-                let mut uses = vec![Field::rB(GPR((((self.code) >> (32 - 21u8))
-                    & ((1 << 5usize) - 1))
-                    as _))];
-                if (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) != 0 {
-                    uses.push(Field::rA(GPR(
-                        (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _,
-                    )));
+                let mut uses = vec![Field::rB(GPR(((self.code >> 11u8) & 0x1f) as _))];
+                if ((self.code >> 16u8) & 0x1f) != 0 {
+                    uses.push(Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)));
                 }
                 uses
             }
             Opcode::Lwbrx => {
-                let mut uses = vec![Field::rB(GPR((((self.code) >> (32 - 21u8))
-                    & ((1 << 5usize) - 1))
-                    as _))];
-                if (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) != 0 {
-                    uses.push(Field::rA(GPR(
-                        (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _,
-                    )));
+                let mut uses = vec![Field::rB(GPR(((self.code >> 11u8) & 0x1f) as _))];
+                if ((self.code >> 16u8) & 0x1f) != 0 {
+                    uses.push(Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)));
                 }
                 uses
             }
             Opcode::Lwz => {
-                let mut uses = vec![Field::offset(Offset(
-                    (((self.code) >> (32 - 32u8)) & ((1 << 16usize) - 1)) as _,
-                ))];
-                if (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) != 0 {
-                    uses.push(Field::rA(GPR(
-                        (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _,
-                    )));
+                let mut uses = vec![Field::offset(Offset(((self.code >> 0u8) & 0xffff) as _))];
+                if ((self.code >> 16u8) & 0x1f) != 0 {
+                    uses.push(Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)));
                 }
                 uses
             }
             Opcode::Lwzu => {
                 let mut uses = vec![
-                    Field::offset(Offset(
-                        (((self.code) >> (32 - 32u8)) & ((1 << 16usize) - 1)) as _,
-                    )),
-                    Field::rA(GPR(
-                        (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                    )),
+                    Field::offset(Offset(((self.code >> 0u8) & 0xffff) as _)),
+                    Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
                 ];
                 uses
             }
             Opcode::Lwzux => {
                 let mut uses = vec![
-                    Field::rA(GPR(
-                        (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                    )),
-                    Field::rB(GPR(
-                        (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                    )),
+                    Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
+                    Field::rB(GPR(((self.code >> 11u8) & 0x1f) as _)),
                 ];
                 uses
             }
             Opcode::Lwzx => {
-                let mut uses = vec![Field::rB(GPR((((self.code) >> (32 - 21u8))
-                    & ((1 << 5usize) - 1))
-                    as _))];
-                if (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) != 0 {
-                    uses.push(Field::rA(GPR(
-                        (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _,
-                    )));
+                let mut uses = vec![Field::rB(GPR(((self.code >> 11u8) & 0x1f) as _))];
+                if ((self.code >> 16u8) & 0x1f) != 0 {
+                    uses.push(Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)));
                 }
                 uses
             }
             Opcode::Mcrf => {
-                let mut uses = vec![Field::crfS(CRBit(
-                    (((self.code) >> (32 - 14u8)) & ((1 << 3usize) - 1)) as _,
-                ))];
+                let mut uses = vec![Field::crfS(CRBit(((self.code >> 18u8) & 0x7) as _))];
                 uses
             }
             Opcode::Mcrfs => {
-                let mut uses = vec![Field::crfS(CRBit(
-                    (((self.code) >> (32 - 14u8)) & ((1 << 3usize) - 1)) as _,
-                ))];
+                let mut uses = vec![Field::crfS(CRBit(((self.code >> 18u8) & 0x7) as _))];
                 uses
             }
             Opcode::Mcrxr => {
@@ -5199,9 +3197,7 @@ impl Ins {
                 uses
             }
             Opcode::Mfsrin => {
-                let mut uses = vec![Field::rB(GPR((((self.code) >> (32 - 21u8))
-                    & ((1 << 5usize) - 1))
-                    as _))];
+                let mut uses = vec![Field::rB(GPR(((self.code >> 11u8) & 0x1f) as _))];
                 uses
             }
             Opcode::Mftb => {
@@ -5209,9 +3205,7 @@ impl Ins {
                 uses
             }
             Opcode::Mtcrf => {
-                let mut uses = vec![Field::rS(GPR((((self.code) >> (32 - 11u8))
-                    & ((1 << 5usize) - 1))
-                    as _))];
+                let mut uses = vec![Field::rS(GPR(((self.code >> 21u8) & 0x1f) as _))];
                 uses
             }
             Opcode::Mtfsb0 => {
@@ -5223,9 +3217,7 @@ impl Ins {
                 uses
             }
             Opcode::Mtfsf => {
-                let mut uses = vec![Field::frB(FPR((((self.code) >> (32 - 21u8))
-                    & ((1 << 5usize) - 1))
-                    as _))];
+                let mut uses = vec![Field::frB(FPR(((self.code >> 11u8) & 0x1f) as _))];
                 uses
             }
             Opcode::Mtfsfi => {
@@ -5233,542 +3225,340 @@ impl Ins {
                 uses
             }
             Opcode::Mtmsr => {
-                let mut uses = vec![Field::rS(GPR((((self.code) >> (32 - 11u8))
-                    & ((1 << 5usize) - 1))
-                    as _))];
+                let mut uses = vec![Field::rS(GPR(((self.code >> 21u8) & 0x1f) as _))];
                 uses
             }
             Opcode::Mtspr => {
-                let mut uses = vec![Field::rS(GPR((((self.code) >> (32 - 11u8))
-                    & ((1 << 5usize) - 1))
-                    as _))];
+                let mut uses = vec![Field::rS(GPR(((self.code >> 21u8) & 0x1f) as _))];
                 uses
             }
             Opcode::Mtsr => {
-                let mut uses = vec![Field::rS(GPR((((self.code) >> (32 - 11u8))
-                    & ((1 << 5usize) - 1))
-                    as _))];
+                let mut uses = vec![Field::rS(GPR(((self.code >> 21u8) & 0x1f) as _))];
                 uses
             }
             Opcode::Mtsrin => {
                 let mut uses = vec![
-                    Field::rS(GPR(
-                        (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                    )),
-                    Field::rB(GPR(
-                        (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                    )),
+                    Field::rS(GPR(((self.code >> 21u8) & 0x1f) as _)),
+                    Field::rB(GPR(((self.code >> 11u8) & 0x1f) as _)),
                 ];
                 uses
             }
             Opcode::Mulhw => {
                 let mut uses = vec![
-                    Field::rA(GPR(
-                        (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                    )),
-                    Field::rB(GPR(
-                        (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                    )),
+                    Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
+                    Field::rB(GPR(((self.code >> 11u8) & 0x1f) as _)),
                 ];
                 uses
             }
             Opcode::Mulhwu => {
                 let mut uses = vec![
-                    Field::rA(GPR(
-                        (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                    )),
-                    Field::rB(GPR(
-                        (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                    )),
+                    Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
+                    Field::rB(GPR(((self.code >> 11u8) & 0x1f) as _)),
                 ];
                 uses
             }
             Opcode::Mulli => {
-                let mut uses = vec![Field::rA(GPR((((self.code) >> (32 - 16u8))
-                    & ((1 << 5usize) - 1))
-                    as _))];
+                let mut uses = vec![Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _))];
                 uses
             }
             Opcode::Mullw => {
                 let mut uses = vec![
-                    Field::rA(GPR(
-                        (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                    )),
-                    Field::rB(GPR(
-                        (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                    )),
+                    Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
+                    Field::rB(GPR(((self.code >> 11u8) & 0x1f) as _)),
                 ];
                 uses
             }
             Opcode::Nand => {
                 let mut uses = vec![
-                    Field::rS(GPR(
-                        (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                    )),
-                    Field::rB(GPR(
-                        (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                    )),
+                    Field::rS(GPR(((self.code >> 21u8) & 0x1f) as _)),
+                    Field::rB(GPR(((self.code >> 11u8) & 0x1f) as _)),
                 ];
                 uses
             }
             Opcode::Neg => {
-                let mut uses = vec![Field::rA(GPR((((self.code) >> (32 - 16u8))
-                    & ((1 << 5usize) - 1))
-                    as _))];
+                let mut uses = vec![Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _))];
                 uses
             }
             Opcode::Nor => {
                 let mut uses = vec![
-                    Field::rS(GPR(
-                        (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                    )),
-                    Field::rB(GPR(
-                        (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                    )),
+                    Field::rS(GPR(((self.code >> 21u8) & 0x1f) as _)),
+                    Field::rB(GPR(((self.code >> 11u8) & 0x1f) as _)),
                 ];
                 uses
             }
             Opcode::Or => {
                 let mut uses = vec![
-                    Field::rS(GPR(
-                        (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                    )),
-                    Field::rB(GPR(
-                        (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                    )),
+                    Field::rS(GPR(((self.code >> 21u8) & 0x1f) as _)),
+                    Field::rB(GPR(((self.code >> 11u8) & 0x1f) as _)),
                 ];
                 uses
             }
             Opcode::Orc => {
                 let mut uses = vec![
-                    Field::rS(GPR(
-                        (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                    )),
-                    Field::rB(GPR(
-                        (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                    )),
+                    Field::rS(GPR(((self.code >> 21u8) & 0x1f) as _)),
+                    Field::rB(GPR(((self.code >> 11u8) & 0x1f) as _)),
                 ];
                 uses
             }
             Opcode::Ori => {
-                let mut uses = vec![Field::rS(GPR((((self.code) >> (32 - 11u8))
-                    & ((1 << 5usize) - 1))
-                    as _))];
+                let mut uses = vec![Field::rS(GPR(((self.code >> 21u8) & 0x1f) as _))];
                 uses
             }
             Opcode::Oris => {
-                let mut uses = vec![Field::rS(GPR((((self.code) >> (32 - 11u8))
-                    & ((1 << 5usize) - 1))
-                    as _))];
+                let mut uses = vec![Field::rS(GPR(((self.code >> 21u8) & 0x1f) as _))];
                 uses
             }
             Opcode::PsqL => {
                 let mut uses = vec![];
-                if (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) != 0 {
-                    uses.push(Field::rA(GPR(
-                        (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _,
-                    )));
+                if ((self.code >> 16u8) & 0x1f) != 0 {
+                    uses.push(Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)));
                 }
                 uses
             }
             Opcode::PsqLu => {
-                let mut uses = vec![Field::rA(GPR((((self.code) >> (32 - 16u8))
-                    & ((1 << 5usize) - 1))
-                    as _))];
+                let mut uses = vec![Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _))];
                 uses
             }
             Opcode::PsqLux => {
                 let mut uses = vec![
-                    Field::rA(GPR(
-                        (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                    )),
-                    Field::rB(GPR(
-                        (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                    )),
+                    Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
+                    Field::rB(GPR(((self.code >> 11u8) & 0x1f) as _)),
                 ];
                 uses
             }
             Opcode::PsqLx => {
-                let mut uses = vec![Field::rB(GPR((((self.code) >> (32 - 21u8))
-                    & ((1 << 5usize) - 1))
-                    as _))];
-                if (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) != 0 {
-                    uses.push(Field::rA(GPR(
-                        (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _,
-                    )));
+                let mut uses = vec![Field::rB(GPR(((self.code >> 11u8) & 0x1f) as _))];
+                if ((self.code >> 16u8) & 0x1f) != 0 {
+                    uses.push(Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)));
                 }
                 uses
             }
             Opcode::PsqSt => {
-                let mut uses = vec![Field::frS(FPR((((self.code) >> (32 - 11u8))
-                    & ((1 << 5usize) - 1))
-                    as _))];
-                if (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) != 0 {
-                    uses.push(Field::rA(GPR(
-                        (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _,
-                    )));
+                let mut uses = vec![Field::frS(FPR(((self.code >> 21u8) & 0x1f) as _))];
+                if ((self.code >> 16u8) & 0x1f) != 0 {
+                    uses.push(Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)));
                 }
                 uses
             }
             Opcode::PsqStu => {
                 let mut uses = vec![
-                    Field::frS(FPR(
-                        (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                    )),
-                    Field::rA(GPR(
-                        (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                    )),
+                    Field::frS(FPR(((self.code >> 21u8) & 0x1f) as _)),
+                    Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
                 ];
                 uses
             }
             Opcode::PsqStux => {
                 let mut uses = vec![
-                    Field::frS(FPR(
-                        (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                    )),
-                    Field::rA(GPR(
-                        (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                    )),
-                    Field::rB(GPR(
-                        (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                    )),
+                    Field::frS(FPR(((self.code >> 21u8) & 0x1f) as _)),
+                    Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
+                    Field::rB(GPR(((self.code >> 11u8) & 0x1f) as _)),
                 ];
                 uses
             }
             Opcode::PsqStx => {
                 let mut uses = vec![
-                    Field::frS(FPR(
-                        (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                    )),
-                    Field::rB(GPR(
-                        (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                    )),
+                    Field::frS(FPR(((self.code >> 21u8) & 0x1f) as _)),
+                    Field::rB(GPR(((self.code >> 11u8) & 0x1f) as _)),
                 ];
-                if (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) != 0 {
-                    uses.push(Field::rA(GPR(
-                        (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _,
-                    )));
+                if ((self.code >> 16u8) & 0x1f) != 0 {
+                    uses.push(Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)));
                 }
                 uses
             }
             Opcode::PsAbs => {
                 let mut uses = vec![
-                    Field::frA(FPR(
-                        (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                    )),
-                    Field::frB(FPR(
-                        (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                    )),
+                    Field::frA(FPR(((self.code >> 16u8) & 0x1f) as _)),
+                    Field::frB(FPR(((self.code >> 11u8) & 0x1f) as _)),
                 ];
                 uses
             }
             Opcode::PsAdd => {
                 let mut uses = vec![
-                    Field::frA(FPR(
-                        (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                    )),
-                    Field::frB(FPR(
-                        (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                    )),
+                    Field::frA(FPR(((self.code >> 16u8) & 0x1f) as _)),
+                    Field::frB(FPR(((self.code >> 11u8) & 0x1f) as _)),
                 ];
                 uses
             }
             Opcode::PsCmpo0 => {
-                let mut uses = vec![Field::frB(FPR((((self.code) >> (32 - 21u8))
-                    & ((1 << 5usize) - 1))
-                    as _))];
-                if (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) != 0 {
-                    uses.push(Field::frA(FPR(
-                        (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _,
-                    )));
+                let mut uses = vec![Field::frB(FPR(((self.code >> 11u8) & 0x1f) as _))];
+                if ((self.code >> 16u8) & 0x1f) != 0 {
+                    uses.push(Field::frA(FPR(((self.code >> 16u8) & 0x1f) as _)));
                 }
                 uses
             }
             Opcode::PsCmpo1 => {
-                let mut uses = vec![Field::frB(FPR((((self.code) >> (32 - 21u8))
-                    & ((1 << 5usize) - 1))
-                    as _))];
-                if (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) != 0 {
-                    uses.push(Field::frA(FPR(
-                        (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _,
-                    )));
+                let mut uses = vec![Field::frB(FPR(((self.code >> 11u8) & 0x1f) as _))];
+                if ((self.code >> 16u8) & 0x1f) != 0 {
+                    uses.push(Field::frA(FPR(((self.code >> 16u8) & 0x1f) as _)));
                 }
                 uses
             }
             Opcode::PsCmpu0 => {
-                let mut uses = vec![Field::frB(FPR((((self.code) >> (32 - 21u8))
-                    & ((1 << 5usize) - 1))
-                    as _))];
-                if (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) != 0 {
-                    uses.push(Field::frA(FPR(
-                        (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _,
-                    )));
+                let mut uses = vec![Field::frB(FPR(((self.code >> 11u8) & 0x1f) as _))];
+                if ((self.code >> 16u8) & 0x1f) != 0 {
+                    uses.push(Field::frA(FPR(((self.code >> 16u8) & 0x1f) as _)));
                 }
                 uses
             }
             Opcode::PsCmpu1 => {
-                let mut uses = vec![Field::frB(FPR((((self.code) >> (32 - 21u8))
-                    & ((1 << 5usize) - 1))
-                    as _))];
-                if (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) != 0 {
-                    uses.push(Field::frA(FPR(
-                        (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _,
-                    )));
+                let mut uses = vec![Field::frB(FPR(((self.code >> 11u8) & 0x1f) as _))];
+                if ((self.code >> 16u8) & 0x1f) != 0 {
+                    uses.push(Field::frA(FPR(((self.code >> 16u8) & 0x1f) as _)));
                 }
                 uses
             }
             Opcode::PsDiv => {
                 let mut uses = vec![
-                    Field::frA(FPR(
-                        (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                    )),
-                    Field::frB(FPR(
-                        (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                    )),
+                    Field::frA(FPR(((self.code >> 16u8) & 0x1f) as _)),
+                    Field::frB(FPR(((self.code >> 11u8) & 0x1f) as _)),
                 ];
                 uses
             }
             Opcode::PsMadd => {
                 let mut uses = vec![
-                    Field::frA(FPR(
-                        (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                    )),
-                    Field::frC(FPR(
-                        (((self.code) >> (32 - 26u8)) & ((1 << 5usize) - 1)) as _
-                    )),
-                    Field::frB(FPR(
-                        (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                    )),
+                    Field::frA(FPR(((self.code >> 16u8) & 0x1f) as _)),
+                    Field::frC(FPR(((self.code >> 6u8) & 0x1f) as _)),
+                    Field::frB(FPR(((self.code >> 11u8) & 0x1f) as _)),
                 ];
                 uses
             }
             Opcode::PsMadds0 => {
                 let mut uses = vec![
-                    Field::frA(FPR(
-                        (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                    )),
-                    Field::frC(FPR(
-                        (((self.code) >> (32 - 26u8)) & ((1 << 5usize) - 1)) as _
-                    )),
-                    Field::frB(FPR(
-                        (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                    )),
+                    Field::frA(FPR(((self.code >> 16u8) & 0x1f) as _)),
+                    Field::frC(FPR(((self.code >> 6u8) & 0x1f) as _)),
+                    Field::frB(FPR(((self.code >> 11u8) & 0x1f) as _)),
                 ];
                 uses
             }
             Opcode::PsMadds1 => {
                 let mut uses = vec![
-                    Field::frA(FPR(
-                        (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                    )),
-                    Field::frC(FPR(
-                        (((self.code) >> (32 - 26u8)) & ((1 << 5usize) - 1)) as _
-                    )),
-                    Field::frB(FPR(
-                        (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                    )),
+                    Field::frA(FPR(((self.code >> 16u8) & 0x1f) as _)),
+                    Field::frC(FPR(((self.code >> 6u8) & 0x1f) as _)),
+                    Field::frB(FPR(((self.code >> 11u8) & 0x1f) as _)),
                 ];
                 uses
             }
             Opcode::PsMerge00 => {
                 let mut uses = vec![
-                    Field::frA(FPR(
-                        (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                    )),
-                    Field::frB(FPR(
-                        (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                    )),
+                    Field::frA(FPR(((self.code >> 16u8) & 0x1f) as _)),
+                    Field::frB(FPR(((self.code >> 11u8) & 0x1f) as _)),
                 ];
                 uses
             }
             Opcode::PsMerge01 => {
                 let mut uses = vec![
-                    Field::frA(FPR(
-                        (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                    )),
-                    Field::frB(FPR(
-                        (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                    )),
+                    Field::frA(FPR(((self.code >> 16u8) & 0x1f) as _)),
+                    Field::frB(FPR(((self.code >> 11u8) & 0x1f) as _)),
                 ];
                 uses
             }
             Opcode::PsMerge10 => {
                 let mut uses = vec![
-                    Field::frA(FPR(
-                        (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                    )),
-                    Field::frB(FPR(
-                        (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                    )),
+                    Field::frA(FPR(((self.code >> 16u8) & 0x1f) as _)),
+                    Field::frB(FPR(((self.code >> 11u8) & 0x1f) as _)),
                 ];
                 uses
             }
             Opcode::PsMerge11 => {
                 let mut uses = vec![
-                    Field::frA(FPR(
-                        (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                    )),
-                    Field::frB(FPR(
-                        (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                    )),
+                    Field::frA(FPR(((self.code >> 16u8) & 0x1f) as _)),
+                    Field::frB(FPR(((self.code >> 11u8) & 0x1f) as _)),
                 ];
                 uses
             }
             Opcode::PsMr => {
-                let mut uses = vec![Field::frB(FPR((((self.code) >> (32 - 21u8))
-                    & ((1 << 5usize) - 1))
-                    as _))];
+                let mut uses = vec![Field::frB(FPR(((self.code >> 11u8) & 0x1f) as _))];
                 uses
             }
             Opcode::PsMsub => {
                 let mut uses = vec![
-                    Field::frA(FPR(
-                        (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                    )),
-                    Field::frC(FPR(
-                        (((self.code) >> (32 - 26u8)) & ((1 << 5usize) - 1)) as _
-                    )),
-                    Field::frB(FPR(
-                        (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                    )),
+                    Field::frA(FPR(((self.code >> 16u8) & 0x1f) as _)),
+                    Field::frC(FPR(((self.code >> 6u8) & 0x1f) as _)),
+                    Field::frB(FPR(((self.code >> 11u8) & 0x1f) as _)),
                 ];
                 uses
             }
             Opcode::PsMul => {
                 let mut uses = vec![
-                    Field::frA(FPR(
-                        (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                    )),
-                    Field::frC(FPR(
-                        (((self.code) >> (32 - 26u8)) & ((1 << 5usize) - 1)) as _
-                    )),
+                    Field::frA(FPR(((self.code >> 16u8) & 0x1f) as _)),
+                    Field::frC(FPR(((self.code >> 6u8) & 0x1f) as _)),
                 ];
                 uses
             }
             Opcode::PsMuls0 => {
                 let mut uses = vec![
-                    Field::frA(FPR(
-                        (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                    )),
-                    Field::frC(FPR(
-                        (((self.code) >> (32 - 26u8)) & ((1 << 5usize) - 1)) as _
-                    )),
+                    Field::frA(FPR(((self.code >> 16u8) & 0x1f) as _)),
+                    Field::frC(FPR(((self.code >> 6u8) & 0x1f) as _)),
                 ];
                 uses
             }
             Opcode::PsMuls1 => {
                 let mut uses = vec![
-                    Field::frA(FPR(
-                        (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                    )),
-                    Field::frC(FPR(
-                        (((self.code) >> (32 - 26u8)) & ((1 << 5usize) - 1)) as _
-                    )),
+                    Field::frA(FPR(((self.code >> 16u8) & 0x1f) as _)),
+                    Field::frC(FPR(((self.code >> 6u8) & 0x1f) as _)),
                 ];
                 uses
             }
             Opcode::PsNabs => {
-                let mut uses = vec![Field::frB(FPR((((self.code) >> (32 - 21u8))
-                    & ((1 << 5usize) - 1))
-                    as _))];
+                let mut uses = vec![Field::frB(FPR(((self.code >> 11u8) & 0x1f) as _))];
                 uses
             }
             Opcode::PsNeg => {
-                let mut uses = vec![Field::frB(FPR((((self.code) >> (32 - 21u8))
-                    & ((1 << 5usize) - 1))
-                    as _))];
+                let mut uses = vec![Field::frB(FPR(((self.code >> 11u8) & 0x1f) as _))];
                 uses
             }
             Opcode::PsNmadd => {
                 let mut uses = vec![
-                    Field::frA(FPR(
-                        (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                    )),
-                    Field::frC(FPR(
-                        (((self.code) >> (32 - 26u8)) & ((1 << 5usize) - 1)) as _
-                    )),
-                    Field::frB(FPR(
-                        (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                    )),
+                    Field::frA(FPR(((self.code >> 16u8) & 0x1f) as _)),
+                    Field::frC(FPR(((self.code >> 6u8) & 0x1f) as _)),
+                    Field::frB(FPR(((self.code >> 11u8) & 0x1f) as _)),
                 ];
                 uses
             }
             Opcode::PsNmsub => {
                 let mut uses = vec![
-                    Field::frA(FPR(
-                        (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                    )),
-                    Field::frC(FPR(
-                        (((self.code) >> (32 - 26u8)) & ((1 << 5usize) - 1)) as _
-                    )),
-                    Field::frB(FPR(
-                        (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                    )),
+                    Field::frA(FPR(((self.code >> 16u8) & 0x1f) as _)),
+                    Field::frC(FPR(((self.code >> 6u8) & 0x1f) as _)),
+                    Field::frB(FPR(((self.code >> 11u8) & 0x1f) as _)),
                 ];
                 uses
             }
             Opcode::PsRes => {
-                let mut uses = vec![Field::frB(FPR((((self.code) >> (32 - 21u8))
-                    & ((1 << 5usize) - 1))
-                    as _))];
+                let mut uses = vec![Field::frB(FPR(((self.code >> 11u8) & 0x1f) as _))];
                 uses
             }
             Opcode::PsRsqrte => {
-                let mut uses = vec![Field::frB(FPR((((self.code) >> (32 - 21u8))
-                    & ((1 << 5usize) - 1))
-                    as _))];
+                let mut uses = vec![Field::frB(FPR(((self.code >> 11u8) & 0x1f) as _))];
                 uses
             }
             Opcode::PsSel => {
                 let mut uses = vec![
-                    Field::frA(FPR(
-                        (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                    )),
-                    Field::frC(FPR(
-                        (((self.code) >> (32 - 26u8)) & ((1 << 5usize) - 1)) as _
-                    )),
-                    Field::frB(FPR(
-                        (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                    )),
+                    Field::frA(FPR(((self.code >> 16u8) & 0x1f) as _)),
+                    Field::frC(FPR(((self.code >> 6u8) & 0x1f) as _)),
+                    Field::frB(FPR(((self.code >> 11u8) & 0x1f) as _)),
                 ];
                 uses
             }
             Opcode::PsSub => {
                 let mut uses = vec![
-                    Field::frA(FPR(
-                        (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                    )),
-                    Field::frB(FPR(
-                        (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                    )),
+                    Field::frA(FPR(((self.code >> 16u8) & 0x1f) as _)),
+                    Field::frB(FPR(((self.code >> 11u8) & 0x1f) as _)),
                 ];
                 uses
             }
             Opcode::PsSum0 => {
                 let mut uses = vec![
-                    Field::frA(FPR(
-                        (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                    )),
-                    Field::frC(FPR(
-                        (((self.code) >> (32 - 26u8)) & ((1 << 5usize) - 1)) as _
-                    )),
-                    Field::frB(FPR(
-                        (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                    )),
+                    Field::frA(FPR(((self.code >> 16u8) & 0x1f) as _)),
+                    Field::frC(FPR(((self.code >> 6u8) & 0x1f) as _)),
+                    Field::frB(FPR(((self.code >> 11u8) & 0x1f) as _)),
                 ];
                 uses
             }
             Opcode::PsSum1 => {
                 let mut uses = vec![
-                    Field::frA(FPR(
-                        (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                    )),
-                    Field::frC(FPR(
-                        (((self.code) >> (32 - 26u8)) & ((1 << 5usize) - 1)) as _
-                    )),
-                    Field::frB(FPR(
-                        (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                    )),
+                    Field::frA(FPR(((self.code >> 16u8) & 0x1f) as _)),
+                    Field::frC(FPR(((self.code >> 6u8) & 0x1f) as _)),
+                    Field::frB(FPR(((self.code >> 11u8) & 0x1f) as _)),
                 ];
                 uses
             }
@@ -5778,37 +3568,23 @@ impl Ins {
             }
             Opcode::Rlwimi => {
                 let mut uses = vec![
-                    Field::rA(GPR(
-                        (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                    )),
-                    Field::rS(GPR(
-                        (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                    )),
-                    Field::SH(OpaqueU(
-                        (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _,
-                    )),
+                    Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
+                    Field::rS(GPR(((self.code >> 21u8) & 0x1f) as _)),
+                    Field::SH(OpaqueU(((self.code >> 11u8) & 0x1f) as _)),
                 ];
                 uses
             }
             Opcode::Rlwinm => {
                 let mut uses = vec![
-                    Field::rS(GPR(
-                        (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                    )),
-                    Field::SH(OpaqueU(
-                        (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _,
-                    )),
+                    Field::rS(GPR(((self.code >> 21u8) & 0x1f) as _)),
+                    Field::SH(OpaqueU(((self.code >> 11u8) & 0x1f) as _)),
                 ];
                 uses
             }
             Opcode::Rlwnm => {
                 let mut uses = vec![
-                    Field::rS(GPR(
-                        (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                    )),
-                    Field::rB(GPR(
-                        (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                    )),
+                    Field::rS(GPR(((self.code >> 21u8) & 0x1f) as _)),
+                    Field::rB(GPR(((self.code >> 11u8) & 0x1f) as _)),
                 ];
                 uses
             }
@@ -5818,454 +3594,284 @@ impl Ins {
             }
             Opcode::Slw => {
                 let mut uses = vec![
-                    Field::rS(GPR(
-                        (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                    )),
-                    Field::rB(GPR(
-                        (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                    )),
+                    Field::rS(GPR(((self.code >> 21u8) & 0x1f) as _)),
+                    Field::rB(GPR(((self.code >> 11u8) & 0x1f) as _)),
                 ];
                 uses
             }
             Opcode::Sraw => {
                 let mut uses = vec![
-                    Field::rS(GPR(
-                        (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                    )),
-                    Field::rB(GPR(
-                        (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                    )),
+                    Field::rS(GPR(((self.code >> 21u8) & 0x1f) as _)),
+                    Field::rB(GPR(((self.code >> 11u8) & 0x1f) as _)),
                 ];
                 uses
             }
             Opcode::Srawi => {
-                let mut uses = vec![Field::rS(GPR((((self.code) >> (32 - 11u8))
-                    & ((1 << 5usize) - 1))
-                    as _))];
+                let mut uses = vec![Field::rS(GPR(((self.code >> 21u8) & 0x1f) as _))];
                 uses
             }
             Opcode::Srw => {
                 let mut uses = vec![
-                    Field::rA(GPR(
-                        (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                    )),
-                    Field::rB(GPR(
-                        (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                    )),
+                    Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
+                    Field::rB(GPR(((self.code >> 11u8) & 0x1f) as _)),
                 ];
                 uses
             }
             Opcode::Stb => {
-                let mut uses = vec![Field::rS(GPR((((self.code) >> (32 - 11u8))
-                    & ((1 << 5usize) - 1))
-                    as _))];
-                if (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) != 0 {
-                    uses.push(Field::rA(GPR(
-                        (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _,
-                    )));
+                let mut uses = vec![Field::rS(GPR(((self.code >> 21u8) & 0x1f) as _))];
+                if ((self.code >> 16u8) & 0x1f) != 0 {
+                    uses.push(Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)));
                 }
                 uses
             }
             Opcode::Stbu => {
                 let mut uses = vec![
-                    Field::rS(GPR(
-                        (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                    )),
-                    Field::rA(GPR(
-                        (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                    )),
+                    Field::rS(GPR(((self.code >> 21u8) & 0x1f) as _)),
+                    Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
                 ];
                 uses
             }
             Opcode::Stbux => {
                 let mut uses = vec![
-                    Field::rS(GPR(
-                        (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                    )),
-                    Field::rA(GPR(
-                        (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                    )),
-                    Field::rB(GPR(
-                        (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                    )),
+                    Field::rS(GPR(((self.code >> 21u8) & 0x1f) as _)),
+                    Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
+                    Field::rB(GPR(((self.code >> 11u8) & 0x1f) as _)),
                 ];
                 uses
             }
             Opcode::Stbx => {
                 let mut uses = vec![
-                    Field::rS(GPR(
-                        (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                    )),
-                    Field::rB(GPR(
-                        (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                    )),
+                    Field::rS(GPR(((self.code >> 21u8) & 0x1f) as _)),
+                    Field::rB(GPR(((self.code >> 11u8) & 0x1f) as _)),
                 ];
-                if (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) != 0 {
-                    uses.push(Field::rA(GPR(
-                        (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _,
-                    )));
+                if ((self.code >> 16u8) & 0x1f) != 0 {
+                    uses.push(Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)));
                 }
                 uses
             }
             Opcode::Stfd => {
-                let mut uses = vec![Field::rS(GPR((((self.code) >> (32 - 11u8))
-                    & ((1 << 5usize) - 1))
-                    as _))];
-                if (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) != 0 {
-                    uses.push(Field::rA(GPR(
-                        (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _,
-                    )));
+                let mut uses = vec![Field::rS(GPR(((self.code >> 21u8) & 0x1f) as _))];
+                if ((self.code >> 16u8) & 0x1f) != 0 {
+                    uses.push(Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)));
                 }
                 uses
             }
             Opcode::Stfdu => {
                 let mut uses = vec![
-                    Field::rS(GPR(
-                        (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                    )),
-                    Field::rA(GPR(
-                        (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                    )),
+                    Field::rS(GPR(((self.code >> 21u8) & 0x1f) as _)),
+                    Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
                 ];
                 uses
             }
             Opcode::Stfdux => {
                 let mut uses = vec![
-                    Field::frS(FPR(
-                        (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                    )),
-                    Field::rA(GPR(
-                        (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                    )),
-                    Field::rB(GPR(
-                        (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                    )),
+                    Field::frS(FPR(((self.code >> 21u8) & 0x1f) as _)),
+                    Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
+                    Field::rB(GPR(((self.code >> 11u8) & 0x1f) as _)),
                 ];
                 uses
             }
             Opcode::Stfdx => {
                 let mut uses = vec![
-                    Field::frS(FPR(
-                        (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                    )),
-                    Field::rB(GPR(
-                        (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                    )),
+                    Field::frS(FPR(((self.code >> 21u8) & 0x1f) as _)),
+                    Field::rB(GPR(((self.code >> 11u8) & 0x1f) as _)),
                 ];
-                if (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) != 0 {
-                    uses.push(Field::rA(GPR(
-                        (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _,
-                    )));
+                if ((self.code >> 16u8) & 0x1f) != 0 {
+                    uses.push(Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)));
                 }
                 uses
             }
             Opcode::Stfiwx => {
                 let mut uses = vec![
-                    Field::frS(FPR(
-                        (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                    )),
-                    Field::rB(GPR(
-                        (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                    )),
+                    Field::frS(FPR(((self.code >> 21u8) & 0x1f) as _)),
+                    Field::rB(GPR(((self.code >> 11u8) & 0x1f) as _)),
                 ];
-                if (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) != 0 {
-                    uses.push(Field::rA(GPR(
-                        (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _,
-                    )));
+                if ((self.code >> 16u8) & 0x1f) != 0 {
+                    uses.push(Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)));
                 }
                 uses
             }
             Opcode::Stfs => {
-                let mut uses = vec![Field::rS(GPR((((self.code) >> (32 - 11u8))
-                    & ((1 << 5usize) - 1))
-                    as _))];
-                if (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) != 0 {
-                    uses.push(Field::rA(GPR(
-                        (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _,
-                    )));
+                let mut uses = vec![Field::rS(GPR(((self.code >> 21u8) & 0x1f) as _))];
+                if ((self.code >> 16u8) & 0x1f) != 0 {
+                    uses.push(Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)));
                 }
                 uses
             }
             Opcode::Stfsu => {
                 let mut uses = vec![
-                    Field::rS(GPR(
-                        (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                    )),
-                    Field::rA(GPR(
-                        (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                    )),
+                    Field::rS(GPR(((self.code >> 21u8) & 0x1f) as _)),
+                    Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
                 ];
                 uses
             }
             Opcode::Stfsux => {
                 let mut uses = vec![
-                    Field::frS(FPR(
-                        (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                    )),
-                    Field::rA(GPR(
-                        (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                    )),
-                    Field::rB(GPR(
-                        (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                    )),
+                    Field::frS(FPR(((self.code >> 21u8) & 0x1f) as _)),
+                    Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
+                    Field::rB(GPR(((self.code >> 11u8) & 0x1f) as _)),
                 ];
                 uses
             }
             Opcode::Stfsx => {
                 let mut uses = vec![
-                    Field::frS(FPR(
-                        (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                    )),
-                    Field::rB(GPR(
-                        (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                    )),
+                    Field::frS(FPR(((self.code >> 21u8) & 0x1f) as _)),
+                    Field::rB(GPR(((self.code >> 11u8) & 0x1f) as _)),
                 ];
-                if (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) != 0 {
-                    uses.push(Field::rA(GPR(
-                        (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _,
-                    )));
+                if ((self.code >> 16u8) & 0x1f) != 0 {
+                    uses.push(Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)));
                 }
                 uses
             }
             Opcode::Sth => {
-                let mut uses = vec![Field::rS(GPR((((self.code) >> (32 - 11u8))
-                    & ((1 << 5usize) - 1))
-                    as _))];
-                if (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) != 0 {
-                    uses.push(Field::rA(GPR(
-                        (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _,
-                    )));
+                let mut uses = vec![Field::rS(GPR(((self.code >> 21u8) & 0x1f) as _))];
+                if ((self.code >> 16u8) & 0x1f) != 0 {
+                    uses.push(Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)));
                 }
                 uses
             }
             Opcode::Sthbrx => {
                 let mut uses = vec![
-                    Field::rS(GPR(
-                        (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                    )),
-                    Field::rB(GPR(
-                        (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                    )),
+                    Field::rS(GPR(((self.code >> 21u8) & 0x1f) as _)),
+                    Field::rB(GPR(((self.code >> 11u8) & 0x1f) as _)),
                 ];
-                if (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) != 0 {
-                    uses.push(Field::rA(GPR(
-                        (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _,
-                    )));
+                if ((self.code >> 16u8) & 0x1f) != 0 {
+                    uses.push(Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)));
                 }
                 uses
             }
             Opcode::Sthu => {
                 let mut uses = vec![
-                    Field::rS(GPR(
-                        (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                    )),
-                    Field::rA(GPR(
-                        (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                    )),
+                    Field::rS(GPR(((self.code >> 21u8) & 0x1f) as _)),
+                    Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
                 ];
                 uses
             }
             Opcode::Sthux => {
                 let mut uses = vec![
-                    Field::rS(GPR(
-                        (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                    )),
-                    Field::rA(GPR(
-                        (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                    )),
-                    Field::rB(GPR(
-                        (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                    )),
+                    Field::rS(GPR(((self.code >> 21u8) & 0x1f) as _)),
+                    Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
+                    Field::rB(GPR(((self.code >> 11u8) & 0x1f) as _)),
                 ];
                 uses
             }
             Opcode::Sthx => {
                 let mut uses = vec![
-                    Field::rS(GPR(
-                        (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                    )),
-                    Field::rB(GPR(
-                        (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                    )),
+                    Field::rS(GPR(((self.code >> 21u8) & 0x1f) as _)),
+                    Field::rB(GPR(((self.code >> 11u8) & 0x1f) as _)),
                 ];
-                if (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) != 0 {
-                    uses.push(Field::rA(GPR(
-                        (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _,
-                    )));
+                if ((self.code >> 16u8) & 0x1f) != 0 {
+                    uses.push(Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)));
                 }
                 uses
             }
             Opcode::Stmw => {
-                let mut uses = vec![Field::rS(GPR((((self.code) >> (32 - 11u8))
-                    & ((1 << 5usize) - 1))
-                    as _))];
-                if (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) != 0 {
-                    uses.push(Field::rA(GPR(
-                        (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _,
-                    )));
+                let mut uses = vec![Field::rS(GPR(((self.code >> 21u8) & 0x1f) as _))];
+                if ((self.code >> 16u8) & 0x1f) != 0 {
+                    uses.push(Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)));
                 }
                 uses
             }
             Opcode::Stswi => {
-                let mut uses = vec![Field::rS(GPR((((self.code) >> (32 - 11u8))
-                    & ((1 << 5usize) - 1))
-                    as _))];
-                if (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) != 0 {
-                    uses.push(Field::rA(GPR(
-                        (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _,
-                    )));
+                let mut uses = vec![Field::rS(GPR(((self.code >> 21u8) & 0x1f) as _))];
+                if ((self.code >> 16u8) & 0x1f) != 0 {
+                    uses.push(Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)));
                 }
                 uses
             }
             Opcode::Stswx => {
                 let mut uses = vec![
-                    Field::rS(GPR(
-                        (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                    )),
-                    Field::rB(GPR(
-                        (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                    )),
+                    Field::rS(GPR(((self.code >> 21u8) & 0x1f) as _)),
+                    Field::rB(GPR(((self.code >> 11u8) & 0x1f) as _)),
                 ];
-                if (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) != 0 {
-                    uses.push(Field::rA(GPR(
-                        (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _,
-                    )));
+                if ((self.code >> 16u8) & 0x1f) != 0 {
+                    uses.push(Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)));
                 }
                 uses
             }
             Opcode::Stw => {
-                let mut uses = vec![Field::rS(GPR((((self.code) >> (32 - 11u8))
-                    & ((1 << 5usize) - 1))
-                    as _))];
-                if (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) != 0 {
-                    uses.push(Field::rA(GPR(
-                        (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _,
-                    )));
+                let mut uses = vec![Field::rS(GPR(((self.code >> 21u8) & 0x1f) as _))];
+                if ((self.code >> 16u8) & 0x1f) != 0 {
+                    uses.push(Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)));
                 }
                 uses
             }
             Opcode::Stwbrx => {
                 let mut uses = vec![
-                    Field::rS(GPR(
-                        (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                    )),
-                    Field::rB(GPR(
-                        (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                    )),
+                    Field::rS(GPR(((self.code >> 21u8) & 0x1f) as _)),
+                    Field::rB(GPR(((self.code >> 11u8) & 0x1f) as _)),
                 ];
-                if (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) != 0 {
-                    uses.push(Field::rA(GPR(
-                        (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _,
-                    )));
+                if ((self.code >> 16u8) & 0x1f) != 0 {
+                    uses.push(Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)));
                 }
                 uses
             }
             Opcode::Stwcx_ => {
                 let mut uses = vec![
-                    Field::rS(GPR(
-                        (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                    )),
-                    Field::rB(GPR(
-                        (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                    )),
+                    Field::rS(GPR(((self.code >> 21u8) & 0x1f) as _)),
+                    Field::rB(GPR(((self.code >> 11u8) & 0x1f) as _)),
                 ];
-                if (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) != 0 {
-                    uses.push(Field::rA(GPR(
-                        (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _,
-                    )));
+                if ((self.code >> 16u8) & 0x1f) != 0 {
+                    uses.push(Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)));
                 }
                 uses
             }
             Opcode::Stwu => {
                 let mut uses = vec![
-                    Field::rS(GPR(
-                        (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                    )),
-                    Field::rA(GPR(
-                        (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                    )),
+                    Field::rS(GPR(((self.code >> 21u8) & 0x1f) as _)),
+                    Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
                 ];
                 uses
             }
             Opcode::Stwux => {
                 let mut uses = vec![
-                    Field::rS(GPR(
-                        (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                    )),
-                    Field::rA(GPR(
-                        (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                    )),
-                    Field::rB(GPR(
-                        (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                    )),
+                    Field::rS(GPR(((self.code >> 21u8) & 0x1f) as _)),
+                    Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
+                    Field::rB(GPR(((self.code >> 11u8) & 0x1f) as _)),
                 ];
                 uses
             }
             Opcode::Stwx => {
                 let mut uses = vec![
-                    Field::rS(GPR(
-                        (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                    )),
-                    Field::rB(GPR(
-                        (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                    )),
+                    Field::rS(GPR(((self.code >> 21u8) & 0x1f) as _)),
+                    Field::rB(GPR(((self.code >> 11u8) & 0x1f) as _)),
                 ];
-                if (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) != 0 {
-                    uses.push(Field::rA(GPR(
-                        (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _,
-                    )));
+                if ((self.code >> 16u8) & 0x1f) != 0 {
+                    uses.push(Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)));
                 }
                 uses
             }
             Opcode::Subf => {
                 let mut uses = vec![
-                    Field::rA(GPR(
-                        (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                    )),
-                    Field::rB(GPR(
-                        (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                    )),
+                    Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
+                    Field::rB(GPR(((self.code >> 11u8) & 0x1f) as _)),
                 ];
                 uses
             }
             Opcode::Subfc => {
                 let mut uses = vec![
-                    Field::rA(GPR(
-                        (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                    )),
-                    Field::rB(GPR(
-                        (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                    )),
+                    Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
+                    Field::rB(GPR(((self.code >> 11u8) & 0x1f) as _)),
                 ];
                 uses
             }
             Opcode::Subfe => {
                 let mut uses = vec![
-                    Field::rA(GPR(
-                        (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                    )),
-                    Field::rB(GPR(
-                        (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                    )),
+                    Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
+                    Field::rB(GPR(((self.code >> 11u8) & 0x1f) as _)),
                 ];
                 uses
             }
             Opcode::Subfic => {
-                let mut uses = vec![Field::rA(GPR((((self.code) >> (32 - 16u8))
-                    & ((1 << 5usize) - 1))
-                    as _))];
+                let mut uses = vec![Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _))];
                 uses
             }
             Opcode::Subfme => {
-                let mut uses = vec![Field::rA(GPR((((self.code) >> (32 - 16u8))
-                    & ((1 << 5usize) - 1))
-                    as _))];
+                let mut uses = vec![Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _))];
                 uses
             }
             Opcode::Subfze => {
-                let mut uses = vec![Field::rA(GPR((((self.code) >> (32 - 16u8))
-                    & ((1 << 5usize) - 1))
-                    as _))];
+                let mut uses = vec![Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _))];
                 uses
             }
             Opcode::Sync => {
@@ -6273,9 +3879,7 @@ impl Ins {
                 uses
             }
             Opcode::Tlbie => {
-                let mut uses = vec![Field::rB(GPR((((self.code) >> (32 - 21u8))
-                    & ((1 << 5usize) - 1))
-                    as _))];
+                let mut uses = vec![Field::rB(GPR(((self.code >> 11u8) & 0x1f) as _))];
                 uses
             }
             Opcode::Tlbsync => {
@@ -6284,42 +3888,28 @@ impl Ins {
             }
             Opcode::Tw => {
                 let mut uses = vec![
-                    Field::rA(GPR(
-                        (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _
-                    )),
-                    Field::rB(GPR(
-                        (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                    )),
+                    Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
+                    Field::rB(GPR(((self.code >> 11u8) & 0x1f) as _)),
                 ];
                 uses
             }
             Opcode::Twi => {
-                let mut uses = vec![Field::rA(GPR((((self.code) >> (32 - 16u8))
-                    & ((1 << 5usize) - 1))
-                    as _))];
+                let mut uses = vec![Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _))];
                 uses
             }
             Opcode::Xor => {
                 let mut uses = vec![
-                    Field::rS(GPR(
-                        (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _
-                    )),
-                    Field::rB(GPR(
-                        (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _
-                    )),
+                    Field::rS(GPR(((self.code >> 21u8) & 0x1f) as _)),
+                    Field::rB(GPR(((self.code >> 11u8) & 0x1f) as _)),
                 ];
                 uses
             }
             Opcode::Xori => {
-                let mut uses = vec![Field::rS(GPR((((self.code) >> (32 - 11u8))
-                    & ((1 << 5usize) - 1))
-                    as _))];
+                let mut uses = vec![Field::rS(GPR(((self.code >> 21u8) & 0x1f) as _))];
                 uses
             }
             Opcode::Xoris => {
-                let mut uses = vec![Field::rS(GPR((((self.code) >> (32 - 11u8))
-                    & ((1 << 5usize) - 1))
-                    as _))];
+                let mut uses = vec![Field::rS(GPR(((self.code >> 21u8) & 0x1f) as _))];
                 uses
             }
         }
@@ -6963,41 +4553,33 @@ impl Ins {
     pub(crate) fn _simplified(self) -> SimplifiedIns {
         match self.op {
             Opcode::Addi => {
-                if (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) == 0 {
+                if ((self.code >> 16u8) & 0x1f) == 0 {
                     return SimplifiedIns {
                         mnemonic: "li",
                         modifiers: Modifiers::default(),
                         args: vec![
-                            Argument::GPR(GPR(
-                                (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _,
-                            )),
-                            Argument::Simm(Simm(
-                                (((self.code) >> (32 - 32u8)) & ((1 << 16usize) - 1)) as _,
-                            )),
+                            Argument::GPR(GPR(((self.code >> 21u8) & 0x1f) as _)),
+                            Argument::Simm(Simm(((self.code >> 0u8) & 0xffff) as _)),
                         ],
                         ins: self,
                     };
                 }
             }
             Opcode::Addis => {
-                if (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) == 0 {
+                if ((self.code >> 16u8) & 0x1f) == 0 {
                     return SimplifiedIns {
                         mnemonic: "lis",
                         modifiers: Modifiers::default(),
                         args: vec![
-                            Argument::GPR(GPR(
-                                (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _,
-                            )),
-                            Argument::Uimm(Uimm(
-                                (((self.code) >> (32 - 32u8)) & ((1 << 16usize) - 1)) as _,
-                            )),
+                            Argument::GPR(GPR(((self.code >> 21u8) & 0x1f) as _)),
+                            Argument::Uimm(Uimm(((self.code >> 0u8) & 0xffff) as _)),
                         ],
                         ins: self,
                     };
                 }
             }
             Opcode::Bc => {
-                if (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) == 12 {
+                if ((self.code >> 21u8) & 0x1f) == 12 {
                     return SimplifiedIns {
                         mnemonic: "blt",
                         modifiers: {
@@ -7007,17 +4589,13 @@ impl Ins {
                             m
                         },
                         args: vec![
-                            Argument::CRBit(CRBit(
-                                (((self.code) >> (32 - 14u8)) & ((1 << 3usize) - 1)) as _,
-                            )),
-                            Argument::BranchDest(BranchDest(
-                                (((self.code) >> (32 - 30u8)) & ((1 << 14usize) - 1)) as _,
-                            )),
+                            Argument::CRBit(CRBit(((self.code >> 18u8) & 0x7) as _)),
+                            Argument::BranchDest(BranchDest(((self.code >> 2u8) & 0x3fff) as _)),
                         ],
                         ins: self,
                     };
                 }
-                if (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) == 4 {
+                if ((self.code >> 21u8) & 0x1f) == 4 {
                     return SimplifiedIns {
                         mnemonic: "ble",
                         modifiers: {
@@ -7027,17 +4605,13 @@ impl Ins {
                             m
                         },
                         args: vec![
-                            Argument::CRBit(CRBit(
-                                (((self.code) >> (32 - 14u8)) & ((1 << 3usize) - 1)) as _,
-                            )),
-                            Argument::BranchDest(BranchDest(
-                                (((self.code) >> (32 - 30u8)) & ((1 << 14usize) - 1)) as _,
-                            )),
+                            Argument::CRBit(CRBit(((self.code >> 18u8) & 0x7) as _)),
+                            Argument::BranchDest(BranchDest(((self.code >> 2u8) & 0x3fff) as _)),
                         ],
                         ins: self,
                     };
                 }
-                if (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) == 12 {
+                if ((self.code >> 21u8) & 0x1f) == 12 {
                     return SimplifiedIns {
                         mnemonic: "beq",
                         modifiers: {
@@ -7047,17 +4621,13 @@ impl Ins {
                             m
                         },
                         args: vec![
-                            Argument::CRBit(CRBit(
-                                (((self.code) >> (32 - 14u8)) & ((1 << 3usize) - 1)) as _,
-                            )),
-                            Argument::BranchDest(BranchDest(
-                                (((self.code) >> (32 - 30u8)) & ((1 << 14usize) - 1)) as _,
-                            )),
+                            Argument::CRBit(CRBit(((self.code >> 18u8) & 0x7) as _)),
+                            Argument::BranchDest(BranchDest(((self.code >> 2u8) & 0x3fff) as _)),
                         ],
                         ins: self,
                     };
                 }
-                if (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) == 4 {
+                if ((self.code >> 21u8) & 0x1f) == 4 {
                     return SimplifiedIns {
                         mnemonic: "bge",
                         modifiers: {
@@ -7067,17 +4637,13 @@ impl Ins {
                             m
                         },
                         args: vec![
-                            Argument::CRBit(CRBit(
-                                (((self.code) >> (32 - 14u8)) & ((1 << 3usize) - 1)) as _,
-                            )),
-                            Argument::BranchDest(BranchDest(
-                                (((self.code) >> (32 - 30u8)) & ((1 << 14usize) - 1)) as _,
-                            )),
+                            Argument::CRBit(CRBit(((self.code >> 18u8) & 0x7) as _)),
+                            Argument::BranchDest(BranchDest(((self.code >> 2u8) & 0x3fff) as _)),
                         ],
                         ins: self,
                     };
                 }
-                if (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) == 12 {
+                if ((self.code >> 21u8) & 0x1f) == 12 {
                     return SimplifiedIns {
                         mnemonic: "bgt",
                         modifiers: {
@@ -7087,17 +4653,13 @@ impl Ins {
                             m
                         },
                         args: vec![
-                            Argument::CRBit(CRBit(
-                                (((self.code) >> (32 - 14u8)) & ((1 << 3usize) - 1)) as _,
-                            )),
-                            Argument::BranchDest(BranchDest(
-                                (((self.code) >> (32 - 30u8)) & ((1 << 14usize) - 1)) as _,
-                            )),
+                            Argument::CRBit(CRBit(((self.code >> 18u8) & 0x7) as _)),
+                            Argument::BranchDest(BranchDest(((self.code >> 2u8) & 0x3fff) as _)),
                         ],
                         ins: self,
                     };
                 }
-                if (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) == 4 {
+                if ((self.code >> 21u8) & 0x1f) == 4 {
                     return SimplifiedIns {
                         mnemonic: "bne",
                         modifiers: {
@@ -7107,17 +4669,13 @@ impl Ins {
                             m
                         },
                         args: vec![
-                            Argument::CRBit(CRBit(
-                                (((self.code) >> (32 - 14u8)) & ((1 << 3usize) - 1)) as _,
-                            )),
-                            Argument::BranchDest(BranchDest(
-                                (((self.code) >> (32 - 30u8)) & ((1 << 14usize) - 1)) as _,
-                            )),
+                            Argument::CRBit(CRBit(((self.code >> 18u8) & 0x7) as _)),
+                            Argument::BranchDest(BranchDest(((self.code >> 2u8) & 0x3fff) as _)),
                         ],
                         ins: self,
                     };
                 }
-                if (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) == 12 {
+                if ((self.code >> 21u8) & 0x1f) == 12 {
                     return SimplifiedIns {
                         mnemonic: "bso",
                         modifiers: {
@@ -7127,17 +4685,13 @@ impl Ins {
                             m
                         },
                         args: vec![
-                            Argument::CRBit(CRBit(
-                                (((self.code) >> (32 - 14u8)) & ((1 << 3usize) - 1)) as _,
-                            )),
-                            Argument::BranchDest(BranchDest(
-                                (((self.code) >> (32 - 30u8)) & ((1 << 14usize) - 1)) as _,
-                            )),
+                            Argument::CRBit(CRBit(((self.code >> 18u8) & 0x7) as _)),
+                            Argument::BranchDest(BranchDest(((self.code >> 2u8) & 0x3fff) as _)),
                         ],
                         ins: self,
                     };
                 }
-                if (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) == 4 {
+                if ((self.code >> 21u8) & 0x1f) == 4 {
                     return SimplifiedIns {
                         mnemonic: "bns",
                         modifiers: {
@@ -7147,19 +4701,13 @@ impl Ins {
                             m
                         },
                         args: vec![
-                            Argument::CRBit(CRBit(
-                                (((self.code) >> (32 - 14u8)) & ((1 << 3usize) - 1)) as _,
-                            )),
-                            Argument::BranchDest(BranchDest(
-                                (((self.code) >> (32 - 30u8)) & ((1 << 14usize) - 1)) as _,
-                            )),
+                            Argument::CRBit(CRBit(((self.code >> 18u8) & 0x7) as _)),
+                            Argument::BranchDest(BranchDest(((self.code >> 2u8) & 0x3fff) as _)),
                         ],
                         ins: self,
                     };
                 }
-                if (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) == 16
-                    && (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) == 0
-                {
+                if ((self.code >> 21u8) & 0x1f) == 16 && ((self.code >> 16u8) & 0x1f) == 0 {
                     return SimplifiedIns {
                         mnemonic: "bdnz",
                         modifiers: {
@@ -7169,14 +4717,12 @@ impl Ins {
                             m
                         },
                         args: vec![Argument::BranchDest(BranchDest(
-                            (((self.code) >> (32 - 30u8)) & ((1 << 14usize) - 1)) as _,
+                            ((self.code >> 2u8) & 0x3fff) as _,
                         ))],
                         ins: self,
                     };
                 }
-                if (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) == 18
-                    && (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) == 0
-                {
+                if ((self.code >> 21u8) & 0x1f) == 18 && ((self.code >> 16u8) & 0x1f) == 0 {
                     return SimplifiedIns {
                         mnemonic: "bdz",
                         modifiers: {
@@ -7186,14 +4732,14 @@ impl Ins {
                             m
                         },
                         args: vec![Argument::BranchDest(BranchDest(
-                            (((self.code) >> (32 - 30u8)) & ((1 << 14usize) - 1)) as _,
+                            ((self.code >> 2u8) & 0x3fff) as _,
                         ))],
                         ins: self,
                     };
                 }
             }
             Opcode::Bcctr => {
-                if (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) == 12 {
+                if ((self.code >> 21u8) & 0x1f) == 12 {
                     return SimplifiedIns {
                         mnemonic: "bltctr",
                         modifiers: {
@@ -7202,17 +4748,13 @@ impl Ins {
                             m
                         },
                         args: vec![
-                            Argument::CRBit(CRBit(
-                                (((self.code) >> (32 - 14u8)) & ((1 << 3usize) - 1)) as _,
-                            )),
-                            Argument::BranchDest(BranchDest(
-                                (((self.code) >> (32 - 30u8)) & ((1 << 14usize) - 1)) as _,
-                            )),
+                            Argument::CRBit(CRBit(((self.code >> 18u8) & 0x7) as _)),
+                            Argument::BranchDest(BranchDest(((self.code >> 2u8) & 0x3fff) as _)),
                         ],
                         ins: self,
                     };
                 }
-                if (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) == 4 {
+                if ((self.code >> 21u8) & 0x1f) == 4 {
                     return SimplifiedIns {
                         mnemonic: "blectr",
                         modifiers: {
@@ -7221,17 +4763,13 @@ impl Ins {
                             m
                         },
                         args: vec![
-                            Argument::CRBit(CRBit(
-                                (((self.code) >> (32 - 14u8)) & ((1 << 3usize) - 1)) as _,
-                            )),
-                            Argument::BranchDest(BranchDest(
-                                (((self.code) >> (32 - 30u8)) & ((1 << 14usize) - 1)) as _,
-                            )),
+                            Argument::CRBit(CRBit(((self.code >> 18u8) & 0x7) as _)),
+                            Argument::BranchDest(BranchDest(((self.code >> 2u8) & 0x3fff) as _)),
                         ],
                         ins: self,
                     };
                 }
-                if (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) == 12 {
+                if ((self.code >> 21u8) & 0x1f) == 12 {
                     return SimplifiedIns {
                         mnemonic: "beqctr",
                         modifiers: {
@@ -7240,17 +4778,13 @@ impl Ins {
                             m
                         },
                         args: vec![
-                            Argument::CRBit(CRBit(
-                                (((self.code) >> (32 - 14u8)) & ((1 << 3usize) - 1)) as _,
-                            )),
-                            Argument::BranchDest(BranchDest(
-                                (((self.code) >> (32 - 30u8)) & ((1 << 14usize) - 1)) as _,
-                            )),
+                            Argument::CRBit(CRBit(((self.code >> 18u8) & 0x7) as _)),
+                            Argument::BranchDest(BranchDest(((self.code >> 2u8) & 0x3fff) as _)),
                         ],
                         ins: self,
                     };
                 }
-                if (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) == 4 {
+                if ((self.code >> 21u8) & 0x1f) == 4 {
                     return SimplifiedIns {
                         mnemonic: "bgectr",
                         modifiers: {
@@ -7259,17 +4793,13 @@ impl Ins {
                             m
                         },
                         args: vec![
-                            Argument::CRBit(CRBit(
-                                (((self.code) >> (32 - 14u8)) & ((1 << 3usize) - 1)) as _,
-                            )),
-                            Argument::BranchDest(BranchDest(
-                                (((self.code) >> (32 - 30u8)) & ((1 << 14usize) - 1)) as _,
-                            )),
+                            Argument::CRBit(CRBit(((self.code >> 18u8) & 0x7) as _)),
+                            Argument::BranchDest(BranchDest(((self.code >> 2u8) & 0x3fff) as _)),
                         ],
                         ins: self,
                     };
                 }
-                if (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) == 12 {
+                if ((self.code >> 21u8) & 0x1f) == 12 {
                     return SimplifiedIns {
                         mnemonic: "bgtctr",
                         modifiers: {
@@ -7278,17 +4808,13 @@ impl Ins {
                             m
                         },
                         args: vec![
-                            Argument::CRBit(CRBit(
-                                (((self.code) >> (32 - 14u8)) & ((1 << 3usize) - 1)) as _,
-                            )),
-                            Argument::BranchDest(BranchDest(
-                                (((self.code) >> (32 - 30u8)) & ((1 << 14usize) - 1)) as _,
-                            )),
+                            Argument::CRBit(CRBit(((self.code >> 18u8) & 0x7) as _)),
+                            Argument::BranchDest(BranchDest(((self.code >> 2u8) & 0x3fff) as _)),
                         ],
                         ins: self,
                     };
                 }
-                if (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) == 4 {
+                if ((self.code >> 21u8) & 0x1f) == 4 {
                     return SimplifiedIns {
                         mnemonic: "bnectr",
                         modifiers: {
@@ -7297,17 +4823,13 @@ impl Ins {
                             m
                         },
                         args: vec![
-                            Argument::CRBit(CRBit(
-                                (((self.code) >> (32 - 14u8)) & ((1 << 3usize) - 1)) as _,
-                            )),
-                            Argument::BranchDest(BranchDest(
-                                (((self.code) >> (32 - 30u8)) & ((1 << 14usize) - 1)) as _,
-                            )),
+                            Argument::CRBit(CRBit(((self.code >> 18u8) & 0x7) as _)),
+                            Argument::BranchDest(BranchDest(((self.code >> 2u8) & 0x3fff) as _)),
                         ],
                         ins: self,
                     };
                 }
-                if (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) == 12 {
+                if ((self.code >> 21u8) & 0x1f) == 12 {
                     return SimplifiedIns {
                         mnemonic: "bsoctr",
                         modifiers: {
@@ -7316,17 +4838,13 @@ impl Ins {
                             m
                         },
                         args: vec![
-                            Argument::CRBit(CRBit(
-                                (((self.code) >> (32 - 14u8)) & ((1 << 3usize) - 1)) as _,
-                            )),
-                            Argument::BranchDest(BranchDest(
-                                (((self.code) >> (32 - 30u8)) & ((1 << 14usize) - 1)) as _,
-                            )),
+                            Argument::CRBit(CRBit(((self.code >> 18u8) & 0x7) as _)),
+                            Argument::BranchDest(BranchDest(((self.code >> 2u8) & 0x3fff) as _)),
                         ],
                         ins: self,
                     };
                 }
-                if (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) == 4 {
+                if ((self.code >> 21u8) & 0x1f) == 4 {
                     return SimplifiedIns {
                         mnemonic: "bnsctr",
                         modifiers: {
@@ -7335,21 +4853,15 @@ impl Ins {
                             m
                         },
                         args: vec![
-                            Argument::CRBit(CRBit(
-                                (((self.code) >> (32 - 14u8)) & ((1 << 3usize) - 1)) as _,
-                            )),
-                            Argument::BranchDest(BranchDest(
-                                (((self.code) >> (32 - 30u8)) & ((1 << 14usize) - 1)) as _,
-                            )),
+                            Argument::CRBit(CRBit(((self.code >> 18u8) & 0x7) as _)),
+                            Argument::BranchDest(BranchDest(((self.code >> 2u8) & 0x3fff) as _)),
                         ],
                         ins: self,
                     };
                 }
             }
             Opcode::Bclr => {
-                if (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) == 20
-                    && (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) == 0
-                {
+                if ((self.code >> 21u8) & 0x1f) == 20 && ((self.code >> 16u8) & 0x1f) == 0 {
                     return SimplifiedIns {
                         mnemonic: "blr",
                         modifiers: Modifiers::default(),
@@ -7357,7 +4869,7 @@ impl Ins {
                         ins: self,
                     };
                 }
-                if (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) == 12 {
+                if ((self.code >> 21u8) & 0x1f) == 12 {
                     return SimplifiedIns {
                         mnemonic: "bltlr",
                         modifiers: {
@@ -7366,17 +4878,13 @@ impl Ins {
                             m
                         },
                         args: vec![
-                            Argument::CRBit(CRBit(
-                                (((self.code) >> (32 - 14u8)) & ((1 << 3usize) - 1)) as _,
-                            )),
-                            Argument::BranchDest(BranchDest(
-                                (((self.code) >> (32 - 30u8)) & ((1 << 14usize) - 1)) as _,
-                            )),
+                            Argument::CRBit(CRBit(((self.code >> 18u8) & 0x7) as _)),
+                            Argument::BranchDest(BranchDest(((self.code >> 2u8) & 0x3fff) as _)),
                         ],
                         ins: self,
                     };
                 }
-                if (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) == 4 {
+                if ((self.code >> 21u8) & 0x1f) == 4 {
                     return SimplifiedIns {
                         mnemonic: "blelr",
                         modifiers: {
@@ -7385,17 +4893,13 @@ impl Ins {
                             m
                         },
                         args: vec![
-                            Argument::CRBit(CRBit(
-                                (((self.code) >> (32 - 14u8)) & ((1 << 3usize) - 1)) as _,
-                            )),
-                            Argument::BranchDest(BranchDest(
-                                (((self.code) >> (32 - 30u8)) & ((1 << 14usize) - 1)) as _,
-                            )),
+                            Argument::CRBit(CRBit(((self.code >> 18u8) & 0x7) as _)),
+                            Argument::BranchDest(BranchDest(((self.code >> 2u8) & 0x3fff) as _)),
                         ],
                         ins: self,
                     };
                 }
-                if (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) == 12 {
+                if ((self.code >> 21u8) & 0x1f) == 12 {
                     return SimplifiedIns {
                         mnemonic: "beqlr",
                         modifiers: {
@@ -7404,17 +4908,13 @@ impl Ins {
                             m
                         },
                         args: vec![
-                            Argument::CRBit(CRBit(
-                                (((self.code) >> (32 - 14u8)) & ((1 << 3usize) - 1)) as _,
-                            )),
-                            Argument::BranchDest(BranchDest(
-                                (((self.code) >> (32 - 30u8)) & ((1 << 14usize) - 1)) as _,
-                            )),
+                            Argument::CRBit(CRBit(((self.code >> 18u8) & 0x7) as _)),
+                            Argument::BranchDest(BranchDest(((self.code >> 2u8) & 0x3fff) as _)),
                         ],
                         ins: self,
                     };
                 }
-                if (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) == 4 {
+                if ((self.code >> 21u8) & 0x1f) == 4 {
                     return SimplifiedIns {
                         mnemonic: "bgelr",
                         modifiers: {
@@ -7423,17 +4923,13 @@ impl Ins {
                             m
                         },
                         args: vec![
-                            Argument::CRBit(CRBit(
-                                (((self.code) >> (32 - 14u8)) & ((1 << 3usize) - 1)) as _,
-                            )),
-                            Argument::BranchDest(BranchDest(
-                                (((self.code) >> (32 - 30u8)) & ((1 << 14usize) - 1)) as _,
-                            )),
+                            Argument::CRBit(CRBit(((self.code >> 18u8) & 0x7) as _)),
+                            Argument::BranchDest(BranchDest(((self.code >> 2u8) & 0x3fff) as _)),
                         ],
                         ins: self,
                     };
                 }
-                if (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) == 12 {
+                if ((self.code >> 21u8) & 0x1f) == 12 {
                     return SimplifiedIns {
                         mnemonic: "bgtlr",
                         modifiers: {
@@ -7442,17 +4938,13 @@ impl Ins {
                             m
                         },
                         args: vec![
-                            Argument::CRBit(CRBit(
-                                (((self.code) >> (32 - 14u8)) & ((1 << 3usize) - 1)) as _,
-                            )),
-                            Argument::BranchDest(BranchDest(
-                                (((self.code) >> (32 - 30u8)) & ((1 << 14usize) - 1)) as _,
-                            )),
+                            Argument::CRBit(CRBit(((self.code >> 18u8) & 0x7) as _)),
+                            Argument::BranchDest(BranchDest(((self.code >> 2u8) & 0x3fff) as _)),
                         ],
                         ins: self,
                     };
                 }
-                if (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) == 4 {
+                if ((self.code >> 21u8) & 0x1f) == 4 {
                     return SimplifiedIns {
                         mnemonic: "bnelr",
                         modifiers: {
@@ -7461,17 +4953,13 @@ impl Ins {
                             m
                         },
                         args: vec![
-                            Argument::CRBit(CRBit(
-                                (((self.code) >> (32 - 14u8)) & ((1 << 3usize) - 1)) as _,
-                            )),
-                            Argument::BranchDest(BranchDest(
-                                (((self.code) >> (32 - 30u8)) & ((1 << 14usize) - 1)) as _,
-                            )),
+                            Argument::CRBit(CRBit(((self.code >> 18u8) & 0x7) as _)),
+                            Argument::BranchDest(BranchDest(((self.code >> 2u8) & 0x3fff) as _)),
                         ],
                         ins: self,
                     };
                 }
-                if (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) == 12 {
+                if ((self.code >> 21u8) & 0x1f) == 12 {
                     return SimplifiedIns {
                         mnemonic: "bsolr",
                         modifiers: {
@@ -7480,17 +4968,13 @@ impl Ins {
                             m
                         },
                         args: vec![
-                            Argument::CRBit(CRBit(
-                                (((self.code) >> (32 - 14u8)) & ((1 << 3usize) - 1)) as _,
-                            )),
-                            Argument::BranchDest(BranchDest(
-                                (((self.code) >> (32 - 30u8)) & ((1 << 14usize) - 1)) as _,
-                            )),
+                            Argument::CRBit(CRBit(((self.code >> 18u8) & 0x7) as _)),
+                            Argument::BranchDest(BranchDest(((self.code >> 2u8) & 0x3fff) as _)),
                         ],
                         ins: self,
                     };
                 }
-                if (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) == 4 {
+                if ((self.code >> 21u8) & 0x1f) == 4 {
                     return SimplifiedIns {
                         mnemonic: "bnslr",
                         modifiers: {
@@ -7499,268 +4983,206 @@ impl Ins {
                             m
                         },
                         args: vec![
-                            Argument::CRBit(CRBit(
-                                (((self.code) >> (32 - 14u8)) & ((1 << 3usize) - 1)) as _,
-                            )),
-                            Argument::BranchDest(BranchDest(
-                                (((self.code) >> (32 - 30u8)) & ((1 << 14usize) - 1)) as _,
-                            )),
+                            Argument::CRBit(CRBit(((self.code >> 18u8) & 0x7) as _)),
+                            Argument::BranchDest(BranchDest(((self.code >> 2u8) & 0x3fff) as _)),
                         ],
                         ins: self,
                     };
                 }
             }
             Opcode::Cmp => {
-                if (((self.code) >> (32 - 9u8)) & ((1 << 3usize) - 1)) == 0 {
+                if ((self.code >> 23u8) & 0x7) == 0 {
                     return SimplifiedIns {
                         mnemonic: "cmpw",
                         modifiers: Modifiers::default(),
                         args: vec![
-                            Argument::GPR(GPR(
-                                (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _,
-                            )),
-                            Argument::GPR(GPR(
-                                (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _,
-                            )),
+                            Argument::GPR(GPR(((self.code >> 16u8) & 0x1f) as _)),
+                            Argument::GPR(GPR(((self.code >> 11u8) & 0x1f) as _)),
                         ],
                         ins: self,
                     };
                 }
             }
             Opcode::Cmpi => {
-                if (((self.code) >> (32 - 9u8)) & ((1 << 3usize) - 1)) == 0 {
+                if ((self.code >> 23u8) & 0x7) == 0 {
                     return SimplifiedIns {
                         mnemonic: "cmpwi",
                         modifiers: Modifiers::default(),
                         args: vec![
-                            Argument::GPR(GPR(
-                                (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _,
-                            )),
-                            Argument::Simm(Simm(
-                                (((self.code) >> (32 - 32u8)) & ((1 << 16usize) - 1)) as _,
-                            )),
+                            Argument::GPR(GPR(((self.code >> 16u8) & 0x1f) as _)),
+                            Argument::Simm(Simm(((self.code >> 0u8) & 0xffff) as _)),
                         ],
                         ins: self,
                     };
                 }
-                if (((self.code) >> (32 - 9u8)) & ((1 << 3usize) - 1)) == 0 {
+                if ((self.code >> 23u8) & 0x7) == 0 {
                     return SimplifiedIns {
                         mnemonic: "cmpwi",
                         modifiers: Modifiers::default(),
                         args: vec![
-                            Argument::CRBit(CRBit(
-                                (((self.code) >> (32 - 9u8)) & ((1 << 3usize) - 1)) as _,
-                            )),
-                            Argument::GPR(GPR(
-                                (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _,
-                            )),
-                            Argument::Simm(Simm(
-                                (((self.code) >> (32 - 32u8)) & ((1 << 16usize) - 1)) as _,
-                            )),
+                            Argument::CRBit(CRBit(((self.code >> 23u8) & 0x7) as _)),
+                            Argument::GPR(GPR(((self.code >> 16u8) & 0x1f) as _)),
+                            Argument::Simm(Simm(((self.code >> 0u8) & 0xffff) as _)),
                         ],
                         ins: self,
                     };
                 }
             }
             Opcode::Cmpl => {
-                if (((self.code) >> (32 - 9u8)) & ((1 << 3usize) - 1)) == 0 {
+                if ((self.code >> 23u8) & 0x7) == 0 {
                     return SimplifiedIns {
                         mnemonic: "cmplw",
                         modifiers: Modifiers::default(),
                         args: vec![
-                            Argument::GPR(GPR(
-                                (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _,
-                            )),
-                            Argument::GPR(GPR(
-                                (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _,
-                            )),
+                            Argument::GPR(GPR(((self.code >> 16u8) & 0x1f) as _)),
+                            Argument::GPR(GPR(((self.code >> 11u8) & 0x1f) as _)),
                         ],
                         ins: self,
                     };
                 }
             }
             Opcode::Cmpli => {
-                if (((self.code) >> (32 - 9u8)) & ((1 << 3usize) - 1)) == 0 {
+                if ((self.code >> 23u8) & 0x7) == 0 {
                     return SimplifiedIns {
                         mnemonic: "cmplwi",
                         modifiers: Modifiers::default(),
                         args: vec![
-                            Argument::GPR(GPR(
-                                (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _,
-                            )),
-                            Argument::Uimm(Uimm(
-                                (((self.code) >> (32 - 32u8)) & ((1 << 16usize) - 1)) as _,
-                            )),
+                            Argument::GPR(GPR(((self.code >> 16u8) & 0x1f) as _)),
+                            Argument::Uimm(Uimm(((self.code >> 0u8) & 0xffff) as _)),
                         ],
                         ins: self,
                     };
                 }
-                if (((self.code) >> (32 - 9u8)) & ((1 << 3usize) - 1)) == 0 {
+                if ((self.code >> 23u8) & 0x7) == 0 {
                     return SimplifiedIns {
                         mnemonic: "cmplwi",
                         modifiers: Modifiers::default(),
                         args: vec![
-                            Argument::CRBit(CRBit(
-                                (((self.code) >> (32 - 9u8)) & ((1 << 3usize) - 1)) as _,
-                            )),
-                            Argument::GPR(GPR(
-                                (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _,
-                            )),
-                            Argument::Uimm(Uimm(
-                                (((self.code) >> (32 - 32u8)) & ((1 << 16usize) - 1)) as _,
-                            )),
+                            Argument::CRBit(CRBit(((self.code >> 23u8) & 0x7) as _)),
+                            Argument::GPR(GPR(((self.code >> 16u8) & 0x1f) as _)),
+                            Argument::Uimm(Uimm(((self.code >> 0u8) & 0xffff) as _)),
                         ],
                         ins: self,
                     };
                 }
             }
             Opcode::Mfspr => {
-                if (((self.code) >> (32 - 21u8)) & ((1 << 10usize) - 1)) == 1 {
+                if ((self.code >> 11u8) & 0x3ff) == 1 {
                     return SimplifiedIns {
                         mnemonic: "mfxer",
                         modifiers: Modifiers::default(),
-                        args: vec![Argument::GPR(GPR((((self.code) >> (32 - 11u8))
-                            & ((1 << 5usize) - 1))
-                            as _))],
+                        args: vec![Argument::GPR(GPR(((self.code >> 21u8) & 0x1f) as _))],
                         ins: self,
                     };
                 }
-                if (((self.code) >> (32 - 21u8)) & ((1 << 10usize) - 1)) == 8 {
+                if ((self.code >> 11u8) & 0x3ff) == 8 {
                     return SimplifiedIns {
                         mnemonic: "mflr",
                         modifiers: Modifiers::default(),
-                        args: vec![Argument::GPR(GPR((((self.code) >> (32 - 11u8))
-                            & ((1 << 5usize) - 1))
-                            as _))],
+                        args: vec![Argument::GPR(GPR(((self.code >> 21u8) & 0x1f) as _))],
                         ins: self,
                     };
                 }
-                if (((self.code) >> (32 - 21u8)) & ((1 << 10usize) - 1)) == 9 {
+                if ((self.code >> 11u8) & 0x3ff) == 9 {
                     return SimplifiedIns {
                         mnemonic: "mfctr",
                         modifiers: Modifiers::default(),
-                        args: vec![Argument::GPR(GPR((((self.code) >> (32 - 11u8))
-                            & ((1 << 5usize) - 1))
-                            as _))],
+                        args: vec![Argument::GPR(GPR(((self.code >> 21u8) & 0x1f) as _))],
                         ins: self,
                     };
                 }
-                if (((self.code) >> (32 - 21u8)) & ((1 << 10usize) - 1)) == 18 {
+                if ((self.code >> 11u8) & 0x3ff) == 18 {
                     return SimplifiedIns {
                         mnemonic: "mfdsisr",
                         modifiers: Modifiers::default(),
-                        args: vec![Argument::GPR(GPR((((self.code) >> (32 - 11u8))
-                            & ((1 << 5usize) - 1))
-                            as _))],
+                        args: vec![Argument::GPR(GPR(((self.code >> 21u8) & 0x1f) as _))],
                         ins: self,
                     };
                 }
-                if (((self.code) >> (32 - 21u8)) & ((1 << 10usize) - 1)) == 397 {
+                if ((self.code >> 11u8) & 0x3ff) == 397 {
                     return SimplifiedIns {
                         mnemonic: "mfdbatu",
                         modifiers: Modifiers::default(),
-                        args: vec![Argument::GPR(GPR((((self.code) >> (32 - 11u8))
-                            & ((1 << 5usize) - 1))
-                            as _))],
+                        args: vec![Argument::GPR(GPR(((self.code >> 21u8) & 0x1f) as _))],
                         ins: self,
                     };
                 }
-                if (((self.code) >> (32 - 21u8)) & ((1 << 10usize) - 1)) == 571 {
+                if ((self.code >> 11u8) & 0x3ff) == 571 {
                     return SimplifiedIns {
                         mnemonic: "mftdu",
                         modifiers: Modifiers::default(),
-                        args: vec![Argument::GPR(GPR((((self.code) >> (32 - 11u8))
-                            & ((1 << 5usize) - 1))
-                            as _))],
+                        args: vec![Argument::GPR(GPR(((self.code >> 21u8) & 0x1f) as _))],
                         ins: self,
                     };
                 }
             }
             Opcode::Mtspr => {
-                if (((self.code) >> (32 - 21u8)) & ((1 << 10usize) - 1)) == 1 {
+                if ((self.code >> 11u8) & 0x3ff) == 1 {
                     return SimplifiedIns {
                         mnemonic: "mtxer",
                         modifiers: Modifiers::default(),
-                        args: vec![Argument::GPR(GPR((((self.code) >> (32 - 11u8))
-                            & ((1 << 5usize) - 1))
-                            as _))],
+                        args: vec![Argument::GPR(GPR(((self.code >> 21u8) & 0x1f) as _))],
                         ins: self,
                     };
                 }
-                if (((self.code) >> (32 - 21u8)) & ((1 << 10usize) - 1)) == 8 {
+                if ((self.code >> 11u8) & 0x3ff) == 8 {
                     return SimplifiedIns {
                         mnemonic: "mtlr",
                         modifiers: Modifiers::default(),
-                        args: vec![Argument::GPR(GPR((((self.code) >> (32 - 11u8))
-                            & ((1 << 5usize) - 1))
-                            as _))],
+                        args: vec![Argument::GPR(GPR(((self.code >> 21u8) & 0x1f) as _))],
                         ins: self,
                     };
                 }
-                if (((self.code) >> (32 - 21u8)) & ((1 << 10usize) - 1)) == 9 {
+                if ((self.code >> 11u8) & 0x3ff) == 9 {
                     return SimplifiedIns {
                         mnemonic: "mtctr",
                         modifiers: Modifiers::default(),
-                        args: vec![Argument::GPR(GPR((((self.code) >> (32 - 11u8))
-                            & ((1 << 5usize) - 1))
-                            as _))],
+                        args: vec![Argument::GPR(GPR(((self.code >> 21u8) & 0x1f) as _))],
                         ins: self,
                     };
                 }
-                if (((self.code) >> (32 - 21u8)) & ((1 << 10usize) - 1)) == 18 {
+                if ((self.code >> 11u8) & 0x3ff) == 18 {
                     return SimplifiedIns {
                         mnemonic: "mtdsisr",
                         modifiers: Modifiers::default(),
-                        args: vec![Argument::GPR(GPR((((self.code) >> (32 - 11u8))
-                            & ((1 << 5usize) - 1))
-                            as _))],
+                        args: vec![Argument::GPR(GPR(((self.code >> 21u8) & 0x1f) as _))],
                         ins: self,
                     };
                 }
-                if (((self.code) >> (32 - 21u8)) & ((1 << 10usize) - 1)) == 397 {
+                if ((self.code >> 11u8) & 0x3ff) == 397 {
                     return SimplifiedIns {
                         mnemonic: "mtdbatu",
                         modifiers: Modifiers::default(),
-                        args: vec![Argument::GPR(GPR((((self.code) >> (32 - 11u8))
-                            & ((1 << 5usize) - 1))
-                            as _))],
+                        args: vec![Argument::GPR(GPR(((self.code >> 21u8) & 0x1f) as _))],
                         ins: self,
                     };
                 }
-                if (((self.code) >> (32 - 21u8)) & ((1 << 10usize) - 1)) == 571 {
+                if ((self.code >> 11u8) & 0x3ff) == 571 {
                     return SimplifiedIns {
                         mnemonic: "mttdu",
                         modifiers: Modifiers::default(),
-                        args: vec![Argument::GPR(GPR((((self.code) >> (32 - 11u8))
-                            & ((1 << 5usize) - 1))
-                            as _))],
+                        args: vec![Argument::GPR(GPR(((self.code >> 21u8) & 0x1f) as _))],
                         ins: self,
                     };
                 }
             }
             Opcode::Or => {
-                if (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1))
-                    == (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1))
-                {
+                if ((self.code >> 21u8) & 0x1f) == ((self.code >> 11u8) & 0x1f) {
                     return SimplifiedIns {
                         mnemonic: "mr",
                         modifiers: Modifiers::default(),
                         args: vec![
-                            Argument::GPR(GPR(
-                                (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _,
-                            )),
-                            Argument::GPR(GPR(
-                                (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _,
-                            )),
+                            Argument::GPR(GPR(((self.code >> 16u8) & 0x1f) as _)),
+                            Argument::GPR(GPR(((self.code >> 21u8) & 0x1f) as _)),
                         ],
                         ins: self,
                     };
                 }
             }
             Opcode::Ori => {
-                if (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) == 0
-                    && (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) == 0
-                    && (((self.code) >> (32 - 32u8)) & ((1 << 16usize) - 1)) == 0
+                if ((self.code >> 16u8) & 0x1f) == 0
+                    && ((self.code >> 21u8) & 0x1f) == 0
+                    && ((self.code >> 0u8) & 0xffff) == 0
                 {
                     return SimplifiedIns {
                         mnemonic: "nop",
@@ -7771,116 +5193,78 @@ impl Ins {
                 }
             }
             Opcode::Rlwinm => {
-                if (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) == 0
-                    && (((self.code) >> (32 - 31u8)) & ((1 << 5usize) - 1)) == 31
-                {
+                if ((self.code >> 11u8) & 0x1f) == 0 && ((self.code >> 1u8) & 0x1f) == 31 {
                     return SimplifiedIns {
                         mnemonic: "clrlwi",
                         modifiers: Modifiers::default(),
                         args: vec![
-                            Argument::GPR(GPR(
-                                (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _,
-                            )),
-                            Argument::GPR(GPR(
-                                (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _,
-                            )),
-                            Argument::OpaqueU(OpaqueU(
-                                (((self.code) >> (32 - 26u8)) & ((1 << 5usize) - 1)) as _,
-                            )),
+                            Argument::GPR(GPR(((self.code >> 16u8) & 0x1f) as _)),
+                            Argument::GPR(GPR(((self.code >> 21u8) & 0x1f) as _)),
+                            Argument::OpaqueU(OpaqueU(((self.code >> 6u8) & 0x1f) as _)),
                         ],
                         ins: self,
                     };
                 }
-                if (((self.code) >> (32 - 26u8)) & ((1 << 5usize) - 1)) == 0
-                    && (((self.code) >> (32 - 31u8)) & ((1 << 5usize) - 1)) == 31
-                {
+                if ((self.code >> 6u8) & 0x1f) == 0 && ((self.code >> 1u8) & 0x1f) == 31 {
                     return SimplifiedIns {
                         mnemonic: "rotlwi",
                         modifiers: Modifiers::default(),
                         args: vec![
-                            Argument::GPR(GPR(
-                                (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _,
-                            )),
-                            Argument::GPR(GPR(
-                                (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _,
-                            )),
-                            Argument::OpaqueU(OpaqueU(
-                                (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _,
-                            )),
+                            Argument::GPR(GPR(((self.code >> 16u8) & 0x1f) as _)),
+                            Argument::GPR(GPR(((self.code >> 21u8) & 0x1f) as _)),
+                            Argument::OpaqueU(OpaqueU(((self.code >> 11u8) & 0x1f) as _)),
                         ],
                         ins: self,
                     };
                 }
-                if (((self.code) >> (32 - 26u8)) & ((1 << 5usize) - 1)) == 0
-                    && 31 - (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1))
-                        == (((self.code) >> (32 - 31u8)) & ((1 << 5usize) - 1))
+                if ((self.code >> 6u8) & 0x1f) == 0
+                    && 31 - ((self.code >> 11u8) & 0x1f) == ((self.code >> 1u8) & 0x1f)
                 {
                     return SimplifiedIns {
                         mnemonic: "slwi",
                         modifiers: Modifiers::default(),
                         args: vec![
-                            Argument::GPR(GPR(
-                                (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _,
-                            )),
-                            Argument::GPR(GPR(
-                                (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _,
-                            )),
-                            Argument::OpaqueU(OpaqueU(
-                                (((self.code) >> (32 - 31u8)) & ((1 << 5usize) - 1)) as _,
-                            )),
+                            Argument::GPR(GPR(((self.code >> 16u8) & 0x1f) as _)),
+                            Argument::GPR(GPR(((self.code >> 21u8) & 0x1f) as _)),
+                            Argument::OpaqueU(OpaqueU(((self.code >> 1u8) & 0x1f) as _)),
                         ],
                         ins: self,
                     };
                 }
-                if (((self.code) >> (32 - 31u8)) & ((1 << 5usize) - 1)) == 31
-                    && 32 - (((self.code) >> (32 - 26u8)) & ((1 << 5usize) - 1))
-                        == (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1))
+                if ((self.code >> 1u8) & 0x1f) == 31
+                    && 32 - ((self.code >> 6u8) & 0x1f) == ((self.code >> 11u8) & 0x1f)
                 {
                     return SimplifiedIns {
                         mnemonic: "srwi",
                         modifiers: Modifiers::default(),
                         args: vec![
-                            Argument::GPR(GPR(
-                                (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _,
-                            )),
-                            Argument::GPR(GPR(
-                                (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _,
-                            )),
-                            Argument::OpaqueU(OpaqueU(
-                                (((self.code) >> (32 - 26u8)) & ((1 << 5usize) - 1)) as _,
-                            )),
+                            Argument::GPR(GPR(((self.code >> 16u8) & 0x1f) as _)),
+                            Argument::GPR(GPR(((self.code >> 21u8) & 0x1f) as _)),
+                            Argument::OpaqueU(OpaqueU(((self.code >> 6u8) & 0x1f) as _)),
                         ],
                         ins: self,
                     };
                 }
             }
             Opcode::Twi => {
-                if (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) == 8 {
+                if ((self.code >> 21u8) & 0x1f) == 8 {
                     return SimplifiedIns {
                         mnemonic: "twgti",
                         modifiers: Modifiers::default(),
                         args: vec![
-                            Argument::GPR(GPR(
-                                (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _,
-                            )),
-                            Argument::Simm(Simm(
-                                (((self.code) >> (32 - 32u8)) & ((1 << 16usize) - 1)) as _,
-                            )),
+                            Argument::GPR(GPR(((self.code >> 16u8) & 0x1f) as _)),
+                            Argument::Simm(Simm(((self.code >> 0u8) & 0xffff) as _)),
                         ],
                         ins: self,
                     };
                 }
-                if (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) == 6 {
+                if ((self.code >> 21u8) & 0x1f) == 6 {
                     return SimplifiedIns {
                         mnemonic: "twllei",
                         modifiers: Modifiers::default(),
                         args: vec![
-                            Argument::GPR(GPR(
-                                (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _,
-                            )),
-                            Argument::Simm(Simm(
-                                (((self.code) >> (32 - 32u8)) & ((1 << 16usize) - 1)) as _,
-                            )),
+                            Argument::GPR(GPR(((self.code >> 16u8) & 0x1f) as _)),
+                            Argument::Simm(Simm(((self.code >> 0u8) & 0xffff) as _)),
                         ],
                         ins: self,
                     };
