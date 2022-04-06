@@ -1968,7 +1968,7 @@ mnemonics:
   - name: "mr"
     opcode: "or"
     args: [ "rA", "rS" ]
-    condition: "S == B"
+    condition: "rS == rB"
   - name: "nop"
     opcode: "ori"
     match:
@@ -2148,56 +2148,56 @@ mnemonics:
   - name: "blt"
     opcode: "bc"
     modifiers: [ "AA", "LK" ]
-    args: [ "crS.LT", "BD" ]
+    args: [ "crfS", "BD" ]
     match:
       - arg: BO
         value: 12
   - name: "ble"
     opcode: "bc"
     modifiers: [ "AA", "LK" ]
-    args: [ "crS.GT", "BD" ]
+    args: [ "crfS", "BD" ]
     match:
       - arg: BO
         value: 4
   - name: "beq"
     opcode: "bc"
     modifiers: [ "AA", "LK" ]
-    args: [ "crS.EQ", "BD" ]
+    args: [ "crfS", "BD" ]
     match:
       - arg: BO
         value: 12
   - name: "bge"
     opcode: "bc"
     modifiers: [ "AA", "LK" ]
-    args: [ "crS.LT", "BD" ]
+    args: [ "crfS", "BD" ]
     match:
       - arg: BO
         value: 4
   - name: "bgt"
     opcode: "bc"
     modifiers: [ "AA", "LK" ]
-    args: [ "crS.GT", "BD" ]
+    args: [ "crfS", "BD" ]
     match:
       - arg: BO
         value: 12
   - name: "bne"
     opcode: "bc"
     modifiers: [ "AA", "LK" ]
-    args: [ "crS.EQ", "BD" ]
+    args: [ "crfS", "BD" ]
     match:
       - arg: BO
         value: 4
   - name: "bso"
     opcode: "bc"
     modifiers: [ "AA", "LK" ]
-    args: [ "crS.SO", "BD" ]
+    args: [ "crfS", "BD" ]
     match:
       - arg: BO
         value: 12
   - name: "bns"
     opcode: "bc"
     modifiers: [ "AA", "LK" ]
-    args: [ "crS.SO", "BD" ]
+    args: [ "crfS", "BD" ]
     match:
       - arg: BO
         value: 4
@@ -2225,56 +2225,56 @@ mnemonics:
   - name: "bltctr"
     opcode: "bcctr"
     modifiers: [ "LK" ]
-    args: [ "crS.LT", "BD" ]
+    args: [ "crfS", "BD" ]
     match:
       - arg: BO
         value: 12
   - name: "blectr"
     opcode: "bcctr"
     modifiers: [ "LK" ]
-    args: [ "crS.GT", "BD" ]
+    args: [ "crfS", "BD" ]
     match:
       - arg: BO
         value: 4
   - name: "beqctr"
     opcode: "bcctr"
     modifiers: [ "LK" ]
-    args: [ "crS.EQ", "BD" ]
+    args: [ "crfS", "BD" ]
     match:
       - arg: BO
         value: 12
   - name: "bgectr"
     opcode: "bcctr"
     modifiers: [ "LK" ]
-    args: [ "crS.LT", "BD" ]
+    args: [ "crfS", "BD" ]
     match:
       - arg: BO
         value: 4
   - name: "bgtctr"
     opcode: "bcctr"
     modifiers: [ "LK" ]
-    args: [ "crS.GT", "BD" ]
+    args: [ "crfS", "BD" ]
     match:
       - arg: BO
         value: 12
   - name: "bnectr"
     opcode: "bcctr"
     modifiers: [ "LK" ]
-    args: [ "crS.EQ", "BD" ]
+    args: [ "crfS", "BD" ]
     match:
       - arg: BO
         value: 4
   - name: "bsoctr"
     opcode: "bcctr"
     modifiers: [ "LK" ]
-    args: [ "crS.SO", "BD" ]
+    args: [ "crfS", "BD" ]
     match:
       - arg: BO
         value: 12
   - name: "bnsctr"
     opcode: "bcctr"
     modifiers: [ "LK" ]
-    args: [ "crS.SO", "BD" ]
+    args: [ "crfS", "BD" ]
     match:
       - arg: BO
         value: 4
@@ -2283,56 +2283,56 @@ mnemonics:
   - name: "bltlr"
     opcode: "bclr"
     modifiers: [ "LK" ]
-    args: [ "crS.LT", "BD" ]
+    args: [ "crfS", "BD" ]
     match:
       - arg: BO
         value: 12
   - name: "blelr"
     opcode: "bclr"
     modifiers: [ "LK" ]
-    args: [ "crS.GT", "BD" ]
+    args: [ "crfS", "BD" ]
     match:
       - arg: BO
         value: 4
   - name: "beqlr"
     opcode: "bclr"
     modifiers: [ "LK" ]
-    args: [ "crS.EQ", "BD" ]
+    args: [ "crfS", "BD" ]
     match:
       - arg: BO
         value: 12
   - name: "bgelr"
     opcode: "bclr"
     modifiers: [ "LK" ]
-    args: [ "crS.LT", "BD" ]
+    args: [ "crfS", "BD" ]
     match:
       - arg: BO
         value: 4
   - name: "bgtlr"
     opcode: "bclr"
     modifiers: [ "LK" ]
-    args: [ "crS.GT", "BD" ]
+    args: [ "crfS", "BD" ]
     match:
       - arg: BO
         value: 12
   - name: "bnelr"
     opcode: "bclr"
     modifiers: [ "LK" ]
-    args: [ "crS.EQ", "BD" ]
+    args: [ "crfS", "BD" ]
     match:
       - arg: BO
         value: 4
   - name: "bsolr"
     opcode: "bclr"
     modifiers: [ "LK" ]
-    args: [ "crS.SO", "BD" ]
+    args: [ "crfS", "BD" ]
     match:
       - arg: BO
         value: 12
   - name: "bnslr"
     opcode: "bclr"
     modifiers: [ "LK" ]
-    args: [ "crS.SO", "BD" ]
+    args: [ "crfS", "BD" ]
     match:
       - arg: BO
         value: 4

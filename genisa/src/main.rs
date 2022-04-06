@@ -3,6 +3,7 @@ use std::fs::File;
 use std::io::Write;
 use std::ops::Range;
 use std::process::{Command, Stdio};
+use std::str::FromStr;
 
 use itertools::Itertools;
 use proc_macro2::{Ident, Literal, Span, TokenStream, TokenTree};
@@ -30,16 +31,19 @@ fn _main() -> Result<()> {
     let isa = load_isa()?;
 
     let mut unformatted_code = Vec::<u8>::new();
-    writeln!(&mut unformatted_code, "{}", quote! {
-        use crate::prelude::*;
-    })?;
+    writeln!(
+        &mut unformatted_code,
+        "{}",
+        quote! {
+            use crate::prelude::*;
+        }
+    )?;
     writeln!(&mut unformatted_code, "{}", isa.gen_opcode_enum()?)?;
     writeln!(&mut unformatted_code, "{}", isa.gen_field_enum()?)?;
     writeln!(&mut unformatted_code, "{}", isa.gen_ins_impl()?)?;
 
     let formatted_code = rustfmt(unformatted_code);
-    File::create("./disasm/src/generated.rs")?
-        .write_all(&formatted_code)?;
+    File::create("./disasm/src/generated.rs")?.write_all(&formatted_code)?;
 
     Ok(())
 }
@@ -69,8 +73,8 @@ pub(crate) struct BitRange(Range<u8>);
 
 impl<'de> Deserialize<'de> for BitRange {
     fn deserialize<D>(deserializer: D) -> std::result::Result<Self, D::Error>
-        where
-            D: Deserializer<'de>,
+    where
+        D: Deserializer<'de>,
     {
         let range_str: String = Deserialize::deserialize(deserializer)?;
         if let Some((start_str, stop_str)) = range_str.split_once("..") {
@@ -321,7 +325,6 @@ impl Isa {
         Ok(field_enum)
     }
 
-
     pub(crate) fn gen_ins_impl(&self) -> Result<TokenStream> {
         // Map fields by name.
         let mut field_by_name = HashMap::<String, &Field>::new();
@@ -331,7 +334,10 @@ impl Isa {
         // Map mnemonics by opcode.
         let mut mnemonics_by_opcode = HashMap::<&String, Vec<&Mnemonic>>::new();
         for simple in &self.mnemonics {
-            mnemonics_by_opcode.entry(&simple.opcode).or_insert_with(|| Vec::new()).push(simple)
+            mnemonics_by_opcode
+                .entry(&simple.opcode)
+                .or_insert_with(|| Vec::new())
+                .push(simple)
         }
         // Generate match arms for each opcode.
         let mut field_match_arms = Vec::new();
@@ -343,9 +349,9 @@ impl Isa {
             // Generate fields of opcode.
             let mut fields = Vec::new();
             for arg in &opcode.args {
-                let field: &Field = field_by_name.get(arg).ok_or_else(|| {
-                    Error::from(format!("undefined field {}", arg))
-                })?;
+                let field: &Field = field_by_name
+                    .get(arg)
+                    .ok_or_else(|| Error::from(format!("undefined field {}", arg)))?;
                 let variant = field.construct_variant_self();
                 fields.extend(quote! { #variant, })
             }
@@ -360,7 +366,8 @@ impl Isa {
             let modifiers = ModifiersExpr {
                 modifiers: opcode.modifiers.clone(),
                 side_effects: opcode.side_effects.clone(),
-            }.build()?;
+            }
+            .build()?;
             modifier_match_arms.push(quote! {
                 Opcode::#ident => #modifiers,
             });
@@ -424,7 +431,7 @@ impl Isa {
             if let Some(mnemonics) = mnemonics_by_opcode.get(&opcode.name) {
                 let mut simplified_conditions = Vec::new();
                 for mnemonic in mnemonics {
-                    if mnemonic.matcher.is_empty() {
+                    if mnemonic.matcher.is_empty() && mnemonic.condition.is_empty() {
                         continue; // TODO else branch
                     }
                     // Emit if condition.
@@ -439,21 +446,44 @@ impl Isa {
                         })?;
                         simplified_conditions.push(field.express_value_self());
                         // Equate with literal.
-                        let lit_int = LitInt::new(&format!("{}", condition.value), Span::call_site());
+                        let lit_int =
+                            LitInt::new(&format!("{}", condition.value), Span::call_site());
                         simplified_conditions.push(quote!(== #lit_int));
+                    }
+                    if !mnemonic.condition.is_empty() {
+                        if mnemonic.matcher.len() > 0 {
+                            simplified_conditions.push(quote!(&&));
+                        }
+                        simplified_conditions.push(compile_mnemonic_condition(
+                            &field_by_name,
+                            &mnemonic.condition,
+                        )?);
                     }
                     // Emit branch.
                     let mnemonic_lit = LitStr::new(&mnemonic.name, Span::call_site());
+                    // Extract modifier bits.
                     let modifiers = ModifiersExpr {
                         modifiers: mnemonic.modifiers.clone(),
                         side_effects: vec![],
-                    }.build()?;
+                    }
+                    .build()?;
+                    // Extract arguments.
+                    let mut args = Vec::new();
+                    for arg in &mnemonic.args {
+                        let field = field_by_name
+                            .get(arg)
+                            .expect(&format!("field not found: {}", arg));
+                        let variant = Ident::new(field.arg.as_ref().unwrap(), Span::call_site());
+                        let value = field.express_value_self();
+                        args.push(quote!(Argument::#variant(#variant(#value as _)),));
+                    }
+                    let args = token_stream!(args);
                     simplified_conditions.push(quote! {
                         {
                             return SimplifiedIns {
                                 mnemonic: #mnemonic_lit,
                                 modifiers: #modifiers,
-                                args: vec![],
+                                args: vec![#args],
                                 ins: self,
                             };
                         }
@@ -621,4 +651,21 @@ impl ModifiersExpr {
     fn build_empty() -> TokenStream {
         quote!(Modifiers::default())
     }
+}
+
+/// Compiles conditions such as `S == B` into valid Rust expressions on a PowerPC instruction.
+fn compile_mnemonic_condition(
+    field_by_name: &HashMap<String, &Field>,
+    code: &str,
+) -> Result<TokenStream> {
+    let src_stream = TokenStream::from_str(code)?;
+    let token_iter = src_stream.into_iter().flat_map(|token| {
+        if let TokenTree::Ident(ref ident) = token {
+            if let Some(field) = field_by_name.get(&ident.to_string()) {
+                return field.express_value_self();
+            }
+        }
+        token.into()
+    });
+    Ok(TokenStream::from_iter(token_iter))
 }

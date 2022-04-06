@@ -6967,7 +6967,14 @@ impl Ins {
                     return SimplifiedIns {
                         mnemonic: "li",
                         modifiers: Modifiers::default(),
-                        args: vec![],
+                        args: vec![
+                            Argument::GPR(GPR(
+                                (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _,
+                            )),
+                            Argument::Simm(Simm(
+                                (((self.code) >> (32 - 32u8)) & ((1 << 16usize) - 1)) as _,
+                            )),
+                        ],
                         ins: self,
                     };
                 }
@@ -6977,7 +6984,14 @@ impl Ins {
                     return SimplifiedIns {
                         mnemonic: "lis",
                         modifiers: Modifiers::default(),
-                        args: vec![],
+                        args: vec![
+                            Argument::GPR(GPR(
+                                (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _,
+                            )),
+                            Argument::Uimm(Uimm(
+                                (((self.code) >> (32 - 32u8)) & ((1 << 16usize) - 1)) as _,
+                            )),
+                        ],
                         ins: self,
                     };
                 }
@@ -6992,7 +7006,14 @@ impl Ins {
                             m.lk = self.bit(31);
                             m
                         },
-                        args: vec![],
+                        args: vec![
+                            Argument::CRBit(CRBit(
+                                (((self.code) >> (32 - 14u8)) & ((1 << 3usize) - 1)) as _,
+                            )),
+                            Argument::BranchDest(BranchDest(
+                                (((self.code) >> (32 - 30u8)) & ((1 << 14usize) - 1)) as _,
+                            )),
+                        ],
                         ins: self,
                     };
                 }
@@ -7005,7 +7026,14 @@ impl Ins {
                             m.lk = self.bit(31);
                             m
                         },
-                        args: vec![],
+                        args: vec![
+                            Argument::CRBit(CRBit(
+                                (((self.code) >> (32 - 14u8)) & ((1 << 3usize) - 1)) as _,
+                            )),
+                            Argument::BranchDest(BranchDest(
+                                (((self.code) >> (32 - 30u8)) & ((1 << 14usize) - 1)) as _,
+                            )),
+                        ],
                         ins: self,
                     };
                 }
@@ -7018,7 +7046,14 @@ impl Ins {
                             m.lk = self.bit(31);
                             m
                         },
-                        args: vec![],
+                        args: vec![
+                            Argument::CRBit(CRBit(
+                                (((self.code) >> (32 - 14u8)) & ((1 << 3usize) - 1)) as _,
+                            )),
+                            Argument::BranchDest(BranchDest(
+                                (((self.code) >> (32 - 30u8)) & ((1 << 14usize) - 1)) as _,
+                            )),
+                        ],
                         ins: self,
                     };
                 }
@@ -7031,7 +7066,14 @@ impl Ins {
                             m.lk = self.bit(31);
                             m
                         },
-                        args: vec![],
+                        args: vec![
+                            Argument::CRBit(CRBit(
+                                (((self.code) >> (32 - 14u8)) & ((1 << 3usize) - 1)) as _,
+                            )),
+                            Argument::BranchDest(BranchDest(
+                                (((self.code) >> (32 - 30u8)) & ((1 << 14usize) - 1)) as _,
+                            )),
+                        ],
                         ins: self,
                     };
                 }
@@ -7044,7 +7086,14 @@ impl Ins {
                             m.lk = self.bit(31);
                             m
                         },
-                        args: vec![],
+                        args: vec![
+                            Argument::CRBit(CRBit(
+                                (((self.code) >> (32 - 14u8)) & ((1 << 3usize) - 1)) as _,
+                            )),
+                            Argument::BranchDest(BranchDest(
+                                (((self.code) >> (32 - 30u8)) & ((1 << 14usize) - 1)) as _,
+                            )),
+                        ],
                         ins: self,
                     };
                 }
@@ -7057,7 +7106,14 @@ impl Ins {
                             m.lk = self.bit(31);
                             m
                         },
-                        args: vec![],
+                        args: vec![
+                            Argument::CRBit(CRBit(
+                                (((self.code) >> (32 - 14u8)) & ((1 << 3usize) - 1)) as _,
+                            )),
+                            Argument::BranchDest(BranchDest(
+                                (((self.code) >> (32 - 30u8)) & ((1 << 14usize) - 1)) as _,
+                            )),
+                        ],
                         ins: self,
                     };
                 }
@@ -7070,7 +7126,14 @@ impl Ins {
                             m.lk = self.bit(31);
                             m
                         },
-                        args: vec![],
+                        args: vec![
+                            Argument::CRBit(CRBit(
+                                (((self.code) >> (32 - 14u8)) & ((1 << 3usize) - 1)) as _,
+                            )),
+                            Argument::BranchDest(BranchDest(
+                                (((self.code) >> (32 - 30u8)) & ((1 << 14usize) - 1)) as _,
+                            )),
+                        ],
                         ins: self,
                     };
                 }
@@ -7083,7 +7146,14 @@ impl Ins {
                             m.lk = self.bit(31);
                             m
                         },
-                        args: vec![],
+                        args: vec![
+                            Argument::CRBit(CRBit(
+                                (((self.code) >> (32 - 14u8)) & ((1 << 3usize) - 1)) as _,
+                            )),
+                            Argument::BranchDest(BranchDest(
+                                (((self.code) >> (32 - 30u8)) & ((1 << 14usize) - 1)) as _,
+                            )),
+                        ],
                         ins: self,
                     };
                 }
@@ -7098,7 +7168,9 @@ impl Ins {
                             m.lk = self.bit(31);
                             m
                         },
-                        args: vec![],
+                        args: vec![Argument::BranchDest(BranchDest(
+                            (((self.code) >> (32 - 30u8)) & ((1 << 14usize) - 1)) as _,
+                        ))],
                         ins: self,
                     };
                 }
@@ -7113,7 +7185,9 @@ impl Ins {
                             m.lk = self.bit(31);
                             m
                         },
-                        args: vec![],
+                        args: vec![Argument::BranchDest(BranchDest(
+                            (((self.code) >> (32 - 30u8)) & ((1 << 14usize) - 1)) as _,
+                        ))],
                         ins: self,
                     };
                 }
@@ -7127,7 +7201,14 @@ impl Ins {
                             m.lk = self.bit(31);
                             m
                         },
-                        args: vec![],
+                        args: vec![
+                            Argument::CRBit(CRBit(
+                                (((self.code) >> (32 - 14u8)) & ((1 << 3usize) - 1)) as _,
+                            )),
+                            Argument::BranchDest(BranchDest(
+                                (((self.code) >> (32 - 30u8)) & ((1 << 14usize) - 1)) as _,
+                            )),
+                        ],
                         ins: self,
                     };
                 }
@@ -7139,7 +7220,14 @@ impl Ins {
                             m.lk = self.bit(31);
                             m
                         },
-                        args: vec![],
+                        args: vec![
+                            Argument::CRBit(CRBit(
+                                (((self.code) >> (32 - 14u8)) & ((1 << 3usize) - 1)) as _,
+                            )),
+                            Argument::BranchDest(BranchDest(
+                                (((self.code) >> (32 - 30u8)) & ((1 << 14usize) - 1)) as _,
+                            )),
+                        ],
                         ins: self,
                     };
                 }
@@ -7151,7 +7239,14 @@ impl Ins {
                             m.lk = self.bit(31);
                             m
                         },
-                        args: vec![],
+                        args: vec![
+                            Argument::CRBit(CRBit(
+                                (((self.code) >> (32 - 14u8)) & ((1 << 3usize) - 1)) as _,
+                            )),
+                            Argument::BranchDest(BranchDest(
+                                (((self.code) >> (32 - 30u8)) & ((1 << 14usize) - 1)) as _,
+                            )),
+                        ],
                         ins: self,
                     };
                 }
@@ -7163,7 +7258,14 @@ impl Ins {
                             m.lk = self.bit(31);
                             m
                         },
-                        args: vec![],
+                        args: vec![
+                            Argument::CRBit(CRBit(
+                                (((self.code) >> (32 - 14u8)) & ((1 << 3usize) - 1)) as _,
+                            )),
+                            Argument::BranchDest(BranchDest(
+                                (((self.code) >> (32 - 30u8)) & ((1 << 14usize) - 1)) as _,
+                            )),
+                        ],
                         ins: self,
                     };
                 }
@@ -7175,7 +7277,14 @@ impl Ins {
                             m.lk = self.bit(31);
                             m
                         },
-                        args: vec![],
+                        args: vec![
+                            Argument::CRBit(CRBit(
+                                (((self.code) >> (32 - 14u8)) & ((1 << 3usize) - 1)) as _,
+                            )),
+                            Argument::BranchDest(BranchDest(
+                                (((self.code) >> (32 - 30u8)) & ((1 << 14usize) - 1)) as _,
+                            )),
+                        ],
                         ins: self,
                     };
                 }
@@ -7187,7 +7296,14 @@ impl Ins {
                             m.lk = self.bit(31);
                             m
                         },
-                        args: vec![],
+                        args: vec![
+                            Argument::CRBit(CRBit(
+                                (((self.code) >> (32 - 14u8)) & ((1 << 3usize) - 1)) as _,
+                            )),
+                            Argument::BranchDest(BranchDest(
+                                (((self.code) >> (32 - 30u8)) & ((1 << 14usize) - 1)) as _,
+                            )),
+                        ],
                         ins: self,
                     };
                 }
@@ -7199,7 +7315,14 @@ impl Ins {
                             m.lk = self.bit(31);
                             m
                         },
-                        args: vec![],
+                        args: vec![
+                            Argument::CRBit(CRBit(
+                                (((self.code) >> (32 - 14u8)) & ((1 << 3usize) - 1)) as _,
+                            )),
+                            Argument::BranchDest(BranchDest(
+                                (((self.code) >> (32 - 30u8)) & ((1 << 14usize) - 1)) as _,
+                            )),
+                        ],
                         ins: self,
                     };
                 }
@@ -7211,7 +7334,14 @@ impl Ins {
                             m.lk = self.bit(31);
                             m
                         },
-                        args: vec![],
+                        args: vec![
+                            Argument::CRBit(CRBit(
+                                (((self.code) >> (32 - 14u8)) & ((1 << 3usize) - 1)) as _,
+                            )),
+                            Argument::BranchDest(BranchDest(
+                                (((self.code) >> (32 - 30u8)) & ((1 << 14usize) - 1)) as _,
+                            )),
+                        ],
                         ins: self,
                     };
                 }
@@ -7235,7 +7365,14 @@ impl Ins {
                             m.lk = self.bit(31);
                             m
                         },
-                        args: vec![],
+                        args: vec![
+                            Argument::CRBit(CRBit(
+                                (((self.code) >> (32 - 14u8)) & ((1 << 3usize) - 1)) as _,
+                            )),
+                            Argument::BranchDest(BranchDest(
+                                (((self.code) >> (32 - 30u8)) & ((1 << 14usize) - 1)) as _,
+                            )),
+                        ],
                         ins: self,
                     };
                 }
@@ -7247,7 +7384,14 @@ impl Ins {
                             m.lk = self.bit(31);
                             m
                         },
-                        args: vec![],
+                        args: vec![
+                            Argument::CRBit(CRBit(
+                                (((self.code) >> (32 - 14u8)) & ((1 << 3usize) - 1)) as _,
+                            )),
+                            Argument::BranchDest(BranchDest(
+                                (((self.code) >> (32 - 30u8)) & ((1 << 14usize) - 1)) as _,
+                            )),
+                        ],
                         ins: self,
                     };
                 }
@@ -7259,7 +7403,14 @@ impl Ins {
                             m.lk = self.bit(31);
                             m
                         },
-                        args: vec![],
+                        args: vec![
+                            Argument::CRBit(CRBit(
+                                (((self.code) >> (32 - 14u8)) & ((1 << 3usize) - 1)) as _,
+                            )),
+                            Argument::BranchDest(BranchDest(
+                                (((self.code) >> (32 - 30u8)) & ((1 << 14usize) - 1)) as _,
+                            )),
+                        ],
                         ins: self,
                     };
                 }
@@ -7271,7 +7422,14 @@ impl Ins {
                             m.lk = self.bit(31);
                             m
                         },
-                        args: vec![],
+                        args: vec![
+                            Argument::CRBit(CRBit(
+                                (((self.code) >> (32 - 14u8)) & ((1 << 3usize) - 1)) as _,
+                            )),
+                            Argument::BranchDest(BranchDest(
+                                (((self.code) >> (32 - 30u8)) & ((1 << 14usize) - 1)) as _,
+                            )),
+                        ],
                         ins: self,
                     };
                 }
@@ -7283,7 +7441,14 @@ impl Ins {
                             m.lk = self.bit(31);
                             m
                         },
-                        args: vec![],
+                        args: vec![
+                            Argument::CRBit(CRBit(
+                                (((self.code) >> (32 - 14u8)) & ((1 << 3usize) - 1)) as _,
+                            )),
+                            Argument::BranchDest(BranchDest(
+                                (((self.code) >> (32 - 30u8)) & ((1 << 14usize) - 1)) as _,
+                            )),
+                        ],
                         ins: self,
                     };
                 }
@@ -7295,7 +7460,14 @@ impl Ins {
                             m.lk = self.bit(31);
                             m
                         },
-                        args: vec![],
+                        args: vec![
+                            Argument::CRBit(CRBit(
+                                (((self.code) >> (32 - 14u8)) & ((1 << 3usize) - 1)) as _,
+                            )),
+                            Argument::BranchDest(BranchDest(
+                                (((self.code) >> (32 - 30u8)) & ((1 << 14usize) - 1)) as _,
+                            )),
+                        ],
                         ins: self,
                     };
                 }
@@ -7307,7 +7479,14 @@ impl Ins {
                             m.lk = self.bit(31);
                             m
                         },
-                        args: vec![],
+                        args: vec![
+                            Argument::CRBit(CRBit(
+                                (((self.code) >> (32 - 14u8)) & ((1 << 3usize) - 1)) as _,
+                            )),
+                            Argument::BranchDest(BranchDest(
+                                (((self.code) >> (32 - 30u8)) & ((1 << 14usize) - 1)) as _,
+                            )),
+                        ],
                         ins: self,
                     };
                 }
@@ -7319,7 +7498,14 @@ impl Ins {
                             m.lk = self.bit(31);
                             m
                         },
-                        args: vec![],
+                        args: vec![
+                            Argument::CRBit(CRBit(
+                                (((self.code) >> (32 - 14u8)) & ((1 << 3usize) - 1)) as _,
+                            )),
+                            Argument::BranchDest(BranchDest(
+                                (((self.code) >> (32 - 30u8)) & ((1 << 14usize) - 1)) as _,
+                            )),
+                        ],
                         ins: self,
                     };
                 }
@@ -7329,7 +7515,14 @@ impl Ins {
                     return SimplifiedIns {
                         mnemonic: "cmpw",
                         modifiers: Modifiers::default(),
-                        args: vec![],
+                        args: vec![
+                            Argument::GPR(GPR(
+                                (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _,
+                            )),
+                            Argument::GPR(GPR(
+                                (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _,
+                            )),
+                        ],
                         ins: self,
                     };
                 }
@@ -7339,7 +7532,14 @@ impl Ins {
                     return SimplifiedIns {
                         mnemonic: "cmpwi",
                         modifiers: Modifiers::default(),
-                        args: vec![],
+                        args: vec![
+                            Argument::GPR(GPR(
+                                (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _,
+                            )),
+                            Argument::Simm(Simm(
+                                (((self.code) >> (32 - 32u8)) & ((1 << 16usize) - 1)) as _,
+                            )),
+                        ],
                         ins: self,
                     };
                 }
@@ -7347,7 +7547,17 @@ impl Ins {
                     return SimplifiedIns {
                         mnemonic: "cmpwi",
                         modifiers: Modifiers::default(),
-                        args: vec![],
+                        args: vec![
+                            Argument::CRBit(CRBit(
+                                (((self.code) >> (32 - 9u8)) & ((1 << 3usize) - 1)) as _,
+                            )),
+                            Argument::GPR(GPR(
+                                (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _,
+                            )),
+                            Argument::Simm(Simm(
+                                (((self.code) >> (32 - 32u8)) & ((1 << 16usize) - 1)) as _,
+                            )),
+                        ],
                         ins: self,
                     };
                 }
@@ -7357,7 +7567,14 @@ impl Ins {
                     return SimplifiedIns {
                         mnemonic: "cmplw",
                         modifiers: Modifiers::default(),
-                        args: vec![],
+                        args: vec![
+                            Argument::GPR(GPR(
+                                (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _,
+                            )),
+                            Argument::GPR(GPR(
+                                (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _,
+                            )),
+                        ],
                         ins: self,
                     };
                 }
@@ -7367,7 +7584,14 @@ impl Ins {
                     return SimplifiedIns {
                         mnemonic: "cmplwi",
                         modifiers: Modifiers::default(),
-                        args: vec![],
+                        args: vec![
+                            Argument::GPR(GPR(
+                                (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _,
+                            )),
+                            Argument::Uimm(Uimm(
+                                (((self.code) >> (32 - 32u8)) & ((1 << 16usize) - 1)) as _,
+                            )),
+                        ],
                         ins: self,
                     };
                 }
@@ -7375,7 +7599,17 @@ impl Ins {
                     return SimplifiedIns {
                         mnemonic: "cmplwi",
                         modifiers: Modifiers::default(),
-                        args: vec![],
+                        args: vec![
+                            Argument::CRBit(CRBit(
+                                (((self.code) >> (32 - 9u8)) & ((1 << 3usize) - 1)) as _,
+                            )),
+                            Argument::GPR(GPR(
+                                (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _,
+                            )),
+                            Argument::Uimm(Uimm(
+                                (((self.code) >> (32 - 32u8)) & ((1 << 16usize) - 1)) as _,
+                            )),
+                        ],
                         ins: self,
                     };
                 }
@@ -7385,7 +7619,9 @@ impl Ins {
                     return SimplifiedIns {
                         mnemonic: "mfxer",
                         modifiers: Modifiers::default(),
-                        args: vec![],
+                        args: vec![Argument::GPR(GPR((((self.code) >> (32 - 11u8))
+                            & ((1 << 5usize) - 1))
+                            as _))],
                         ins: self,
                     };
                 }
@@ -7393,7 +7629,9 @@ impl Ins {
                     return SimplifiedIns {
                         mnemonic: "mflr",
                         modifiers: Modifiers::default(),
-                        args: vec![],
+                        args: vec![Argument::GPR(GPR((((self.code) >> (32 - 11u8))
+                            & ((1 << 5usize) - 1))
+                            as _))],
                         ins: self,
                     };
                 }
@@ -7401,7 +7639,9 @@ impl Ins {
                     return SimplifiedIns {
                         mnemonic: "mfctr",
                         modifiers: Modifiers::default(),
-                        args: vec![],
+                        args: vec![Argument::GPR(GPR((((self.code) >> (32 - 11u8))
+                            & ((1 << 5usize) - 1))
+                            as _))],
                         ins: self,
                     };
                 }
@@ -7409,7 +7649,9 @@ impl Ins {
                     return SimplifiedIns {
                         mnemonic: "mfdsisr",
                         modifiers: Modifiers::default(),
-                        args: vec![],
+                        args: vec![Argument::GPR(GPR((((self.code) >> (32 - 11u8))
+                            & ((1 << 5usize) - 1))
+                            as _))],
                         ins: self,
                     };
                 }
@@ -7417,7 +7659,9 @@ impl Ins {
                     return SimplifiedIns {
                         mnemonic: "mfdbatu",
                         modifiers: Modifiers::default(),
-                        args: vec![],
+                        args: vec![Argument::GPR(GPR((((self.code) >> (32 - 11u8))
+                            & ((1 << 5usize) - 1))
+                            as _))],
                         ins: self,
                     };
                 }
@@ -7425,7 +7669,9 @@ impl Ins {
                     return SimplifiedIns {
                         mnemonic: "mftdu",
                         modifiers: Modifiers::default(),
-                        args: vec![],
+                        args: vec![Argument::GPR(GPR((((self.code) >> (32 - 11u8))
+                            & ((1 << 5usize) - 1))
+                            as _))],
                         ins: self,
                     };
                 }
@@ -7435,7 +7681,9 @@ impl Ins {
                     return SimplifiedIns {
                         mnemonic: "mtxer",
                         modifiers: Modifiers::default(),
-                        args: vec![],
+                        args: vec![Argument::GPR(GPR((((self.code) >> (32 - 11u8))
+                            & ((1 << 5usize) - 1))
+                            as _))],
                         ins: self,
                     };
                 }
@@ -7443,7 +7691,9 @@ impl Ins {
                     return SimplifiedIns {
                         mnemonic: "mtlr",
                         modifiers: Modifiers::default(),
-                        args: vec![],
+                        args: vec![Argument::GPR(GPR((((self.code) >> (32 - 11u8))
+                            & ((1 << 5usize) - 1))
+                            as _))],
                         ins: self,
                     };
                 }
@@ -7451,7 +7701,9 @@ impl Ins {
                     return SimplifiedIns {
                         mnemonic: "mtctr",
                         modifiers: Modifiers::default(),
-                        args: vec![],
+                        args: vec![Argument::GPR(GPR((((self.code) >> (32 - 11u8))
+                            & ((1 << 5usize) - 1))
+                            as _))],
                         ins: self,
                     };
                 }
@@ -7459,7 +7711,9 @@ impl Ins {
                     return SimplifiedIns {
                         mnemonic: "mtdsisr",
                         modifiers: Modifiers::default(),
-                        args: vec![],
+                        args: vec![Argument::GPR(GPR((((self.code) >> (32 - 11u8))
+                            & ((1 << 5usize) - 1))
+                            as _))],
                         ins: self,
                     };
                 }
@@ -7467,7 +7721,9 @@ impl Ins {
                     return SimplifiedIns {
                         mnemonic: "mtdbatu",
                         modifiers: Modifiers::default(),
-                        args: vec![],
+                        args: vec![Argument::GPR(GPR((((self.code) >> (32 - 11u8))
+                            & ((1 << 5usize) - 1))
+                            as _))],
                         ins: self,
                     };
                 }
@@ -7475,12 +7731,32 @@ impl Ins {
                     return SimplifiedIns {
                         mnemonic: "mttdu",
                         modifiers: Modifiers::default(),
-                        args: vec![],
+                        args: vec![Argument::GPR(GPR((((self.code) >> (32 - 11u8))
+                            & ((1 << 5usize) - 1))
+                            as _))],
                         ins: self,
                     };
                 }
             }
-            Opcode::Or => {}
+            Opcode::Or => {
+                if (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1))
+                    == (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1))
+                {
+                    return SimplifiedIns {
+                        mnemonic: "mr",
+                        modifiers: Modifiers::default(),
+                        args: vec![
+                            Argument::GPR(GPR(
+                                (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _,
+                            )),
+                            Argument::GPR(GPR(
+                                (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _,
+                            )),
+                        ],
+                        ins: self,
+                    };
+                }
+            }
             Opcode::Ori => {
                 if (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) == 0
                     && (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) == 0
@@ -7494,13 +7770,103 @@ impl Ins {
                     };
                 }
             }
-            Opcode::Rlwinm => {}
+            Opcode::Rlwinm => {
+                if (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) == 0
+                    && (((self.code) >> (32 - 31u8)) & ((1 << 5usize) - 1)) == 31
+                {
+                    return SimplifiedIns {
+                        mnemonic: "clrlwi",
+                        modifiers: Modifiers::default(),
+                        args: vec![
+                            Argument::GPR(GPR(
+                                (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _,
+                            )),
+                            Argument::GPR(GPR(
+                                (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _,
+                            )),
+                            Argument::OpaqueU(OpaqueU(
+                                (((self.code) >> (32 - 26u8)) & ((1 << 5usize) - 1)) as _,
+                            )),
+                        ],
+                        ins: self,
+                    };
+                }
+                if (((self.code) >> (32 - 26u8)) & ((1 << 5usize) - 1)) == 0
+                    && (((self.code) >> (32 - 31u8)) & ((1 << 5usize) - 1)) == 31
+                {
+                    return SimplifiedIns {
+                        mnemonic: "rotlwi",
+                        modifiers: Modifiers::default(),
+                        args: vec![
+                            Argument::GPR(GPR(
+                                (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _,
+                            )),
+                            Argument::GPR(GPR(
+                                (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _,
+                            )),
+                            Argument::OpaqueU(OpaqueU(
+                                (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1)) as _,
+                            )),
+                        ],
+                        ins: self,
+                    };
+                }
+                if (((self.code) >> (32 - 26u8)) & ((1 << 5usize) - 1)) == 0
+                    && 31 - (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1))
+                        == (((self.code) >> (32 - 31u8)) & ((1 << 5usize) - 1))
+                {
+                    return SimplifiedIns {
+                        mnemonic: "slwi",
+                        modifiers: Modifiers::default(),
+                        args: vec![
+                            Argument::GPR(GPR(
+                                (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _,
+                            )),
+                            Argument::GPR(GPR(
+                                (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _,
+                            )),
+                            Argument::OpaqueU(OpaqueU(
+                                (((self.code) >> (32 - 31u8)) & ((1 << 5usize) - 1)) as _,
+                            )),
+                        ],
+                        ins: self,
+                    };
+                }
+                if (((self.code) >> (32 - 31u8)) & ((1 << 5usize) - 1)) == 31
+                    && 32 - (((self.code) >> (32 - 26u8)) & ((1 << 5usize) - 1))
+                        == (((self.code) >> (32 - 21u8)) & ((1 << 5usize) - 1))
+                {
+                    return SimplifiedIns {
+                        mnemonic: "srwi",
+                        modifiers: Modifiers::default(),
+                        args: vec![
+                            Argument::GPR(GPR(
+                                (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _,
+                            )),
+                            Argument::GPR(GPR(
+                                (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _,
+                            )),
+                            Argument::OpaqueU(OpaqueU(
+                                (((self.code) >> (32 - 26u8)) & ((1 << 5usize) - 1)) as _,
+                            )),
+                        ],
+                        ins: self,
+                    };
+                }
+            }
             Opcode::Twi => {
                 if (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) == 8 {
                     return SimplifiedIns {
                         mnemonic: "twgti",
                         modifiers: Modifiers::default(),
-                        args: vec![],
+                        args: vec![
+                            Argument::GPR(GPR(
+                                (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _,
+                            )),
+                            Argument::Simm(Simm(
+                                (((self.code) >> (32 - 32u8)) & ((1 << 16usize) - 1)) as _,
+                            )),
+                        ],
                         ins: self,
                     };
                 }
@@ -7508,7 +7874,14 @@ impl Ins {
                     return SimplifiedIns {
                         mnemonic: "twllei",
                         modifiers: Modifiers::default(),
-                        args: vec![],
+                        args: vec![
+                            Argument::GPR(GPR(
+                                (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) as _,
+                            )),
+                            Argument::Simm(Simm(
+                                (((self.code) >> (32 - 32u8)) & ((1 << 16usize) - 1)) as _,
+                            )),
+                        ],
                         ins: self,
                     };
                 }

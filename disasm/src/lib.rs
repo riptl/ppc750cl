@@ -6,16 +6,17 @@ use num_traits::{AsPrimitive, PrimInt};
 pub use crate::iter::{disasm_iter, DisasmIterator};
 
 pub mod formatter;
-mod iter;
 mod generated;
+mod iter;
 use generated::*;
 
 pub mod prelude {
     pub use crate::formatter::FormattedIns;
+    pub use crate::Argument;
     pub use crate::Field::*;
     pub use crate::Ins;
-    pub use crate::Opcode::*;
     pub use crate::Modifiers;
+    pub use crate::Opcode::*;
     pub use crate::SimplifiedIns;
     pub use crate::{
         Bit, BranchDest, CRBit, CRField, Offset, OpaqueU, Simm, Uimm, FPR, GPR, GQR, SPR, SR,
