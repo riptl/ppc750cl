@@ -203,7 +203,7 @@ impl Field {
             Field::tbr(x) => Some(Argument::OpaqueU(*x)),
             Field::mtfsf_FM(x) => Some(Argument::OpaqueU(*x)),
             Field::mtfsf_IMM(x) => Some(Argument::OpaqueU(*x)),
-            Field::tw_TO(x) => Some(Argument::OpaqueU(*x)),
+            Field::TO(x) => Some(Argument::OpaqueU(*x)),
             _ => None,
         }
     }

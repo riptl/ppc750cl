@@ -8,7 +8,7 @@ use itertools::Itertools;
 use proc_macro2::{Ident, Literal, Span, TokenStream, TokenTree};
 use quote::quote;
 use serde::{Deserialize, Deserializer};
-use syn::LitInt;
+use syn::{LitInt, LitStr};
 
 macro_rules! token_stream {
     ($stream:ident) => {
@@ -22,6 +22,9 @@ fn main() {
         std::process::exit(1);
     }
 }
+
+type Error = Box<dyn std::error::Error>;
+type Result<T> = std::result::Result<T, Error>;
 
 fn _main() -> Result<()> {
     let isa = load_isa()?;
@@ -172,6 +175,7 @@ impl Opcode {
 pub(crate) struct Mnemonic {
     name: String,
     opcode: String,
+    modifiers: Vec<String>,
     args: Vec<String>,
     condition: String,
     #[serde(rename = "match")]
@@ -324,14 +328,19 @@ impl Isa {
         for field in &self.fields {
             field_by_name.insert(field.name.clone(), field);
         }
+        // Map mnemonics by opcode.
+        let mut mnemonics_by_opcode = HashMap::<&String, Vec<&Mnemonic>>::new();
+        for simple in &self.mnemonics {
+            mnemonics_by_opcode.entry(&simple.opcode).or_insert_with(|| Vec::new()).push(simple)
+        }
         // Generate match arms for each opcode.
         let mut field_match_arms = Vec::new();
         let mut def_match_arms = Vec::new();
         let mut use_match_arms = Vec::new();
         let mut modifier_match_arms = Vec::new();
+        let mut simplified_ins_match_arms = Vec::new();
         for opcode in &self.opcodes {
             // Generate fields of opcode.
-            // TODO Support mnemonics.
             let mut fields = Vec::new();
             for arg in &opcode.args {
                 let field: &Field = field_by_name.get(arg).ok_or_else(|| {
@@ -348,36 +357,12 @@ impl Isa {
             });
 
             // Generate modifiers.
-            let mut set_modifiers: Vec<TokenTree> = Vec::new();
-            for modifier in &opcode.modifiers {
-                set_modifiers.extend(match modifier.as_str() {
-                    "OE" => quote! { m.oe = self.bit(21); },
-                    "Rc" => quote! { m.rc = self.bit(31); },
-                    "AA" => quote! { m.aa = self.bit(30); },
-                    "LK" => quote! { m.lk = self.bit(31); },
-                    _ => {
-                        return Err(format!("unsupported modifier {}", modifier).into());
-                    }
-                })
-            }
-            for modifier in &opcode.side_effects {
-                set_modifiers.extend(match modifier.as_str() {
-                    "OE" => quote! { m.oe = true; },
-                    "Rc" => quote! { m.rc = true; },
-                    "AA" => quote! { m.aa = true; },
-                    "LK" => quote! { m.lk = true; },
-                    _ => {
-                        return Err(format!("unsupported modifier {}", modifier).into());
-                    }
-                })
-            }
-            let set_modifiers = token_stream!(set_modifiers);
+            let modifiers = ModifiersExpr {
+                modifiers: opcode.modifiers.clone(),
+                side_effects: opcode.side_effects.clone(),
+            }.build()?;
             modifier_match_arms.push(quote! {
-                Opcode::#ident => {
-                    let mut m = Modifiers::default();
-                    #set_modifiers
-                    m
-                }
+                Opcode::#ident => #modifiers,
             });
 
             // Generate defs.
@@ -434,11 +419,59 @@ impl Isa {
                     uses
                 },
             });
+
+            // Generate instruction simplification.
+            if let Some(mnemonics) = mnemonics_by_opcode.get(&opcode.name) {
+                let mut simplified_conditions = Vec::new();
+                for mnemonic in mnemonics {
+                    if mnemonic.matcher.is_empty() {
+                        continue; // TODO else branch
+                    }
+                    // Emit if condition.
+                    simplified_conditions.push(quote!(if));
+                    for (i, condition) in mnemonic.matcher.iter().enumerate() {
+                        if i > 0 {
+                            simplified_conditions.push(quote!(&&));
+                        }
+                        // Express value from opcode.
+                        let field: &Field = field_by_name.get(&condition.arg).ok_or_else(|| {
+                            Error::from(format!("undefined field {}", &condition.arg))
+                        })?;
+                        simplified_conditions.push(field.express_value_self());
+                        // Equate with literal.
+                        let lit_int = LitInt::new(&format!("{}", condition.value), Span::call_site());
+                        simplified_conditions.push(quote!(== #lit_int));
+                    }
+                    // Emit branch.
+                    let mnemonic_lit = LitStr::new(&mnemonic.name, Span::call_site());
+                    let modifiers = ModifiersExpr {
+                        modifiers: mnemonic.modifiers.clone(),
+                        side_effects: vec![],
+                    }.build()?;
+                    simplified_conditions.push(quote! {
+                        {
+                            return SimplifiedIns {
+                                mnemonic: #mnemonic_lit,
+                                modifiers: #modifiers,
+                                args: vec![],
+                                ins: self,
+                            };
+                        }
+                    });
+                }
+                let simplified_conditions = token_stream!(simplified_conditions);
+                simplified_ins_match_arms.push(quote! {
+                    Opcode::#ident => {
+                        #simplified_conditions
+                    },
+                });
+            }
         }
         let field_match_arms = token_stream!(field_match_arms);
         let def_match_arms = token_stream!(def_match_arms);
         let use_match_arms = token_stream!(use_match_arms);
         let modifier_match_arms = token_stream!(modifier_match_arms);
+        let simplified_ins_match_arms = token_stream!(simplified_ins_match_arms);
         // Generate final fields function.
         let ins_impl = quote! {
             impl Ins {
@@ -474,6 +507,10 @@ impl Isa {
                 }
 
                 pub(crate) fn _simplified(self) -> SimplifiedIns {
+                    match self.op {
+                        #simplified_ins_match_arms
+                        _ => {}
+                    }
                     SimplifiedIns {
                         mnemonic: self.op.mnemonic(),
                         modifiers: self._modifiers(),
@@ -532,5 +569,56 @@ fn to_rust_variant_str(key: &str) -> Result<String> {
     }
 }
 
-type Error = Box<dyn std::error::Error>;
-type Result<T> = std::result::Result<T, Error>;
+#[derive(Default)]
+pub(crate) struct ModifiersExpr {
+    pub(crate) modifiers: Vec<String>,
+    pub(crate) side_effects: Vec<String>,
+}
+
+impl ModifiersExpr {
+    fn new() -> Self {
+        Self::default()
+    }
+
+    fn build(&self) -> Result<TokenStream> {
+        if self.modifiers.is_empty() && self.side_effects.is_empty() {
+            return Ok(Self::build_empty());
+        }
+        let mut statements: Vec<TokenTree> = Vec::new();
+        for modifier in &self.modifiers {
+            statements.extend(match modifier.as_str() {
+                "OE" => quote! { m.oe = self.bit(21); },
+                "Rc" => quote! { m.rc = self.bit(31); },
+                "AA" => quote! { m.aa = self.bit(30); },
+                "LK" => quote! { m.lk = self.bit(31); },
+                _ => {
+                    return Err(format!("unsupported modifier {}", modifier).into());
+                }
+            })
+        }
+        for modifier in &self.side_effects {
+            statements.extend(match modifier.as_str() {
+                // TODO dedup modifiers
+                "OE" => quote! { m.oe = true; },
+                "Rc" => quote! { m.rc = true; },
+                "AA" => quote! { m.aa = true; },
+                "LK" => quote! { m.lk = true; },
+                _ => {
+                    return Err(format!("unsupported modifier {}", modifier).into());
+                }
+            })
+        }
+        let statements = token_stream!(statements);
+        Ok(quote! {
+            {
+                let mut m = Modifiers::default();
+                #statements
+                m
+            }
+        })
+    }
+
+    fn build_empty() -> TokenStream {
+        quote!(Modifiers::default())
+    }
+}

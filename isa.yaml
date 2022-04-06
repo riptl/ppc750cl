@@ -127,7 +127,7 @@ fields:
     arg: "OpaqueU"
     desc: "Immediate for mtfsfi"
     bits: "16..20"
-  - name: "tw_TO"
+  - name: "TO"
     arg: "OpaqueU"
     desc: "Bitset for tw and twi"
     bits: "6..11"
@@ -1048,7 +1048,7 @@ opcodes:
     desc: "Move from FPSCR"
     bitmask: 0xfc1ffffe
     pattern: 0xfc00048e
-    modifier: [ "Rc" ]
+    modifiers: [ "Rc" ]
     args: [ "crfD" ]
     defs: [ "crfD" ]
 
@@ -1099,7 +1099,7 @@ opcodes:
     desc: "Move to FPSCR Bit 0"
     bitmask: 0xfc1ffffe
     pattern: 0xfc00008c
-    modifier: [ "Rc" ]
+    modifiers: [ "Rc" ]
     args: [ "crbD" ]
     defs: [ "crbD" ]
 
@@ -1107,7 +1107,7 @@ opcodes:
     desc: "Move to FPSCR Bit 1"
     bitmask: 0xfc1ffffe
     pattern: 0xfc00004c
-    modifier: [ "Rc" ]
+    modifiers: [ "Rc" ]
     args: [ "crbD" ]
     defs: [ "crbD" ]
 
@@ -1115,7 +1115,7 @@ opcodes:
     desc: "Move to FPSCR Fields"
     bitmask: 0xfe0107fe
     pattern: 0xfc00058e
-    modifier: [ "Rc" ]
+    modifiers: [ "Rc" ]
     args: [ "mtfsf_FM", "frB" ]
     uses: [ "frB" ]
 
@@ -1123,7 +1123,7 @@ opcodes:
     desc: "Move to FPSCR Field Immediate"
     bitmask: 0xfc7f0ffe
     pattern: 0xfc00010c
-    modifier: [ "Rc" ]
+    modifiers: [ "Rc" ]
     args: [ "crfD", "mtfsf_IMM" ]
     defs: [ "crfD" ]
 
@@ -1159,7 +1159,7 @@ opcodes:
     desc: "Multiply High Word"
     bitmask: 0xfc0007fe
     pattern: 0x7c000096
-    modifier: [ "Rc" ]
+    modifiers: [ "Rc" ]
     args: [ "rD", "rA", "rB" ]
     defs: [ "rD" ]
     uses: [ "rA", "rB" ]
@@ -1168,7 +1168,7 @@ opcodes:
     desc: "Multiply High Word Unsigned"
     bitmask: 0xfc0007fe
     pattern: 0x7c000016
-    modifier: [ "Rc" ]
+    modifiers: [ "Rc" ]
     args: [ "rD", "rA", "rB" ]
     defs: [ "rD" ]
     uses: [ "rA", "rB" ]
@@ -1177,7 +1177,7 @@ opcodes:
     desc: "Multiply Low Immediate"
     bitmask: 0xfc000000
     pattern: 0x1c000000
-    modifier: [ "Rc" ]
+    modifiers: [ "Rc" ]
     args: [ "rD", "rA", "simm" ]
     defs: [ "rD" ]
     uses: [ "rA" ]
@@ -1186,7 +1186,7 @@ opcodes:
     desc: "Multiply Low Word"
     bitmask: 0xfc0003fe
     pattern: 0x7c0001d6
-    modifier: [ "OE", "Rc" ]
+    modifiers: [ "OE", "Rc" ]
     args: [ "rD", "rA", "rB" ]
     defs: [ "rD" ]
     uses: [ "rA", "rB" ]
@@ -1195,7 +1195,7 @@ opcodes:
     desc: "NAND"
     bitmask: 0xfc0007fe
     pattern: 0x7c0003b8
-    modifier: [ "Rc" ]
+    modifiers: [ "Rc" ]
     args: [ "rA", "rS", "rB" ]
     defs: [ "rA" ]
     uses: [ "rS", "rB" ]
@@ -1204,7 +1204,7 @@ opcodes:
     desc: "Negate"
     bitmask: 0xfc00fffe
     pattern: 0x7c0000d0
-    modifier: [ "OE", "Rc" ]
+    modifiers: [ "OE", "Rc" ]
     args: [ "rD", "rA" ]
     defs: [ "rD" ]
     uses: [ "rA" ]
@@ -1213,7 +1213,7 @@ opcodes:
     desc: "NOR"
     bitmask: 0xfc0007fe
     pattern: 0x7c0000f8
-    modifier: [ "Rc" ]
+    modifiers: [ "Rc" ]
     args: [ "rA", "rS", "rB" ]
     defs: [ "rA" ]
     uses: [ "rS", "rB" ]
@@ -1222,7 +1222,7 @@ opcodes:
     desc: "OR"
     bitmask: 0xfc0007fe
     pattern: 0x7c000378
-    modifier: [ "Rc" ]
+    modifiers: [ "Rc" ]
     args: [ "rA", "rS", "rB" ]
     defs: [ "rA" ]
     uses: [ "rS", "rB" ]
@@ -1231,7 +1231,7 @@ opcodes:
     desc: "OR with Complement"
     bitmask: 0xfc0007fe
     pattern: 0x7c000338
-    modifier: [ "Rc" ]
+    modifiers: [ "Rc" ]
     args: [ "rA", "rS", "rB" ]
     defs: [ "rA" ]
     uses: [ "rS", "rB" ]
@@ -1318,7 +1318,7 @@ opcodes:
     desc: "Paired Single Absolute Value"
     bitmask: 0xfc1f07fe
     pattern: 0x10000210
-    modifier: [ "Rc" ]
+    modifiers: [ "Rc" ]
     args: [ "frD", "frA", "frB" ]
     defs: [ "frD" ]
     uses: [ "frA", "frB" ]
@@ -1327,7 +1327,7 @@ opcodes:
     desc: "Paired Single Add"
     bitmask: 0xfc0007fe
     pattern: 0x1000002a
-    modifier: [ "Rc" ]
+    modifiers: [ "Rc" ]
     args: [ "frD", "frA", "frB" ]
     defs: [ "frD" ]
     uses: [ "frA", "frB" ]
@@ -1368,7 +1368,7 @@ opcodes:
     desc: "Paired Single Divide"
     bitmask: 0xfc0007fe
     pattern: 0x10000024
-    modifier: [ "Rc" ]
+    modifiers: [ "Rc" ]
     args: [ "frD", "frA", "frB" ]
     defs: [ "frD" ]
     uses: [ "frA", "frB" ]
@@ -1377,7 +1377,7 @@ opcodes:
     desc: "Paired Single Multiply-Add"
     bitmask: 0xfc00003e
     pattern: 0x1000003a
-    modifier: [ "Rc" ]
+    modifiers: [ "Rc" ]
     args: [ "frD", "frA", "frC", "frB" ]
     defs: [ "frD" ]
     uses: [ "frA", "frC", "frB" ]
@@ -1386,7 +1386,7 @@ opcodes:
     desc: "Paired Single Multiply-Add Scalar high"
     bitmask: 0xfc00003e
     pattern: 0x1000001c
-    modifier: [ "Rc" ]
+    modifiers: [ "Rc" ]
     args: [ "frD", "frA", "frC", "frB" ]
     defs: [ "frD" ]
     uses: [ "frA", "frC", "frB" ]
@@ -1395,7 +1395,7 @@ opcodes:
     desc: "Paired Single Multiply-Add Scalar low"
     bitmask: 0xfc00003e
     pattern: 0x1000001e
-    modifier: [ "Rc" ]
+    modifiers: [ "Rc" ]
     args: [ "frD", "frA", "frC", "frB" ]
     defs: [ "frD" ]
     uses: [ "frA", "frC", "frB" ]
@@ -1404,7 +1404,7 @@ opcodes:
     desc: "Paired Single MERGE high"
     bitmask: 0xfc0007fe
     pattern: 0x10000420
-    modifier: [ "Rc" ]
+    modifiers: [ "Rc" ]
     args: [ "frD", "frA", "frB" ]
     defs: [ "frD" ]
     uses: [ "frA", "frB" ]
@@ -1413,7 +1413,7 @@ opcodes:
     desc: "Paired Single MERGE direct"
     bitmask: 0xfc0007fe
     pattern: 0x10000460
-    modifier: [ "Rc" ]
+    modifiers: [ "Rc" ]
     args: [ "frD", "frA", "frB" ]
     defs: [ "frD" ]
     uses: [ "frA", "frB" ]
@@ -1422,7 +1422,7 @@ opcodes:
     desc: "Paired Single MERGE swapped"
     bitmask: 0xfc0007fe
     pattern: 0x100004a0
-    modifier: [ "Rc" ]
+    modifiers: [ "Rc" ]
     args: [ "frD", "frA", "frB" ]
     defs: [ "frD" ]
     uses: [ "frA", "frB" ]
@@ -1431,7 +1431,7 @@ opcodes:
     desc: "Paired Single MERGE low"
     bitmask: 0xfc0007fe
     pattern: 0x100004e0
-    modifier: [ "Rc" ]
+    modifiers: [ "Rc" ]
     args: [ "frD", "frA", "frB" ]
     defs: [ "frD" ]
     uses: [ "frA", "frB" ]
@@ -1440,7 +1440,7 @@ opcodes:
     desc: "Paired Single Move Register"
     bitmask: 0xfc1f07fe
     pattern: 0x10000090
-    modifier: [ "Rc" ]
+    modifiers: [ "Rc" ]
     args: [ "frD", "frA", "frB" ]
     defs: [ "frD" ]
     uses: [ "frB" ]
@@ -1449,7 +1449,7 @@ opcodes:
     desc: "Paired Single Multiply-Subtract"
     bitmask: 0xfc00003e
     pattern: 0x10000038
-    modifier: [ "Rc" ]
+    modifiers: [ "Rc" ]
     args: [ "frD", "frA", "frC", "frB" ]
     defs: [ "frD" ]
     uses: [ "frA", "frC", "frB" ]
@@ -1458,7 +1458,7 @@ opcodes:
     desc: "Paired Single Multiply"
     bitmask: 0xfc00f83e
     pattern: 0x10000032
-    modifier: [ "Rc" ]
+    modifiers: [ "Rc" ]
     args: [ "frD", "frA", "frC" ]
     defs: [ "frD" ]
     uses: [ "frA", "frC" ]
@@ -1467,7 +1467,7 @@ opcodes:
     desc: "Paired Single Multiply Scalar high"
     bitmask: 0xfc00f83e
     pattern: 0x10000018
-    modifier: [ "Rc" ]
+    modifiers: [ "Rc" ]
     args: [ "frD", "frA", "frC" ]
     defs: [ "frD" ]
     uses: [ "frA", "frC" ]
@@ -1476,7 +1476,7 @@ opcodes:
     desc: "Paired Single Multiply Scalar low"
     bitmask: 0xfc00f83e
     pattern: 0x1000001a
-    modifier: [ "Rc" ]
+    modifiers: [ "Rc" ]
     args: [ "frD", "frA", "frC" ]
     defs: [ "frD" ]
     uses: [ "frA", "frC" ]
@@ -1485,7 +1485,7 @@ opcodes:
     desc: "Paired Single Negative Absolute Value"
     bitmask: 0xfc1f07fe
     pattern: 0x10000110
-    modifier: [ "Rc" ]
+    modifiers: [ "Rc" ]
     args: [ "frD", "frB" ]
     defs: [ "frD" ]
     uses: [ "frB" ]
@@ -1494,7 +1494,7 @@ opcodes:
     desc: "Paired Single Negate"
     bitmask: 0xfc1f07fe
     pattern: 0x10000050
-    modifier: [ "Rc" ]
+    modifiers: [ "Rc" ]
     args: [ "frD", "frB" ]
     defs: [ "frD" ]
     uses: [ "frB" ]
@@ -1503,7 +1503,7 @@ opcodes:
     desc: "Paired Single Negative Multiply-Add"
     bitmask: 0xfc00003e
     pattern: 0x1000003e
-    modifier: [ "Rc" ]
+    modifiers: [ "Rc" ]
     args: [ "frD", "frA", "frC", "frB" ]
     defs: [ "frD" ]
     uses: [ "frA", "frC", "frB" ]
@@ -1512,7 +1512,7 @@ opcodes:
     desc: "Paired Single Negative Multiply-Subtract"
     bitmask: 0xfc00003e
     pattern: 0x1000003c
-    modifier: [ "Rc" ]
+    modifiers: [ "Rc" ]
     args: [ "frD", "frA", "frC", "frB" ]
     defs: [ "frD" ]
     uses: [ "frA", "frC", "frB" ]
@@ -1521,7 +1521,7 @@ opcodes:
     desc: "Paired Single Reciprocal Estimate"
     bitmask: 0xfc1f07fe
     pattern: 0x10000030
-    modifier: [ "Rc" ]
+    modifiers: [ "Rc" ]
     args: [ "frD", "frB" ]
     defs: [ "frD" ]
     uses: [ "frB" ]
@@ -1530,7 +1530,7 @@ opcodes:
     desc: "Paired Single Reciprocal Square Root Estimate"
     bitmask: 0xfc1f07fe
     pattern: 0x10000034
-    modifier: [ "Rc" ]
+    modifiers: [ "Rc" ]
     args: [ "frD", "frB" ]
     defs: [ "frD" ]
     uses: [ "frB" ]
@@ -1539,7 +1539,7 @@ opcodes:
     desc: "Paired Single Select"
     bitmask: 0xfc00003e
     pattern: 0x1000002e
-    modifier: [ "Rc" ]
+    modifiers: [ "Rc" ]
     args: [ "frD", "frA", "frC", "frB" ]
     defs: [ "frD" ]
     uses: [ "frA", "frC", "frB" ]
@@ -1548,7 +1548,7 @@ opcodes:
     desc: "Paired Single Subtract"
     bitmask: 0xfc0007fe
     pattern: 0x10000028
-    modifier: [ "Rc" ]
+    modifiers: [ "Rc" ]
     args: [ "frD", "frA", "frB" ]
     defs: [ "frD" ]
     uses: [ "frA", "frB" ]
@@ -1557,7 +1557,7 @@ opcodes:
     desc: "Paired Single vector SUM high"
     bitmask: 0xfc00003e
     pattern: 0x10000014
-    modifier: [ "Rc" ]
+    modifiers: [ "Rc" ]
     args: [ "frD", "frA", "frC", "frB" ]
     defs: [ "frD" ]
     uses: [ "frA", "frC", "frB" ]
@@ -1566,7 +1566,7 @@ opcodes:
     desc: "Paired Single vector SUM low"
     bitmask: 0xfc00003e
     pattern: 0x10000016
-    modifier: [ "Rc" ]
+    modifiers: [ "Rc" ]
     args: [ "frD", "frA", "frC", "frB" ]
     defs: [ "frD" ]
     uses: [ "frA", "frC", "frB" ]
@@ -1580,7 +1580,7 @@ opcodes:
     desc: "Rotate Left Word Immediate then Mask Insert"
     bitmask: 0xfc000000
     pattern: 0x50000000
-    modifier: [ "Rc" ]
+    modifiers: [ "Rc" ]
     args: [ "rA", "rS", "SH", "MB", "ME" ]
     defs: [ "rA" ]
     uses: [ "rA", "rS", "SH" ]
@@ -1589,7 +1589,7 @@ opcodes:
     desc: "Rotate Left Word Immediate then AND with Mask"
     bitmask: 0xfc000000
     pattern: 0x54000000
-    modifier: [ "Rc" ]
+    modifiers: [ "Rc" ]
     args: [ "rA", "rS", "SH", "MB", "ME" ]
     defs: [ "rA" ]
     uses: [ "rS", "SH" ]
@@ -1598,7 +1598,7 @@ opcodes:
     desc: "Rotate Left Word then AND with Mask"
     bitmask: 0xfc000000
     pattern: 0x5c000000
-    modifier: [ "Rc" ]
+    modifiers: [ "Rc" ]
     args: [ "rA", "rS", "rB", "MB", "ME" ]
     defs: [ "rA" ]
     uses: [ "rS", "rB" ]
@@ -1612,7 +1612,7 @@ opcodes:
     desc: "Shift Left Word"
     bitmask: 0xfc0007fe
     pattern: 0x7c000030
-    modifier: [ "Rc" ]
+    modifiers: [ "Rc" ]
     args: [ "rA", "rS", "rB" ]
     defs: [ "rA" ]
     uses: [ "rS", "rB" ]
@@ -1621,7 +1621,7 @@ opcodes:
     desc: "Shift Right Algebraic Word"
     bitmask: 0xfc0007fe
     pattern: 0x7c000630
-    modifier: [ "Rc" ]
+    modifiers: [ "Rc" ]
     args: [ "rA", "rS", "rB" ]
     defs: [ "rA" ]
     uses: [ "rS", "rB" ]
@@ -1630,7 +1630,7 @@ opcodes:
     desc: "Shift Right Algebraic Word Immediate"
     bitmask: 0xfc0007fe
     pattern: 0x7c000670
-    modifier: [ "Rc" ]
+    modifiers: [ "Rc" ]
     args: [ "rA", "rS", "SH" ]
     defs: [ "rA" ]
     uses: [ "rS" ]
@@ -1639,7 +1639,7 @@ opcodes:
     desc: "Shift Right Word"
     bitmask: 0xfc0007fe
     pattern: 0x7c000430
-    modifier: [ "Rc" ]
+    modifiers: [ "Rc" ]
     args: [ "rS", "rA", "rB" ]
     defs: [ "rA" ]
     uses: [ "rA", "rB" ]
@@ -1847,7 +1847,7 @@ opcodes:
     desc: "Subtract From Carrying"
     bitmask: 0xfc0003fe
     pattern: 0x7c000050
-    modifier: [ "OE", "Rc" ]
+    modifiers: [ "OE", "Rc" ]
     args: [ "rD", "rA", "rB" ]
     defs: [ "rD" ]
     uses: [ "rA", "rB" ]
@@ -1856,7 +1856,7 @@ opcodes:
     desc: "Subtract from Carrying"
     bitmask: 0xfc0003fe
     pattern: 0x7c000010
-    modifier: [ "OE", "Rc" ]
+    modifiers: [ "OE", "Rc" ]
     args: [ "rD", "rA", "rB" ]
     defs: [ "rD" ]
     uses: [ "rA", "rB" ]
@@ -1865,7 +1865,7 @@ opcodes:
     desc: "Subtract from Extended"
     bitmask: 0xfc0003fe
     pattern: 0x7c000110
-    modifier: [ "OE", "Rc" ]
+    modifiers: [ "OE", "Rc" ]
     args: [ "rD", "rA", "rB" ]
     defs: [ "rD" ]
     uses: [ "rA", "rB" ]
@@ -1882,7 +1882,7 @@ opcodes:
     desc: "Subtract from Minus One Extended"
     bitmask: 0xfc00fbfe
     pattern: 0x7c0001d0
-    modifier: [ "OE", "Rc" ]
+    modifiers: [ "OE", "Rc" ]
     args: [ "rD", "rA" ]
     defs: [ "rD" ]
     uses: [ "rA" ]
@@ -1891,7 +1891,7 @@ opcodes:
     desc: "Subtract from Zero Extended"
     bitmask: 0xfc00fbfe
     pattern: 0x7c000190
-    modifier: [ "OE", "Rc" ]
+    modifiers: [ "OE", "Rc" ]
     args: [ "rD", "rA" ]
     defs: [ "rD" ]
     uses: [ "rA" ]
@@ -1917,14 +1917,14 @@ opcodes:
     desc: "Trap Word"
     bitmask: 0xfc0007ff
     pattern: 0x7c000008
-    args: [ "tw_TO", "rA", "rB" ]
+    args: [ "TO", "rA", "rB" ]
     uses: [ "rA", "rB" ]
 
   - name: "twi"
     desc: "Trap Word Immediate"
     bitmask: 0xfc000000
     pattern: 0xc0000000
-    args: [ "tw_TO", "rA", "simm" ]
+    args: [ "TO", "rA", "simm" ]
     uses: [ "rA" ]
 
   - name: "xor"

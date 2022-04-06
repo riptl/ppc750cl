@@ -1160,7 +1160,7 @@ pub enum Field {
     tbr(OpaqueU),
     mtfsf_FM(OpaqueU),
     mtfsf_IMM(OpaqueU),
-    tw_TO(OpaqueU),
+    TO(OpaqueU),
     xer,
     ctr,
     lr,
@@ -3412,7 +3412,7 @@ impl Ins {
             ))],
             Opcode::Tlbsync => vec![],
             Opcode::Tw => vec![
-                Field::tw_TO(OpaqueU(
+                Field::TO(OpaqueU(
                     (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _,
                 )),
                 Field::rA(GPR(
@@ -3423,7 +3423,7 @@ impl Ins {
                 )),
             ],
             Opcode::Twi => vec![
-                Field::tw_TO(OpaqueU(
+                Field::TO(OpaqueU(
                     (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) as _,
                 )),
                 Field::rA(GPR(
@@ -6346,23 +6346,14 @@ impl Ins {
                 m.rc = self.bit(31);
                 m
             }
-            Opcode::Addi => {
-                let mut m = Modifiers::default();
-                m
-            }
-            Opcode::Addic => {
-                let mut m = Modifiers::default();
-                m
-            }
+            Opcode::Addi => Modifiers::default(),
+            Opcode::Addic => Modifiers::default(),
             Opcode::Addic_ => {
                 let mut m = Modifiers::default();
                 m.rc = true;
                 m
             }
-            Opcode::Addis => {
-                let mut m = Modifiers::default();
-                m
-            }
+            Opcode::Addis => Modifiers::default(),
             Opcode::Addme => {
                 let mut m = Modifiers::default();
                 m.oe = self.bit(21);
@@ -6417,87 +6408,30 @@ impl Ins {
                 m.lk = self.bit(31);
                 m
             }
-            Opcode::Cmp => {
-                let mut m = Modifiers::default();
-                m
-            }
-            Opcode::Cmpi => {
-                let mut m = Modifiers::default();
-                m
-            }
-            Opcode::Cmpl => {
-                let mut m = Modifiers::default();
-                m
-            }
-            Opcode::Cmpli => {
-                let mut m = Modifiers::default();
-                m
-            }
+            Opcode::Cmp => Modifiers::default(),
+            Opcode::Cmpi => Modifiers::default(),
+            Opcode::Cmpl => Modifiers::default(),
+            Opcode::Cmpli => Modifiers::default(),
             Opcode::Cntlzw => {
                 let mut m = Modifiers::default();
                 m.rc = self.bit(31);
                 m
             }
-            Opcode::Crand => {
-                let mut m = Modifiers::default();
-                m
-            }
-            Opcode::Crandc => {
-                let mut m = Modifiers::default();
-                m
-            }
-            Opcode::Creqv => {
-                let mut m = Modifiers::default();
-                m
-            }
-            Opcode::Crnand => {
-                let mut m = Modifiers::default();
-                m
-            }
-            Opcode::Crnor => {
-                let mut m = Modifiers::default();
-                m
-            }
-            Opcode::Cror => {
-                let mut m = Modifiers::default();
-                m
-            }
-            Opcode::Crorc => {
-                let mut m = Modifiers::default();
-                m
-            }
-            Opcode::Crxor => {
-                let mut m = Modifiers::default();
-                m
-            }
-            Opcode::Dcbf => {
-                let mut m = Modifiers::default();
-                m
-            }
-            Opcode::Dcbi => {
-                let mut m = Modifiers::default();
-                m
-            }
-            Opcode::Dcbst => {
-                let mut m = Modifiers::default();
-                m
-            }
-            Opcode::Dcbt => {
-                let mut m = Modifiers::default();
-                m
-            }
-            Opcode::Dcbtst => {
-                let mut m = Modifiers::default();
-                m
-            }
-            Opcode::Dcbz => {
-                let mut m = Modifiers::default();
-                m
-            }
-            Opcode::DcbzL => {
-                let mut m = Modifiers::default();
-                m
-            }
+            Opcode::Crand => Modifiers::default(),
+            Opcode::Crandc => Modifiers::default(),
+            Opcode::Creqv => Modifiers::default(),
+            Opcode::Crnand => Modifiers::default(),
+            Opcode::Crnor => Modifiers::default(),
+            Opcode::Cror => Modifiers::default(),
+            Opcode::Crorc => Modifiers::default(),
+            Opcode::Crxor => Modifiers::default(),
+            Opcode::Dcbf => Modifiers::default(),
+            Opcode::Dcbi => Modifiers::default(),
+            Opcode::Dcbst => Modifiers::default(),
+            Opcode::Dcbt => Modifiers::default(),
+            Opcode::Dcbtst => Modifiers::default(),
+            Opcode::Dcbz => Modifiers::default(),
+            Opcode::DcbzL => Modifiers::default(),
             Opcode::Divw => {
                 let mut m = Modifiers::default();
                 m.oe = self.bit(21);
@@ -6510,18 +6444,9 @@ impl Ins {
                 m.rc = self.bit(31);
                 m
             }
-            Opcode::Eciwx => {
-                let mut m = Modifiers::default();
-                m
-            }
-            Opcode::Ecowx => {
-                let mut m = Modifiers::default();
-                m
-            }
-            Opcode::Eieio => {
-                let mut m = Modifiers::default();
-                m
-            }
+            Opcode::Eciwx => Modifiers::default(),
+            Opcode::Ecowx => Modifiers::default(),
+            Opcode::Eieio => Modifiers::default(),
             Opcode::Eqv => {
                 let mut m = Modifiers::default();
                 m.rc = self.bit(31);
@@ -6552,14 +6477,8 @@ impl Ins {
                 m.rc = self.bit(31);
                 m
             }
-            Opcode::Fcmpo => {
-                let mut m = Modifiers::default();
-                m
-            }
-            Opcode::Fcmpu => {
-                let mut m = Modifiers::default();
-                m
-            }
+            Opcode::Fcmpo => Modifiers::default(),
+            Opcode::Fcmpu => Modifiers::default(),
             Opcode::Fctiw => {
                 let mut m = Modifiers::default();
                 m.rc = self.bit(31);
@@ -6680,601 +6599,922 @@ impl Ins {
                 m.rc = self.bit(31);
                 m
             }
-            Opcode::Isync => {
-                let mut m = Modifiers::default();
-                m
-            }
-            Opcode::Lbz => {
-                let mut m = Modifiers::default();
-                m
-            }
-            Opcode::Lbzu => {
-                let mut m = Modifiers::default();
-                m
-            }
-            Opcode::Lbzux => {
-                let mut m = Modifiers::default();
-                m
-            }
-            Opcode::Lbzx => {
-                let mut m = Modifiers::default();
-                m
-            }
-            Opcode::Lfd => {
-                let mut m = Modifiers::default();
-                m
-            }
-            Opcode::Lfdu => {
-                let mut m = Modifiers::default();
-                m
-            }
-            Opcode::Lfdux => {
-                let mut m = Modifiers::default();
-                m
-            }
-            Opcode::Lfdx => {
-                let mut m = Modifiers::default();
-                m
-            }
-            Opcode::Lfs => {
-                let mut m = Modifiers::default();
-                m
-            }
-            Opcode::Lfsu => {
-                let mut m = Modifiers::default();
-                m
-            }
-            Opcode::Lfsux => {
-                let mut m = Modifiers::default();
-                m
-            }
-            Opcode::Lfsx => {
-                let mut m = Modifiers::default();
-                m
-            }
-            Opcode::Lha => {
-                let mut m = Modifiers::default();
-                m
-            }
-            Opcode::Lhau => {
-                let mut m = Modifiers::default();
-                m
-            }
-            Opcode::Lhaux => {
-                let mut m = Modifiers::default();
-                m
-            }
-            Opcode::Lhax => {
-                let mut m = Modifiers::default();
-                m
-            }
-            Opcode::Lhbrx => {
-                let mut m = Modifiers::default();
-                m
-            }
-            Opcode::Lhz => {
-                let mut m = Modifiers::default();
-                m
-            }
-            Opcode::Lhzu => {
-                let mut m = Modifiers::default();
-                m
-            }
-            Opcode::Lhzux => {
-                let mut m = Modifiers::default();
-                m
-            }
-            Opcode::Lhzx => {
-                let mut m = Modifiers::default();
-                m
-            }
-            Opcode::Lmw => {
-                let mut m = Modifiers::default();
-                m
-            }
-            Opcode::Lswi => {
-                let mut m = Modifiers::default();
-                m
-            }
-            Opcode::Lswx => {
-                let mut m = Modifiers::default();
-                m
-            }
-            Opcode::Lwarx => {
-                let mut m = Modifiers::default();
-                m
-            }
-            Opcode::Lwbrx => {
-                let mut m = Modifiers::default();
-                m
-            }
-            Opcode::Lwz => {
-                let mut m = Modifiers::default();
-                m
-            }
-            Opcode::Lwzu => {
-                let mut m = Modifiers::default();
-                m
-            }
-            Opcode::Lwzux => {
-                let mut m = Modifiers::default();
-                m
-            }
-            Opcode::Lwzx => {
-                let mut m = Modifiers::default();
-                m
-            }
-            Opcode::Mcrf => {
-                let mut m = Modifiers::default();
-                m
-            }
-            Opcode::Mcrfs => {
-                let mut m = Modifiers::default();
-                m
-            }
-            Opcode::Mcrxr => {
-                let mut m = Modifiers::default();
-                m
-            }
-            Opcode::Mfcr => {
-                let mut m = Modifiers::default();
-                m
-            }
+            Opcode::Isync => Modifiers::default(),
+            Opcode::Lbz => Modifiers::default(),
+            Opcode::Lbzu => Modifiers::default(),
+            Opcode::Lbzux => Modifiers::default(),
+            Opcode::Lbzx => Modifiers::default(),
+            Opcode::Lfd => Modifiers::default(),
+            Opcode::Lfdu => Modifiers::default(),
+            Opcode::Lfdux => Modifiers::default(),
+            Opcode::Lfdx => Modifiers::default(),
+            Opcode::Lfs => Modifiers::default(),
+            Opcode::Lfsu => Modifiers::default(),
+            Opcode::Lfsux => Modifiers::default(),
+            Opcode::Lfsx => Modifiers::default(),
+            Opcode::Lha => Modifiers::default(),
+            Opcode::Lhau => Modifiers::default(),
+            Opcode::Lhaux => Modifiers::default(),
+            Opcode::Lhax => Modifiers::default(),
+            Opcode::Lhbrx => Modifiers::default(),
+            Opcode::Lhz => Modifiers::default(),
+            Opcode::Lhzu => Modifiers::default(),
+            Opcode::Lhzux => Modifiers::default(),
+            Opcode::Lhzx => Modifiers::default(),
+            Opcode::Lmw => Modifiers::default(),
+            Opcode::Lswi => Modifiers::default(),
+            Opcode::Lswx => Modifiers::default(),
+            Opcode::Lwarx => Modifiers::default(),
+            Opcode::Lwbrx => Modifiers::default(),
+            Opcode::Lwz => Modifiers::default(),
+            Opcode::Lwzu => Modifiers::default(),
+            Opcode::Lwzux => Modifiers::default(),
+            Opcode::Lwzx => Modifiers::default(),
+            Opcode::Mcrf => Modifiers::default(),
+            Opcode::Mcrfs => Modifiers::default(),
+            Opcode::Mcrxr => Modifiers::default(),
+            Opcode::Mfcr => Modifiers::default(),
             Opcode::Mffs => {
                 let mut m = Modifiers::default();
+                m.rc = self.bit(31);
                 m
             }
-            Opcode::Mfmsr => {
-                let mut m = Modifiers::default();
-                m
-            }
-            Opcode::Mfspr => {
-                let mut m = Modifiers::default();
-                m
-            }
-            Opcode::Mfsr => {
-                let mut m = Modifiers::default();
-                m
-            }
-            Opcode::Mfsrin => {
-                let mut m = Modifiers::default();
-                m
-            }
-            Opcode::Mftb => {
-                let mut m = Modifiers::default();
-                m
-            }
-            Opcode::Mtcrf => {
-                let mut m = Modifiers::default();
-                m
-            }
+            Opcode::Mfmsr => Modifiers::default(),
+            Opcode::Mfspr => Modifiers::default(),
+            Opcode::Mfsr => Modifiers::default(),
+            Opcode::Mfsrin => Modifiers::default(),
+            Opcode::Mftb => Modifiers::default(),
+            Opcode::Mtcrf => Modifiers::default(),
             Opcode::Mtfsb0 => {
                 let mut m = Modifiers::default();
+                m.rc = self.bit(31);
                 m
             }
             Opcode::Mtfsb1 => {
                 let mut m = Modifiers::default();
+                m.rc = self.bit(31);
                 m
             }
             Opcode::Mtfsf => {
                 let mut m = Modifiers::default();
+                m.rc = self.bit(31);
                 m
             }
             Opcode::Mtfsfi => {
                 let mut m = Modifiers::default();
+                m.rc = self.bit(31);
                 m
             }
-            Opcode::Mtmsr => {
-                let mut m = Modifiers::default();
-                m
-            }
-            Opcode::Mtspr => {
-                let mut m = Modifiers::default();
-                m
-            }
-            Opcode::Mtsr => {
-                let mut m = Modifiers::default();
-                m
-            }
-            Opcode::Mtsrin => {
-                let mut m = Modifiers::default();
-                m
-            }
+            Opcode::Mtmsr => Modifiers::default(),
+            Opcode::Mtspr => Modifiers::default(),
+            Opcode::Mtsr => Modifiers::default(),
+            Opcode::Mtsrin => Modifiers::default(),
             Opcode::Mulhw => {
                 let mut m = Modifiers::default();
+                m.rc = self.bit(31);
                 m
             }
             Opcode::Mulhwu => {
                 let mut m = Modifiers::default();
+                m.rc = self.bit(31);
                 m
             }
             Opcode::Mulli => {
                 let mut m = Modifiers::default();
+                m.rc = self.bit(31);
                 m
             }
             Opcode::Mullw => {
                 let mut m = Modifiers::default();
+                m.oe = self.bit(21);
+                m.rc = self.bit(31);
                 m
             }
             Opcode::Nand => {
                 let mut m = Modifiers::default();
+                m.rc = self.bit(31);
                 m
             }
             Opcode::Neg => {
                 let mut m = Modifiers::default();
+                m.oe = self.bit(21);
+                m.rc = self.bit(31);
                 m
             }
             Opcode::Nor => {
                 let mut m = Modifiers::default();
+                m.rc = self.bit(31);
                 m
             }
             Opcode::Or => {
                 let mut m = Modifiers::default();
+                m.rc = self.bit(31);
                 m
             }
             Opcode::Orc => {
                 let mut m = Modifiers::default();
+                m.rc = self.bit(31);
                 m
             }
-            Opcode::Ori => {
-                let mut m = Modifiers::default();
-                m
-            }
-            Opcode::Oris => {
-                let mut m = Modifiers::default();
-                m
-            }
-            Opcode::PsqL => {
-                let mut m = Modifiers::default();
-                m
-            }
-            Opcode::PsqLu => {
-                let mut m = Modifiers::default();
-                m
-            }
-            Opcode::PsqLux => {
-                let mut m = Modifiers::default();
-                m
-            }
-            Opcode::PsqLx => {
-                let mut m = Modifiers::default();
-                m
-            }
-            Opcode::PsqSt => {
-                let mut m = Modifiers::default();
-                m
-            }
-            Opcode::PsqStu => {
-                let mut m = Modifiers::default();
-                m
-            }
-            Opcode::PsqStux => {
-                let mut m = Modifiers::default();
-                m
-            }
-            Opcode::PsqStx => {
-                let mut m = Modifiers::default();
-                m
-            }
+            Opcode::Ori => Modifiers::default(),
+            Opcode::Oris => Modifiers::default(),
+            Opcode::PsqL => Modifiers::default(),
+            Opcode::PsqLu => Modifiers::default(),
+            Opcode::PsqLux => Modifiers::default(),
+            Opcode::PsqLx => Modifiers::default(),
+            Opcode::PsqSt => Modifiers::default(),
+            Opcode::PsqStu => Modifiers::default(),
+            Opcode::PsqStux => Modifiers::default(),
+            Opcode::PsqStx => Modifiers::default(),
             Opcode::PsAbs => {
                 let mut m = Modifiers::default();
+                m.rc = self.bit(31);
                 m
             }
             Opcode::PsAdd => {
                 let mut m = Modifiers::default();
+                m.rc = self.bit(31);
                 m
             }
-            Opcode::PsCmpo0 => {
-                let mut m = Modifiers::default();
-                m
-            }
-            Opcode::PsCmpo1 => {
-                let mut m = Modifiers::default();
-                m
-            }
-            Opcode::PsCmpu0 => {
-                let mut m = Modifiers::default();
-                m
-            }
-            Opcode::PsCmpu1 => {
-                let mut m = Modifiers::default();
-                m
-            }
+            Opcode::PsCmpo0 => Modifiers::default(),
+            Opcode::PsCmpo1 => Modifiers::default(),
+            Opcode::PsCmpu0 => Modifiers::default(),
+            Opcode::PsCmpu1 => Modifiers::default(),
             Opcode::PsDiv => {
                 let mut m = Modifiers::default();
+                m.rc = self.bit(31);
                 m
             }
             Opcode::PsMadd => {
                 let mut m = Modifiers::default();
+                m.rc = self.bit(31);
                 m
             }
             Opcode::PsMadds0 => {
                 let mut m = Modifiers::default();
+                m.rc = self.bit(31);
                 m
             }
             Opcode::PsMadds1 => {
                 let mut m = Modifiers::default();
+                m.rc = self.bit(31);
                 m
             }
             Opcode::PsMerge00 => {
                 let mut m = Modifiers::default();
+                m.rc = self.bit(31);
                 m
             }
             Opcode::PsMerge01 => {
                 let mut m = Modifiers::default();
+                m.rc = self.bit(31);
                 m
             }
             Opcode::PsMerge10 => {
                 let mut m = Modifiers::default();
+                m.rc = self.bit(31);
                 m
             }
             Opcode::PsMerge11 => {
                 let mut m = Modifiers::default();
+                m.rc = self.bit(31);
                 m
             }
             Opcode::PsMr => {
                 let mut m = Modifiers::default();
+                m.rc = self.bit(31);
                 m
             }
             Opcode::PsMsub => {
                 let mut m = Modifiers::default();
+                m.rc = self.bit(31);
                 m
             }
             Opcode::PsMul => {
                 let mut m = Modifiers::default();
+                m.rc = self.bit(31);
                 m
             }
             Opcode::PsMuls0 => {
                 let mut m = Modifiers::default();
+                m.rc = self.bit(31);
                 m
             }
             Opcode::PsMuls1 => {
                 let mut m = Modifiers::default();
+                m.rc = self.bit(31);
                 m
             }
             Opcode::PsNabs => {
                 let mut m = Modifiers::default();
+                m.rc = self.bit(31);
                 m
             }
             Opcode::PsNeg => {
                 let mut m = Modifiers::default();
+                m.rc = self.bit(31);
                 m
             }
             Opcode::PsNmadd => {
                 let mut m = Modifiers::default();
+                m.rc = self.bit(31);
                 m
             }
             Opcode::PsNmsub => {
                 let mut m = Modifiers::default();
+                m.rc = self.bit(31);
                 m
             }
             Opcode::PsRes => {
                 let mut m = Modifiers::default();
+                m.rc = self.bit(31);
                 m
             }
             Opcode::PsRsqrte => {
                 let mut m = Modifiers::default();
+                m.rc = self.bit(31);
                 m
             }
             Opcode::PsSel => {
                 let mut m = Modifiers::default();
+                m.rc = self.bit(31);
                 m
             }
             Opcode::PsSub => {
                 let mut m = Modifiers::default();
+                m.rc = self.bit(31);
                 m
             }
             Opcode::PsSum0 => {
                 let mut m = Modifiers::default();
+                m.rc = self.bit(31);
                 m
             }
             Opcode::PsSum1 => {
                 let mut m = Modifiers::default();
+                m.rc = self.bit(31);
                 m
             }
-            Opcode::Rfi => {
-                let mut m = Modifiers::default();
-                m
-            }
+            Opcode::Rfi => Modifiers::default(),
             Opcode::Rlwimi => {
                 let mut m = Modifiers::default();
+                m.rc = self.bit(31);
                 m
             }
             Opcode::Rlwinm => {
                 let mut m = Modifiers::default();
+                m.rc = self.bit(31);
                 m
             }
             Opcode::Rlwnm => {
                 let mut m = Modifiers::default();
+                m.rc = self.bit(31);
                 m
             }
-            Opcode::Sc => {
-                let mut m = Modifiers::default();
-                m
-            }
+            Opcode::Sc => Modifiers::default(),
             Opcode::Slw => {
                 let mut m = Modifiers::default();
+                m.rc = self.bit(31);
                 m
             }
             Opcode::Sraw => {
                 let mut m = Modifiers::default();
+                m.rc = self.bit(31);
                 m
             }
             Opcode::Srawi => {
                 let mut m = Modifiers::default();
+                m.rc = self.bit(31);
                 m
             }
             Opcode::Srw => {
                 let mut m = Modifiers::default();
+                m.rc = self.bit(31);
                 m
             }
-            Opcode::Stb => {
-                let mut m = Modifiers::default();
-                m
-            }
-            Opcode::Stbu => {
-                let mut m = Modifiers::default();
-                m
-            }
-            Opcode::Stbux => {
-                let mut m = Modifiers::default();
-                m
-            }
-            Opcode::Stbx => {
-                let mut m = Modifiers::default();
-                m
-            }
-            Opcode::Stfd => {
-                let mut m = Modifiers::default();
-                m
-            }
-            Opcode::Stfdu => {
-                let mut m = Modifiers::default();
-                m
-            }
-            Opcode::Stfdux => {
-                let mut m = Modifiers::default();
-                m
-            }
-            Opcode::Stfdx => {
-                let mut m = Modifiers::default();
-                m
-            }
-            Opcode::Stfiwx => {
-                let mut m = Modifiers::default();
-                m
-            }
-            Opcode::Stfs => {
-                let mut m = Modifiers::default();
-                m
-            }
-            Opcode::Stfsu => {
-                let mut m = Modifiers::default();
-                m
-            }
-            Opcode::Stfsux => {
-                let mut m = Modifiers::default();
-                m
-            }
-            Opcode::Stfsx => {
-                let mut m = Modifiers::default();
-                m
-            }
-            Opcode::Sth => {
-                let mut m = Modifiers::default();
-                m
-            }
-            Opcode::Sthbrx => {
-                let mut m = Modifiers::default();
-                m
-            }
-            Opcode::Sthu => {
-                let mut m = Modifiers::default();
-                m
-            }
-            Opcode::Sthux => {
-                let mut m = Modifiers::default();
-                m
-            }
-            Opcode::Sthx => {
-                let mut m = Modifiers::default();
-                m
-            }
-            Opcode::Stmw => {
-                let mut m = Modifiers::default();
-                m
-            }
-            Opcode::Stswi => {
-                let mut m = Modifiers::default();
-                m
-            }
-            Opcode::Stswx => {
-                let mut m = Modifiers::default();
-                m
-            }
-            Opcode::Stw => {
-                let mut m = Modifiers::default();
-                m
-            }
-            Opcode::Stwbrx => {
-                let mut m = Modifiers::default();
-                m
-            }
-            Opcode::Stwcx_ => {
-                let mut m = Modifiers::default();
-                m
-            }
-            Opcode::Stwu => {
-                let mut m = Modifiers::default();
-                m
-            }
-            Opcode::Stwux => {
-                let mut m = Modifiers::default();
-                m
-            }
-            Opcode::Stwx => {
-                let mut m = Modifiers::default();
-                m
-            }
+            Opcode::Stb => Modifiers::default(),
+            Opcode::Stbu => Modifiers::default(),
+            Opcode::Stbux => Modifiers::default(),
+            Opcode::Stbx => Modifiers::default(),
+            Opcode::Stfd => Modifiers::default(),
+            Opcode::Stfdu => Modifiers::default(),
+            Opcode::Stfdux => Modifiers::default(),
+            Opcode::Stfdx => Modifiers::default(),
+            Opcode::Stfiwx => Modifiers::default(),
+            Opcode::Stfs => Modifiers::default(),
+            Opcode::Stfsu => Modifiers::default(),
+            Opcode::Stfsux => Modifiers::default(),
+            Opcode::Stfsx => Modifiers::default(),
+            Opcode::Sth => Modifiers::default(),
+            Opcode::Sthbrx => Modifiers::default(),
+            Opcode::Sthu => Modifiers::default(),
+            Opcode::Sthux => Modifiers::default(),
+            Opcode::Sthx => Modifiers::default(),
+            Opcode::Stmw => Modifiers::default(),
+            Opcode::Stswi => Modifiers::default(),
+            Opcode::Stswx => Modifiers::default(),
+            Opcode::Stw => Modifiers::default(),
+            Opcode::Stwbrx => Modifiers::default(),
+            Opcode::Stwcx_ => Modifiers::default(),
+            Opcode::Stwu => Modifiers::default(),
+            Opcode::Stwux => Modifiers::default(),
+            Opcode::Stwx => Modifiers::default(),
             Opcode::Subf => {
                 let mut m = Modifiers::default();
+                m.oe = self.bit(21);
+                m.rc = self.bit(31);
                 m
             }
             Opcode::Subfc => {
                 let mut m = Modifiers::default();
+                m.oe = self.bit(21);
+                m.rc = self.bit(31);
                 m
             }
             Opcode::Subfe => {
                 let mut m = Modifiers::default();
+                m.oe = self.bit(21);
+                m.rc = self.bit(31);
                 m
             }
-            Opcode::Subfic => {
-                let mut m = Modifiers::default();
-                m
-            }
+            Opcode::Subfic => Modifiers::default(),
             Opcode::Subfme => {
                 let mut m = Modifiers::default();
+                m.oe = self.bit(21);
+                m.rc = self.bit(31);
                 m
             }
             Opcode::Subfze => {
                 let mut m = Modifiers::default();
+                m.oe = self.bit(21);
+                m.rc = self.bit(31);
                 m
             }
-            Opcode::Sync => {
-                let mut m = Modifiers::default();
-                m
-            }
-            Opcode::Tlbie => {
-                let mut m = Modifiers::default();
-                m
-            }
-            Opcode::Tlbsync => {
-                let mut m = Modifiers::default();
-                m
-            }
-            Opcode::Tw => {
-                let mut m = Modifiers::default();
-                m
-            }
-            Opcode::Twi => {
-                let mut m = Modifiers::default();
-                m
-            }
-            Opcode::Xor => {
-                let mut m = Modifiers::default();
-                m
-            }
-            Opcode::Xori => {
-                let mut m = Modifiers::default();
-                m
-            }
-            Opcode::Xoris => {
-                let mut m = Modifiers::default();
-                m
-            }
+            Opcode::Sync => Modifiers::default(),
+            Opcode::Tlbie => Modifiers::default(),
+            Opcode::Tlbsync => Modifiers::default(),
+            Opcode::Tw => Modifiers::default(),
+            Opcode::Twi => Modifiers::default(),
+            Opcode::Xor => Modifiers::default(),
+            Opcode::Xori => Modifiers::default(),
+            Opcode::Xoris => Modifiers::default(),
         }
     }
     pub(crate) fn _simplified(self) -> SimplifiedIns {
+        match self.op {
+            Opcode::Addi => {
+                if (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) == 0 {
+                    return SimplifiedIns {
+                        mnemonic: "li",
+                        modifiers: Modifiers::default(),
+                        args: vec![],
+                        ins: self,
+                    };
+                }
+            }
+            Opcode::Addis => {
+                if (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) == 0 {
+                    return SimplifiedIns {
+                        mnemonic: "lis",
+                        modifiers: Modifiers::default(),
+                        args: vec![],
+                        ins: self,
+                    };
+                }
+            }
+            Opcode::Bc => {
+                if (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) == 12 {
+                    return SimplifiedIns {
+                        mnemonic: "blt",
+                        modifiers: {
+                            let mut m = Modifiers::default();
+                            m.aa = self.bit(30);
+                            m.lk = self.bit(31);
+                            m
+                        },
+                        args: vec![],
+                        ins: self,
+                    };
+                }
+                if (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) == 4 {
+                    return SimplifiedIns {
+                        mnemonic: "ble",
+                        modifiers: {
+                            let mut m = Modifiers::default();
+                            m.aa = self.bit(30);
+                            m.lk = self.bit(31);
+                            m
+                        },
+                        args: vec![],
+                        ins: self,
+                    };
+                }
+                if (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) == 12 {
+                    return SimplifiedIns {
+                        mnemonic: "beq",
+                        modifiers: {
+                            let mut m = Modifiers::default();
+                            m.aa = self.bit(30);
+                            m.lk = self.bit(31);
+                            m
+                        },
+                        args: vec![],
+                        ins: self,
+                    };
+                }
+                if (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) == 4 {
+                    return SimplifiedIns {
+                        mnemonic: "bge",
+                        modifiers: {
+                            let mut m = Modifiers::default();
+                            m.aa = self.bit(30);
+                            m.lk = self.bit(31);
+                            m
+                        },
+                        args: vec![],
+                        ins: self,
+                    };
+                }
+                if (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) == 12 {
+                    return SimplifiedIns {
+                        mnemonic: "bgt",
+                        modifiers: {
+                            let mut m = Modifiers::default();
+                            m.aa = self.bit(30);
+                            m.lk = self.bit(31);
+                            m
+                        },
+                        args: vec![],
+                        ins: self,
+                    };
+                }
+                if (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) == 4 {
+                    return SimplifiedIns {
+                        mnemonic: "bne",
+                        modifiers: {
+                            let mut m = Modifiers::default();
+                            m.aa = self.bit(30);
+                            m.lk = self.bit(31);
+                            m
+                        },
+                        args: vec![],
+                        ins: self,
+                    };
+                }
+                if (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) == 12 {
+                    return SimplifiedIns {
+                        mnemonic: "bso",
+                        modifiers: {
+                            let mut m = Modifiers::default();
+                            m.aa = self.bit(30);
+                            m.lk = self.bit(31);
+                            m
+                        },
+                        args: vec![],
+                        ins: self,
+                    };
+                }
+                if (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) == 4 {
+                    return SimplifiedIns {
+                        mnemonic: "bns",
+                        modifiers: {
+                            let mut m = Modifiers::default();
+                            m.aa = self.bit(30);
+                            m.lk = self.bit(31);
+                            m
+                        },
+                        args: vec![],
+                        ins: self,
+                    };
+                }
+                if (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) == 16
+                    && (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) == 0
+                {
+                    return SimplifiedIns {
+                        mnemonic: "bdnz",
+                        modifiers: {
+                            let mut m = Modifiers::default();
+                            m.aa = self.bit(30);
+                            m.lk = self.bit(31);
+                            m
+                        },
+                        args: vec![],
+                        ins: self,
+                    };
+                }
+                if (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) == 18
+                    && (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) == 0
+                {
+                    return SimplifiedIns {
+                        mnemonic: "bdz",
+                        modifiers: {
+                            let mut m = Modifiers::default();
+                            m.aa = self.bit(30);
+                            m.lk = self.bit(31);
+                            m
+                        },
+                        args: vec![],
+                        ins: self,
+                    };
+                }
+            }
+            Opcode::Bcctr => {
+                if (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) == 12 {
+                    return SimplifiedIns {
+                        mnemonic: "bltctr",
+                        modifiers: {
+                            let mut m = Modifiers::default();
+                            m.lk = self.bit(31);
+                            m
+                        },
+                        args: vec![],
+                        ins: self,
+                    };
+                }
+                if (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) == 4 {
+                    return SimplifiedIns {
+                        mnemonic: "blectr",
+                        modifiers: {
+                            let mut m = Modifiers::default();
+                            m.lk = self.bit(31);
+                            m
+                        },
+                        args: vec![],
+                        ins: self,
+                    };
+                }
+                if (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) == 12 {
+                    return SimplifiedIns {
+                        mnemonic: "beqctr",
+                        modifiers: {
+                            let mut m = Modifiers::default();
+                            m.lk = self.bit(31);
+                            m
+                        },
+                        args: vec![],
+                        ins: self,
+                    };
+                }
+                if (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) == 4 {
+                    return SimplifiedIns {
+                        mnemonic: "bgectr",
+                        modifiers: {
+                            let mut m = Modifiers::default();
+                            m.lk = self.bit(31);
+                            m
+                        },
+                        args: vec![],
+                        ins: self,
+                    };
+                }
+                if (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) == 12 {
+                    return SimplifiedIns {
+                        mnemonic: "bgtctr",
+                        modifiers: {
+                            let mut m = Modifiers::default();
+                            m.lk = self.bit(31);
+                            m
+                        },
+                        args: vec![],
+                        ins: self,
+                    };
+                }
+                if (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) == 4 {
+                    return SimplifiedIns {
+                        mnemonic: "bnectr",
+                        modifiers: {
+                            let mut m = Modifiers::default();
+                            m.lk = self.bit(31);
+                            m
+                        },
+                        args: vec![],
+                        ins: self,
+                    };
+                }
+                if (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) == 12 {
+                    return SimplifiedIns {
+                        mnemonic: "bsoctr",
+                        modifiers: {
+                            let mut m = Modifiers::default();
+                            m.lk = self.bit(31);
+                            m
+                        },
+                        args: vec![],
+                        ins: self,
+                    };
+                }
+                if (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) == 4 {
+                    return SimplifiedIns {
+                        mnemonic: "bnsctr",
+                        modifiers: {
+                            let mut m = Modifiers::default();
+                            m.lk = self.bit(31);
+                            m
+                        },
+                        args: vec![],
+                        ins: self,
+                    };
+                }
+            }
+            Opcode::Bclr => {
+                if (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) == 20
+                    && (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) == 0
+                {
+                    return SimplifiedIns {
+                        mnemonic: "blr",
+                        modifiers: Modifiers::default(),
+                        args: vec![],
+                        ins: self,
+                    };
+                }
+                if (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) == 12 {
+                    return SimplifiedIns {
+                        mnemonic: "bltlr",
+                        modifiers: {
+                            let mut m = Modifiers::default();
+                            m.lk = self.bit(31);
+                            m
+                        },
+                        args: vec![],
+                        ins: self,
+                    };
+                }
+                if (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) == 4 {
+                    return SimplifiedIns {
+                        mnemonic: "blelr",
+                        modifiers: {
+                            let mut m = Modifiers::default();
+                            m.lk = self.bit(31);
+                            m
+                        },
+                        args: vec![],
+                        ins: self,
+                    };
+                }
+                if (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) == 12 {
+                    return SimplifiedIns {
+                        mnemonic: "beqlr",
+                        modifiers: {
+                            let mut m = Modifiers::default();
+                            m.lk = self.bit(31);
+                            m
+                        },
+                        args: vec![],
+                        ins: self,
+                    };
+                }
+                if (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) == 4 {
+                    return SimplifiedIns {
+                        mnemonic: "bgelr",
+                        modifiers: {
+                            let mut m = Modifiers::default();
+                            m.lk = self.bit(31);
+                            m
+                        },
+                        args: vec![],
+                        ins: self,
+                    };
+                }
+                if (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) == 12 {
+                    return SimplifiedIns {
+                        mnemonic: "bgtlr",
+                        modifiers: {
+                            let mut m = Modifiers::default();
+                            m.lk = self.bit(31);
+                            m
+                        },
+                        args: vec![],
+                        ins: self,
+                    };
+                }
+                if (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) == 4 {
+                    return SimplifiedIns {
+                        mnemonic: "bnelr",
+                        modifiers: {
+                            let mut m = Modifiers::default();
+                            m.lk = self.bit(31);
+                            m
+                        },
+                        args: vec![],
+                        ins: self,
+                    };
+                }
+                if (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) == 12 {
+                    return SimplifiedIns {
+                        mnemonic: "bsolr",
+                        modifiers: {
+                            let mut m = Modifiers::default();
+                            m.lk = self.bit(31);
+                            m
+                        },
+                        args: vec![],
+                        ins: self,
+                    };
+                }
+                if (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) == 4 {
+                    return SimplifiedIns {
+                        mnemonic: "bnslr",
+                        modifiers: {
+                            let mut m = Modifiers::default();
+                            m.lk = self.bit(31);
+                            m
+                        },
+                        args: vec![],
+                        ins: self,
+                    };
+                }
+            }
+            Opcode::Cmp => {
+                if (((self.code) >> (32 - 9u8)) & ((1 << 3usize) - 1)) == 0 {
+                    return SimplifiedIns {
+                        mnemonic: "cmpw",
+                        modifiers: Modifiers::default(),
+                        args: vec![],
+                        ins: self,
+                    };
+                }
+            }
+            Opcode::Cmpi => {
+                if (((self.code) >> (32 - 9u8)) & ((1 << 3usize) - 1)) == 0 {
+                    return SimplifiedIns {
+                        mnemonic: "cmpwi",
+                        modifiers: Modifiers::default(),
+                        args: vec![],
+                        ins: self,
+                    };
+                }
+                if (((self.code) >> (32 - 9u8)) & ((1 << 3usize) - 1)) == 0 {
+                    return SimplifiedIns {
+                        mnemonic: "cmpwi",
+                        modifiers: Modifiers::default(),
+                        args: vec![],
+                        ins: self,
+                    };
+                }
+            }
+            Opcode::Cmpl => {
+                if (((self.code) >> (32 - 9u8)) & ((1 << 3usize) - 1)) == 0 {
+                    return SimplifiedIns {
+                        mnemonic: "cmplw",
+                        modifiers: Modifiers::default(),
+                        args: vec![],
+                        ins: self,
+                    };
+                }
+            }
+            Opcode::Cmpli => {
+                if (((self.code) >> (32 - 9u8)) & ((1 << 3usize) - 1)) == 0 {
+                    return SimplifiedIns {
+                        mnemonic: "cmplwi",
+                        modifiers: Modifiers::default(),
+                        args: vec![],
+                        ins: self,
+                    };
+                }
+                if (((self.code) >> (32 - 9u8)) & ((1 << 3usize) - 1)) == 0 {
+                    return SimplifiedIns {
+                        mnemonic: "cmplwi",
+                        modifiers: Modifiers::default(),
+                        args: vec![],
+                        ins: self,
+                    };
+                }
+            }
+            Opcode::Mfspr => {
+                if (((self.code) >> (32 - 21u8)) & ((1 << 10usize) - 1)) == 1 {
+                    return SimplifiedIns {
+                        mnemonic: "mfxer",
+                        modifiers: Modifiers::default(),
+                        args: vec![],
+                        ins: self,
+                    };
+                }
+                if (((self.code) >> (32 - 21u8)) & ((1 << 10usize) - 1)) == 8 {
+                    return SimplifiedIns {
+                        mnemonic: "mflr",
+                        modifiers: Modifiers::default(),
+                        args: vec![],
+                        ins: self,
+                    };
+                }
+                if (((self.code) >> (32 - 21u8)) & ((1 << 10usize) - 1)) == 9 {
+                    return SimplifiedIns {
+                        mnemonic: "mfctr",
+                        modifiers: Modifiers::default(),
+                        args: vec![],
+                        ins: self,
+                    };
+                }
+                if (((self.code) >> (32 - 21u8)) & ((1 << 10usize) - 1)) == 18 {
+                    return SimplifiedIns {
+                        mnemonic: "mfdsisr",
+                        modifiers: Modifiers::default(),
+                        args: vec![],
+                        ins: self,
+                    };
+                }
+                if (((self.code) >> (32 - 21u8)) & ((1 << 10usize) - 1)) == 397 {
+                    return SimplifiedIns {
+                        mnemonic: "mfdbatu",
+                        modifiers: Modifiers::default(),
+                        args: vec![],
+                        ins: self,
+                    };
+                }
+                if (((self.code) >> (32 - 21u8)) & ((1 << 10usize) - 1)) == 571 {
+                    return SimplifiedIns {
+                        mnemonic: "mftdu",
+                        modifiers: Modifiers::default(),
+                        args: vec![],
+                        ins: self,
+                    };
+                }
+            }
+            Opcode::Mtspr => {
+                if (((self.code) >> (32 - 21u8)) & ((1 << 10usize) - 1)) == 1 {
+                    return SimplifiedIns {
+                        mnemonic: "mtxer",
+                        modifiers: Modifiers::default(),
+                        args: vec![],
+                        ins: self,
+                    };
+                }
+                if (((self.code) >> (32 - 21u8)) & ((1 << 10usize) - 1)) == 8 {
+                    return SimplifiedIns {
+                        mnemonic: "mtlr",
+                        modifiers: Modifiers::default(),
+                        args: vec![],
+                        ins: self,
+                    };
+                }
+                if (((self.code) >> (32 - 21u8)) & ((1 << 10usize) - 1)) == 9 {
+                    return SimplifiedIns {
+                        mnemonic: "mtctr",
+                        modifiers: Modifiers::default(),
+                        args: vec![],
+                        ins: self,
+                    };
+                }
+                if (((self.code) >> (32 - 21u8)) & ((1 << 10usize) - 1)) == 18 {
+                    return SimplifiedIns {
+                        mnemonic: "mtdsisr",
+                        modifiers: Modifiers::default(),
+                        args: vec![],
+                        ins: self,
+                    };
+                }
+                if (((self.code) >> (32 - 21u8)) & ((1 << 10usize) - 1)) == 397 {
+                    return SimplifiedIns {
+                        mnemonic: "mtdbatu",
+                        modifiers: Modifiers::default(),
+                        args: vec![],
+                        ins: self,
+                    };
+                }
+                if (((self.code) >> (32 - 21u8)) & ((1 << 10usize) - 1)) == 571 {
+                    return SimplifiedIns {
+                        mnemonic: "mttdu",
+                        modifiers: Modifiers::default(),
+                        args: vec![],
+                        ins: self,
+                    };
+                }
+            }
+            Opcode::Or => {}
+            Opcode::Ori => {
+                if (((self.code) >> (32 - 16u8)) & ((1 << 5usize) - 1)) == 0
+                    && (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) == 0
+                    && (((self.code) >> (32 - 32u8)) & ((1 << 16usize) - 1)) == 0
+                {
+                    return SimplifiedIns {
+                        mnemonic: "nop",
+                        modifiers: Modifiers::default(),
+                        args: vec![],
+                        ins: self,
+                    };
+                }
+            }
+            Opcode::Rlwinm => {}
+            Opcode::Twi => {
+                if (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) == 8 {
+                    return SimplifiedIns {
+                        mnemonic: "twgti",
+                        modifiers: Modifiers::default(),
+                        args: vec![],
+                        ins: self,
+                    };
+                }
+                if (((self.code) >> (32 - 11u8)) & ((1 << 5usize) - 1)) == 6 {
+                    return SimplifiedIns {
+                        mnemonic: "twllei",
+                        modifiers: Modifiers::default(),
+                        args: vec![],
+                        ins: self,
+                    };
+                }
+            }
+            _ => {}
+        }
         SimplifiedIns {
             mnemonic: self.op.mnemonic(),
             modifiers: self._modifiers(),
