@@ -4676,7 +4676,27 @@ impl Ins {
                 }
             }
             Opcode::Bc => {
-                if ((self.code >> 21u8) & 0x1f) == 12 {
+                if ((self.code >> 21u8) & 0x1f) == 12
+                    && ((self.code >> 16u8) & 0x1f) & 0b11 == 0b00
+                    && ((self.code >> 18u8) & 0x7) == 0
+                {
+                    return SimplifiedIns {
+                        mnemonic: "blt",
+                        modifiers: {
+                            let mut m = Modifiers::default();
+                            m.aa = self.bit(30);
+                            m.lk = self.bit(31);
+                            m
+                        },
+                        args: vec![Argument::BranchDest(BranchDest(
+                            (((((self.code >> 2u8) & 0x3fff) ^ 0x2000).wrapping_sub(0x2000)) << 2u8)
+                                as _,
+                        ))],
+                        ins: self,
+                    };
+                }
+                if ((self.code >> 21u8) & 0x1f) == 12 && ((self.code >> 16u8) & 0x1f) & 0b11 == 0b00
+                {
                     return SimplifiedIns {
                         mnemonic: "blt",
                         modifiers: {
@@ -4695,7 +4715,27 @@ impl Ins {
                         ins: self,
                     };
                 }
-                if ((self.code >> 21u8) & 0x1f) == 4 {
+                if ((self.code >> 21u8) & 0x1f) == 4
+                    && ((self.code >> 16u8) & 0x1f) & 0b11 == 0b01
+                    && ((self.code >> 18u8) & 0x7) == 0
+                {
+                    return SimplifiedIns {
+                        mnemonic: "ble",
+                        modifiers: {
+                            let mut m = Modifiers::default();
+                            m.aa = self.bit(30);
+                            m.lk = self.bit(31);
+                            m
+                        },
+                        args: vec![Argument::BranchDest(BranchDest(
+                            (((((self.code >> 2u8) & 0x3fff) ^ 0x2000).wrapping_sub(0x2000)) << 2u8)
+                                as _,
+                        ))],
+                        ins: self,
+                    };
+                }
+                if ((self.code >> 21u8) & 0x1f) == 4 && ((self.code >> 16u8) & 0x1f) & 0b11 == 0b01
+                {
                     return SimplifiedIns {
                         mnemonic: "ble",
                         modifiers: {
@@ -4714,7 +4754,27 @@ impl Ins {
                         ins: self,
                     };
                 }
-                if ((self.code >> 21u8) & 0x1f) == 12 {
+                if ((self.code >> 21u8) & 0x1f) == 12
+                    && ((self.code >> 16u8) & 0x1f) & 0b11 == 0b10
+                    && ((self.code >> 18u8) & 0x7) == 0
+                {
+                    return SimplifiedIns {
+                        mnemonic: "beq",
+                        modifiers: {
+                            let mut m = Modifiers::default();
+                            m.aa = self.bit(30);
+                            m.lk = self.bit(31);
+                            m
+                        },
+                        args: vec![Argument::BranchDest(BranchDest(
+                            (((((self.code >> 2u8) & 0x3fff) ^ 0x2000).wrapping_sub(0x2000)) << 2u8)
+                                as _,
+                        ))],
+                        ins: self,
+                    };
+                }
+                if ((self.code >> 21u8) & 0x1f) == 12 && ((self.code >> 16u8) & 0x1f) & 0b11 == 0b10
+                {
                     return SimplifiedIns {
                         mnemonic: "beq",
                         modifiers: {
@@ -4733,7 +4793,27 @@ impl Ins {
                         ins: self,
                     };
                 }
-                if ((self.code >> 21u8) & 0x1f) == 4 {
+                if ((self.code >> 21u8) & 0x1f) == 4
+                    && ((self.code >> 16u8) & 0x1f) & 0b11 == 0b00
+                    && ((self.code >> 18u8) & 0x7) == 0
+                {
+                    return SimplifiedIns {
+                        mnemonic: "bge",
+                        modifiers: {
+                            let mut m = Modifiers::default();
+                            m.aa = self.bit(30);
+                            m.lk = self.bit(31);
+                            m
+                        },
+                        args: vec![Argument::BranchDest(BranchDest(
+                            (((((self.code >> 2u8) & 0x3fff) ^ 0x2000).wrapping_sub(0x2000)) << 2u8)
+                                as _,
+                        ))],
+                        ins: self,
+                    };
+                }
+                if ((self.code >> 21u8) & 0x1f) == 4 && ((self.code >> 16u8) & 0x1f) & 0b11 == 0b00
+                {
                     return SimplifiedIns {
                         mnemonic: "bge",
                         modifiers: {
@@ -4752,7 +4832,27 @@ impl Ins {
                         ins: self,
                     };
                 }
-                if ((self.code >> 21u8) & 0x1f) == 12 {
+                if ((self.code >> 21u8) & 0x1f) == 12
+                    && ((self.code >> 16u8) & 0x1f) & 0b11 == 0b01
+                    && ((self.code >> 18u8) & 0x7) == 0
+                {
+                    return SimplifiedIns {
+                        mnemonic: "bgt",
+                        modifiers: {
+                            let mut m = Modifiers::default();
+                            m.aa = self.bit(30);
+                            m.lk = self.bit(31);
+                            m
+                        },
+                        args: vec![Argument::BranchDest(BranchDest(
+                            (((((self.code >> 2u8) & 0x3fff) ^ 0x2000).wrapping_sub(0x2000)) << 2u8)
+                                as _,
+                        ))],
+                        ins: self,
+                    };
+                }
+                if ((self.code >> 21u8) & 0x1f) == 12 && ((self.code >> 16u8) & 0x1f) & 0b11 == 0b01
+                {
                     return SimplifiedIns {
                         mnemonic: "bgt",
                         modifiers: {
@@ -4771,7 +4871,27 @@ impl Ins {
                         ins: self,
                     };
                 }
-                if ((self.code >> 21u8) & 0x1f) == 4 {
+                if ((self.code >> 21u8) & 0x1f) == 4
+                    && ((self.code >> 16u8) & 0x1f) & 0b11 == 0b10
+                    && ((self.code >> 18u8) & 0x7) == 0
+                {
+                    return SimplifiedIns {
+                        mnemonic: "bne",
+                        modifiers: {
+                            let mut m = Modifiers::default();
+                            m.aa = self.bit(30);
+                            m.lk = self.bit(31);
+                            m
+                        },
+                        args: vec![Argument::BranchDest(BranchDest(
+                            (((((self.code >> 2u8) & 0x3fff) ^ 0x2000).wrapping_sub(0x2000)) << 2u8)
+                                as _,
+                        ))],
+                        ins: self,
+                    };
+                }
+                if ((self.code >> 21u8) & 0x1f) == 4 && ((self.code >> 16u8) & 0x1f) & 0b11 == 0b10
+                {
                     return SimplifiedIns {
                         mnemonic: "bne",
                         modifiers: {
@@ -4790,7 +4910,27 @@ impl Ins {
                         ins: self,
                     };
                 }
-                if ((self.code >> 21u8) & 0x1f) == 12 {
+                if ((self.code >> 21u8) & 0x1f) == 12
+                    && ((self.code >> 16u8) & 0x1f) & 0b11 == 0b11
+                    && ((self.code >> 18u8) & 0x7) == 0
+                {
+                    return SimplifiedIns {
+                        mnemonic: "bso",
+                        modifiers: {
+                            let mut m = Modifiers::default();
+                            m.aa = self.bit(30);
+                            m.lk = self.bit(31);
+                            m
+                        },
+                        args: vec![Argument::BranchDest(BranchDest(
+                            (((((self.code >> 2u8) & 0x3fff) ^ 0x2000).wrapping_sub(0x2000)) << 2u8)
+                                as _,
+                        ))],
+                        ins: self,
+                    };
+                }
+                if ((self.code >> 21u8) & 0x1f) == 12 && ((self.code >> 16u8) & 0x1f) & 0b11 == 0b11
+                {
                     return SimplifiedIns {
                         mnemonic: "bso",
                         modifiers: {
@@ -4809,7 +4949,27 @@ impl Ins {
                         ins: self,
                     };
                 }
-                if ((self.code >> 21u8) & 0x1f) == 4 {
+                if ((self.code >> 21u8) & 0x1f) == 4
+                    && ((self.code >> 16u8) & 0x1f) & 0b11 == 0b11
+                    && ((self.code >> 18u8) & 0x7) == 0
+                {
+                    return SimplifiedIns {
+                        mnemonic: "bns",
+                        modifiers: {
+                            let mut m = Modifiers::default();
+                            m.aa = self.bit(30);
+                            m.lk = self.bit(31);
+                            m
+                        },
+                        args: vec![Argument::BranchDest(BranchDest(
+                            (((((self.code >> 2u8) & 0x3fff) ^ 0x2000).wrapping_sub(0x2000)) << 2u8)
+                                as _,
+                        ))],
+                        ins: self,
+                    };
+                }
+                if ((self.code >> 21u8) & 0x1f) == 4 && ((self.code >> 16u8) & 0x1f) & 0b11 == 0b11
+                {
                     return SimplifiedIns {
                         mnemonic: "bns",
                         modifiers: {

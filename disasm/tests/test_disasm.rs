@@ -96,7 +96,6 @@ fn test_ins_b() {
     assert_asm!(0x4BDC1A59, "bl -0x23e5a8");
 }
 
-/*
 #[test]
 fn test_ins_bc() {
     assert_asm!(0x40800008, "bge 0x8");
@@ -124,7 +123,6 @@ fn test_ins_bc() {
     assert_asm!(0x419C0008, "blt cr7, 0x8");
     assert_asm!(0x4200F560, "bdnz -0xaa0");
 }
- */
 
 /*
 #[test]
