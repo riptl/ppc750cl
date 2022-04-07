@@ -534,18 +534,13 @@ impl Isa {
         let use_match_arms = token_stream!(use_match_arms);
         let suffix_match_arms = token_stream!(suffix_match_arms);
         let simplified_ins_match_arms = token_stream!(simplified_ins_match_arms);
-        let field_accessors = self
-            .fields
-            .iter()
-            .map(|field| field.construct_accessor())
-            .collect::<Vec<_>>();
-        let field_accessors = token_stream!(field_accessors);
-        let modifier_accessors = self
-            .modifiers
-            .iter()
-            .map(|modifier| modifier.construct_accessor())
-            .collect::<Vec<_>>();
-        let modifier_accessors = token_stream!(modifier_accessors);
+        let field_accessors =
+            TokenStream::from_iter(self.fields.iter().map(|field| field.construct_accessor()));
+        let modifier_accessors = TokenStream::from_iter(
+            self.modifiers
+                .iter()
+                .map(|modifier| modifier.construct_accessor()),
+        );
         // Generate final fields function.
         let ins_impl = quote! {
             #[allow(clippy::all, unused_mut)]

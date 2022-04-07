@@ -1,5 +1,6 @@
 use std::io::Write;
 use std::ops::Range;
+use std::str::FromStr;
 use std::sync::atomic::{AtomicU32, Ordering};
 use std::sync::Arc;
 use std::time::{Duration, Instant};
@@ -8,8 +9,24 @@ use ppc750cl::formatter::FormattedIns;
 use ppc750cl::Ins;
 
 fn main() {
+    let matches = clap::Command::new("ppc750cl-fuzz")
+        .version("0.2.0")
+        .about("Complete \"fuzzer\" for ppc750cl disassembler")
+        .arg(
+            clap::Arg::new("threads")
+                .short('t')
+                .long("--threads")
+                .takes_value(true)
+                .help("Number of threads to use (default num CPUs)"),
+        )
+        .get_matches();
+
+    let threads = match matches.value_of("threads") {
+        Some(t) => u32::from_str(t).expect("invalid threads flag"),
+        None => num_cpus::get() as u32,
+    };
     let start = Instant::now();
-    let fuzzer = MultiFuzzer::new(num_cpus::get() as u32);
+    let fuzzer = MultiFuzzer::new(threads);
     fuzzer.run();
     println!("Finished in {:.2}s", start.elapsed().as_secs_f32());
 }

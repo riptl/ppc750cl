@@ -8,5 +8,6 @@ description = "Complete fuzzer for ppc750cl"
 repository = "https://github.com/terorie/ppc750cl"
 
 [dependencies]
+clap = "3"
 num_cpus = "1.13"
 ppc750cl = { path = "../disasm", version = "0.2.0" }

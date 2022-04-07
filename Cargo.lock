@@ -300,6 +300,7 @@ dependencies = [
 name = "ppc750cl-fuzz"
 version = "0.2.0"
 dependencies = [
+ "clap",
  "num_cpus",
  "ppc750cl",
 ]
