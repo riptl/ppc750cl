@@ -1,0 +1,2368 @@
+fields:
+  # Immediates
+  - name: simm
+    arg: Simm
+    bits: 16..32
+    signed: true
+  - name: uimm
+    arg: Uimm
+    bits: 16..32
+  - name: offset
+    arg: Offset
+    bits: 16..32
+    signed: true
+  # Branch fields
+  - name: BO
+    arg: OpaqueU
+    bits: 6..11
+  - name: BI
+    arg: OpaqueU
+    bits: 11..16
+  - name: BD
+    arg: BranchDest
+    bits: 16..30
+    shift_left: 2
+    signed: true
+  - name: LI
+    arg: BranchDest
+    bits: 6..30
+    signed: true
+    shift_left: 2
+  # Shift/rotate type fields
+  - name: SH
+    arg: OpaqueU
+    desc: Shift
+    bits: 16..21
+  - name: MB
+    arg: OpaqueU
+    desc: Mask start
+    bits: 21..26
+  - name: ME
+    arg: OpaqueU
+    desc: Mask stop
+    bits: 26..31
+  # Registers
+  - name: rS
+    arg: GPR
+    bits: 6..11
+  - name: rD
+    arg: GPR
+    bits: 6..11
+  - name: rA
+    arg: GPR
+    bits: 11..16
+  - name: rA.nz
+    arg: GPR
+    bits: 11..16
+  - name: rB
+    arg: GPR
+    bits: 16..21
+  - name: rC
+    arg: GPR
+    bits: 21..26
+  - name: sr
+    arg: SR
+    bits: 12..16
+  - name: spr
+    arg: SPR
+    bits: 11..21
+    split: true
+  # Floating-point registers
+  - name: frS
+    arg: FPR
+    bits: 6..11
+  - name: frD
+    arg: FPR
+    bits: 6..11
+  - name: frA
+    arg: FPR
+    bits: 11..16
+  - name: frB
+    arg: FPR
+    bits: 16..21
+  - name: frC
+    arg: FPR
+    bits: 21..26
+  # Condition registers
+  # TODO This looks swapped the wrong way around
+  - name: crbD
+    arg: CRField
+    bits: 6..11
+  - name: crbA
+    arg: CRField
+    bits: 11..16
+  - name: crbB
+    arg: CRField
+    bits: 16..21
+  # Condition register fields
+  - name: crfD
+    arg: CRBit
+    bits: 6..9
+  - name: crfS
+    arg: CRBit
+    bits: 11..14
+  # Condition register misc
+  - name: crm
+    arg: OpaqueU
+    bits: 12..20
+  # Paired single fields
+  - name: ps_l
+    arg: GQR
+    bits: 17..20
+  - name: ps_W
+    arg: OpaqueU
+    bits: 16
+  # Misc
+  - name: NB
+    arg: OpaqueU
+    bits: 16..21
+  - name: tbr
+    arg: OpaqueU
+    desc: Time Base
+    bits: 11..21
+    split: true
+  - name: mtfsf_FM
+    arg: OpaqueU
+    desc: Field Mask for mtfsf
+    bits: 7..15
+  - name: mtfsf_IMM
+    arg: OpaqueU
+    desc: Immediate for mtfsfi
+    bits: 16..20
+  - name: TO
+    arg: OpaqueU
+    desc: Bitset for tw and twi
+    bits: 6..11
+  - name: xer
+  - name: ctr
+  - name: lr
+
+# TODO Add defs/uses for modifiers.
+modifiers:
+  - name: OE
+    suffix: o
+    bit: 21
+  - name: Rc
+    suffix: .
+    bit: 31
+  - name: LK
+    suffix: l
+    bit: 31
+  - name: AA
+    suffix: a
+    bit: 30
+
+opcodes:
+  - name: add
+    desc: Add
+    bitmask: 0xfc0007fe
+    pattern: 0x7c000214
+    modifiers: [ OE, Rc ]
+    args: [ rD, rA, rB ]
+    defs: [ rD ]
+    uses: [ rA, rB ]
+
+  - name: addc
+    desc: Add Carrying
+    bitmask: 0xfc0007fe
+    pattern: 0x7c000014
+    modifiers: [ OE, Rc ]
+    args: [ rD, rA, rB ]
+    defs: [ rD ]
+    uses: [ rA, rB ]
+
+  - name: adde
+    desc: Add Extended
+    bitmask: 0xfc0007fe
+    pattern: 0x7c000114
+    modifiers: [ OE, Rc ]
+    args: [ rD, rA, rB ]
+    defs: [ rD ]
+    uses: [ rA, rB ]
+
+  - name: addi
+    desc: Add Immediate
+    bitmask: 0xfc000000
+    pattern: 0x38000000
+    args: [ rD, rA, simm ]
+    defs: [ rD ]
+    uses: [ rA.nz ]
+
+  - name: addic
+    desc: Add Immediate Carrying
+    bitmask: 0xfc000000
+    pattern: 0x30000000
+    args: [ rD, rA, simm ]
+    defs: [ rD ]
+    uses: [ rA ]
+
+  - name: addic.
+    desc: Add Immediate Carrying and Record
+    bitmask: 0xfc000000
+    pattern: 0x34000000
+    args: [ rD, rA, simm ]
+    side_effects: [ Rc ]
+    defs: [ rD ]
+    uses: [ rA ]
+
+  - name: addis
+    desc: Add Immediate Shifted
+    bitmask: 0xfc000000
+    pattern: 0x3c000000
+    args: [ rD, rA, uimm ]
+    defs: [ rD ]
+    uses: [ rA.nz ]
+
+  - name: addme
+    desc: Add to Minus One Extended
+    bitmask: 0xfc00fbfe
+    pattern: 0x7c0001d4
+    modifiers: [ OE, Rc ]
+    args: [ rD, rA ]
+    defs: [ rD ]
+    uses: [ rA ]
+
+  - name: addze
+    desc: Add to Zero Extended
+    bitmask: 0xfc00fbfe
+    pattern: 0x7c000194
+    modifiers: [ OE, Rc ]
+    args: [ rD, rA ]
+    defs: [ rD ]
+    uses: [ rA ]
+
+  - name: and
+    desc: AND
+    bitmask: 0xfc0007fe
+    pattern: 0x7c000038
+    modifiers: [ Rc ]
+    args: [ rA, rS, rB ]
+    defs: [ rA ]
+    uses: [ rS, rB ]
+
+  - name: andc
+    desc: AND with Complement
+    bitmask: 0xfc0007fe
+    pattern: 0x7c000078
+    modifiers: [ Rc ]
+    args: [ rA, rS, rB ]
+    defs: [ rA ]
+    uses: [ rS, rB ]
+
+  - name: andi.
+    desc: AND Immediate
+    bitmask: 0xfc000000
+    pattern: 0x70000000
+    side_effects: [ Rc ]
+    args: [ rA, rS, uimm ]
+    defs: [ rA ]
+    uses: [ rB ]
+
+  - name: andis.
+    desc: AND Immediate Shifted
+    bitmask: 0xfc000000
+    pattern: 0x74000000
+    side_effects: [ Rc ]
+    args: [ rA, rS, uimm ]
+    defs: [ rA ]
+    uses: [ rB ]
+
+  - name: b
+    desc: Branch
+    bitmask: 0xfc000000
+    pattern: 0x48000000
+    modifiers: [ AA, LK ]
+    args: [ LI ]
+
+  - name: bc
+    desc: Branch Conditional
+    bitmask: 0xfc000000
+    pattern: 0x40000000
+    modifiers: [ AA, LK ]
+    args: [ BO, BI, BD ]
+
+  - name: bcctr
+    desc: Branch Conditional to Count Register
+    bitmask: 0xfc007ffe
+    pattern: 0x4c000420
+    modifiers: [ LK ]
+    args: [ BO, BI ]
+    uses: [ ctr ]
+
+  - name: bclr
+    desc: Branch Conditional to Link Register
+    bitmask: 0xfc007ffe
+    pattern: 0x4c000020
+    modifiers: [ LK ]
+    args: [ BO, BI ]
+    uses: [ lr ]
+
+  - name: cmp
+    desc: Compare
+    bitmask: 0xfc4007ff
+    pattern: 0x7c000000
+    args: [ crfD, rA, rB ]
+    defs: [ crfD ]
+    uses: [ rA, rB ]
+
+  - name: cmpi
+    desc: Compare Immediate
+    bitmask: 0xfc400000
+    pattern: 0x2c000000
+    args: [ crfD, rA, simm ]
+    defs: [ crfD ]
+    uses: [ rA ]
+
+  - name: cmpl
+    desc: Compare Logical
+    bitmask: 0xfc4007ff
+    pattern: 0x7c000040
+    args: [ crfD, rA, rB ]
+    defs: [ crfD ]
+    uses: [ rA, rB ]
+
+  - name: cmpli
+    desc: Compare Logical Immediate
+    bitmask: 0xfc400000
+    pattern: 0x28000000
+    args: [ crfD, rA, uimm ]
+    defs: [ crfD ]
+    uses: [ rA ]
+
+  - name: cntlzw
+    desc: Count Leading Zeros Word
+    bitmask: 0xfc00fffe
+    pattern: 0x7c000034
+    modifiers: [ Rc ]
+    args: [ rA, rS ]
+    defs: [ rA ]
+    uses: [ rS ]
+
+  - name: crand
+    desc: Condition Register AND
+    bitmask: 0xfc0007ff
+    pattern: 0x4c000202
+    args: [ crbD, crbA, crbB ]
+    defs: [ crbD ]
+    uses: [ crbA, crbB ]
+
+  - name: crandc
+    desc: Condition Register AND with Complement
+    bitmask: 0xfc0007ff
+    pattern: 0x4c000102
+    args: [ crbD, crbA, crbB ]
+    defs: [ crbD ]
+    uses: [ crbA, crbB ]
+
+  - name: creqv
+    desc: Condition Register Equivalent
+    bitmask: 0xfc0007ff
+    pattern: 0x4c000242
+    args: [ crbD, crbA, crbB ]
+    defs: [ crbD ]
+    uses: [ crbA, crbB ]
+
+  - name: crnand
+    desc: Condition Register NAND
+    bitmask: 0xfc0007ff
+    pattern: 0x4c0001c2
+    args: [ crbD, crbA, crbB ]
+    defs: [ crbD ]
+    uses: [ crbA, crbB ]
+
+  - name: crnor
+    desc: Condition Register NOR
+    bitmask: 0xfc0007ff
+    pattern: 0x4c000042
+    args: [ crbD, crbA, crbB ]
+    defs: [ crbD ]
+    uses: [ crbA, crbB ]
+
+  - name: cror
+    desc: Condition Register OR
+    bitmask: 0xfc0007ff
+    pattern: 0x4c000382
+    args: [ crbD, crbA, crbB ]
+    defs: [ crbD ]
+    uses: [ crbA, crbB ]
+
+  - name: crorc
+    desc: Condition Register OR with Complement
+    bitmask: 0xfc0007ff
+    pattern: 0x4c000342
+    args: [ crbD, crbA, crbB ]
+    defs: [ crbD ]
+    uses: [ crbA, crbB ]
+
+  - name: crxor
+    desc: Condition Register XOR
+    bitmask: 0xfc0007ff
+    pattern: 0x4c000182
+    args: [ crbD, crbA, crbB ]
+    defs: [ crbD ]
+    uses: [ crbA, crbB ]
+
+  - name: dcbf
+    desc: Data Cache Block Flush
+    bitmask: 0xffe007ff
+    pattern: 0x7c0000ac
+    args: [ rA, rB ]
+    uses: [ rA.nz, rB ]
+
+  - name: dcbi
+    desc: Data Cache Block Invalidate
+    bitmask: 0xffe007ff
+    pattern: 0x7c0003ac
+    args: [ rA, rB ]
+    uses: [ rA.nz, rB ]
+
+  - name: dcbst
+    desc: Data Cache Block Store
+    bitmask: 0xffe007ff
+    pattern: 0x7c00006c
+    args: [ rA, rB ]
+    uses: [ rA.nz, rB ]
+
+  - name: dcbt
+    desc: Data Cache Block Touch
+    bitmask: 0xffe007ff
+    pattern: 0x7c00022c
+    args: [ rA, rB ]
+    uses: [ rA.nz, rB ]
+
+  - name: dcbtst
+    desc: Data Cache Block Touch for Store
+    bitmask: 0xffe007ff
+    pattern: 0x7c0001ec
+    args: [ rA, rB ]
+    uses: [ rA.nz, rB ]
+
+  - name: dcbz
+    desc: Data Cache Block Clear to Zero
+    bitmask: 0xffe007ff
+    pattern: 0x7c0007ec
+    args: [ rA, rB ]
+    uses: [ rA.nz, rB ]
+
+  - name: dcbz_l
+    desc: Data Cache Block Set to Zero Locked
+    bitmask: 0xffe007ff
+    pattern: 0x100007ec
+    args: [ rA, rB ]
+    uses: [ rA.nz, rB ]
+
+  - name: divw
+    desc: Divide Word
+    bitmask: 0xfc0003fe
+    pattern: 0x7c0003d6
+    modifiers: [ OE, Rc ]
+    args: [ rD, rA, rB ]
+    defs: [ rD ]
+    uses: [ rA, rB ]
+
+  - name: divwu
+    desc: Divide Word Unsigned
+    bitmask: 0xfc0003fe
+    pattern: 0x7c000396
+    modifiers: [ OE, Rc ]
+    args: [ rD, rA, rB ]
+    defs: [ rD ]
+    uses: [ rA, rB ]
+
+  - name: eciwx
+    desc: External Control In Word Indexed
+    bitmask: 0xfc0003ff
+    pattern: 0x7c00026c
+    args: [ rD, rA, rB ]
+    defs: [ rD ]
+    uses: [ rA.nz, rB ]
+
+  - name: ecowx
+    desc: External Control Out Word Indexed
+    bitmask: 0xfc0003ff
+    pattern: 0x7c00036c
+    args: [ rS, rA, rB ]
+    uses: [ rS, rA.nz, rB ]
+
+  - name: eieio
+    desc: Enforce In-Order Execution of I/O
+    bitmask: 0xffffffff
+    pattern: 0x7c0006ac
+
+  - name: eqv
+    desc: Equivalent
+    bitmask: 0xfc0003fe
+    pattern: 0x7c000238
+    modifiers: [ Rc ]
+    args: [ rA, rS, rB ]
+    defs: [ rA ]
+    uses: [ rS, rB ]
+
+  - name: extsb
+    desc: Extend Sign Byte
+    bitmask: 0xfc00fffe
+    pattern: 0x7c000774
+    modifiers: [ Rc ]
+    args: [ rA, rS ]
+    defs: [ rA ]
+    uses: [ rS ]
+
+  - name: extsh
+    desc: Extend Sign Half Word
+    bitmask: 0xfc00fffe
+    pattern: 0x7c000734
+    modifiers: [ Rc ]
+    args: [ rA, rS ]
+    defs: [ rA ]
+    uses: [ rS ]
+
+  - name: fabs
+    desc: Floating Absolute Value
+    bitmask: 0xfc1f07fe
+    pattern: 0xfc000210
+    modifiers: [ Rc ]
+    args: [ frD, frB ]
+    defs: [ frD ]
+    uses: [ frB ]
+
+  - name: fadd
+    desc: Floating Add (Double-Precision)
+    bitmask: 0xfc0007fe
+    pattern: 0xfc00002a
+    modifiers: [ Rc ]
+    args: [ frD, frA, frB ]
+    defs: [ frD ]
+    uses: [ frA, frB ]
+
+  - name: fadds
+    desc: Floating Add (Single-Precision)
+    bitmask: 0xfc0007fe
+    pattern: 0xec00002a
+    modifiers: [ Rc ]
+    args: [ frD, frA, frB ]
+    defs: [ frD ]
+    uses: [ frA, frB ]
+
+  - name: fcmpo
+    desc: Floating Compare Ordered
+    bitmask: 0xfc6007ff
+    pattern: 0xfc000040
+    args: [ crfD, frA, frB ]
+    defs: [ crfD ]
+    uses: [ frA, frB ]
+
+  - name: fcmpu
+    desc: Floating Compare Unordered
+    bitmask: 0xfc6007ff
+    pattern: 0xfc000000
+    args: [ crfD, frA, frB ]
+    defs: [ crfD ]
+    uses: [ frA, frB ]
+
+  - name: fctiw
+    desc: Floating Convert to Integer Word
+    bitmask: 0xfc1f07fe
+    pattern: 0xfc00001c
+    modifiers: [ Rc ]
+    args: [ frD, frB ]
+    defs: [ frD ]
+    uses: [ frB ]
+
+  - name: fctiwz
+    desc: Floating Convert to Integer Word with Round toward Zero
+    bitmask: 0xfc1f07fe
+    pattern: 0xfc00001e
+    modifiers: [ Rc ]
+    args: [ frD, frB ]
+    defs: [ frD ]
+    uses: [ frB ]
+
+  - name: fdiv
+    desc: Floating Divide (Double-Precision)
+    bitmask: 0xfc0007fe
+    pattern: 0xfc000024
+    modifiers: [ Rc ]
+    args: [ frD, frA, frB ]
+    defs: [ frD ]
+    uses: [ frA, frB ]
+
+  - name: fdivs
+    desc: Floating Divide (Single-Precision)
+    bitmask: 0xfc0007fe
+    pattern: 0xec000024
+    modifiers: [ Rc ]
+    args: [ frD, frA, frB ]
+    defs: [ frD ]
+    uses: [ frA, frB ]
+
+  - name: fmadd
+    desc: Floating Multiply-Add (Double-Precision)
+    bitmask: 0xfc00003e
+    pattern: 0xfc00003a
+    modifiers: [ Rc ]
+    args: [ frD, frA, frC, frB ]
+    defs: [ frD ]
+    uses: [ frA, frC, frB ]
+
+  - name: fmadds
+    desc: Floating Multiply-Add (Single-Precision)
+    bitmask: 0xfc00003e
+    pattern: 0xec00003a
+    modifiers: [ Rc ]
+    args: [ frD, frA, frC, frB ]
+    defs: [ frD ]
+    uses: [ frA, frC, frB ]
+
+  - name: fmr
+    desc: Floating Move Register (Double-Precision)
+    bitmask: 0xfc1f07fe
+    pattern: 0xfc000090
+    modifiers: [ Rc ]
+    args: [ frD, frB ]
+    defs: [ frD ]
+    uses: [ frB ]
+
+  - name: fmsub
+    desc: Floating Multiply-Subtract (Double-Precision)
+    bitmask: 0xfc00003e
+    pattern: 0xfc000038
+    modifiers: [ Rc ]
+    args: [ frD, frA, frC, frB ]
+    defs: [ frD ]
+    uses: [ frA, frC, frB ]
+
+  - name: fmsubs
+    desc: Floating Multiply-Subtract (Single-Precision)
+    bitmask: 0xfc00003e
+    pattern: 0xec000038
+    modifiers: [ Rc ]
+    args: [ frD, frA, frC, frB ]
+    defs: [ frD ]
+    uses: [ frA, frC, frB ]
+
+  - name: fmul
+    desc: Floating Multiply (Double-Precision)
+    bitmask: 0xfc00f83e
+    pattern: 0xfc000032
+    modifiers: [ Rc ]
+    args: [ frD, frA, frC ]
+    defs: [ frD ]
+    uses: [ frA, frC ]
+
+  - name: fmuls
+    desc: Floating Multiply (Single-Precision)
+    bitmask: 0xfc00f83e
+    pattern: 0xec000032
+    modifiers: [ Rc ]
+    args: [ frD, frA, frC ]
+    defs: [ frD ]
+    uses: [ frA, frC ]
+
+  - name: fnabs
+    desc: Floating Negative Absolute Value
+    bitmask: 0xfc1f07fe
+    pattern: 0xfc000110
+    modifiers: [ Rc ]
+    args: [ frD, frB ]
+    defs: [ frD ]
+    uses: [ frB ]
+
+  - name: fneg
+    desc: Floating Negate
+    bitmask: 0xfc1f07fe
+    pattern: 0xfc000050
+    modifiers: [ Rc ]
+    args: [ frD, frB ]
+    defs: [ frD ]
+    uses: [ frB ]
+
+  - name: fnmadd
+    desc: Floating Negative Multiply-Add (Double-Precision)
+    bitmask: 0xfc00003e
+    pattern: 0xfc00003e
+    modifiers: [ Rc ]
+    args: [ frD, frA, frC, frB ]
+    defs: [ frD ]
+    uses: [ frA, frC, frB ]
+
+  - name: fnmadds
+    desc: Floating Negative Multiply-Add (Single-Precision)
+    bitmask: 0xfc00003e
+    pattern: 0xec00003e
+    modifiers: [ Rc ]
+    args: [ frD, frA, frC, frB ]
+    defs: [ frD ]
+    uses: [ frA, frC, frB ]
+
+  - name: fnmsub
+    desc: Floating Negative Multiply-Subtract (Double-Precision)
+    bitmask: 0xfc00003e
+    pattern: 0xfc00003c
+    modifiers: [ Rc ]
+    args: [ frD, frA, frC, frB ]
+    defs: [ frD ]
+    uses: [ frA, frC, frB ]
+
+  - name: fnmsubs
+    desc: Floating Negative Multiply-Subtract (Single-Precision)
+    bitmask: 0xfc00003e
+    pattern: 0xec00003c
+    modifiers: [ Rc ]
+    args: [ frD, frA, frC, frB ]
+    defs: [ frD ]
+    uses: [ frA, frC, frB ]
+
+  - name: fres
+    desc: Floating Reciprocal Estimate Single
+    bitmask: 0xfc1f07fe
+    pattern: 0xec000030
+    modifiers: [ Rc ]
+    args: [ frD, frB ]
+    defs: [ frD ]
+    uses: [ frB ]
+
+  - name: frsp
+    desc: Floating Round to Single
+    bitmask: 0xfc1f07fe
+    pattern: 0xfc000018
+    modifiers: [ Rc ]
+    args: [ frD, frB ]
+    defs: [ frD ]
+    uses: [ frB ]
+
+  - name: frsqrte
+    desc: Floating Reciprocal Square Root Estimate
+    bitmask: 0xfc1f07fe
+    pattern: 0xfc000034
+    modifiers: [ Rc ]
+    args: [ frD, frB ]
+    defs: [ frD ]
+    uses: [ frB ]
+
+  - name: fsel
+    desc: Floating Select
+    bitmask: 0xfc00003e
+    pattern: 0xfc00002e
+    modifiers: [ Rc ]
+    args: [ frD, frA, frC, frB ]
+    defs: [ frD ]
+    uses: [ frA, frC, frB ]
+
+  - name: fsub
+    desc: Floating Subtract (Double-Precision)
+    bitmask: 0xfc0007fe
+    pattern: 0xfc000028
+    modifiers: [ Rc ]
+    args: [ frD, frA, frB ]
+    defs: [ frD ]
+    uses: [ frA, frB ]
+
+  - name: fsubs
+    desc: Floating Subtract (Single-Precision)
+    bitmask: 0xfc0007fe
+    pattern: 0xec000028
+    modifiers: [ Rc ]
+    args: [ frD, frA, frB ]
+    defs: [ frD ]
+    uses: [ frA, frB ]
+
+  - name: icbi
+    desc: Instruction Cache Block Invalidate
+    bitmask: 0xffe007ff
+    pattern: 0x7c0007ac
+    modifiers: [ Rc ]
+    args: [ rA, rB ]
+    uses: [ rA.nz, rB ]
+
+  - name: isync
+    desc: Instruction Synchronize
+    bitmask: 0xffffffff
+    pattern: 0x4c00012c
+
+  - name: lbz
+    desc: Load Byte and Zero
+    bitmask: 0xfc000000
+    pattern: 0x88000000
+    args: [ rD, offset, rA ]
+    defs: [ rD ]
+    uses: [ offset, rA.nz ]
+
+  - name: lbzu
+    desc: Load Byte and Zero with Update
+    bitmask: 0xfc000000
+    pattern: 0x8c000000
+    args: [ rD, offset, rA ]
+    defs: [ rD, rA ]
+    uses: [ offset, rA ]
+
+  - name: lbzux
+    desc: Load Byte and Zero with Update Indexed
+    bitmask: 0xfc0007ff
+    pattern: 0x7c0000ee
+    args: [ rD, rA, rB ]
+    defs: [ rD, rA ]
+    uses: [ rA, rB ]
+
+  - name: lbzx
+    desc: Load Byte and Zero Indexed
+    bitmask: 0xfc0007ff
+    pattern: 0x7c0000ae
+    args: [ rD, rA, rB ]
+    defs: [ rD ]
+    uses: [ rA.nz, rB ]
+
+  - name: lfd
+    desc: Load Floating-Point Double
+    bitmask: 0xfc000000
+    pattern: 0xc8000000
+    args: [ frD, offset, rA ]
+    defs: [ frD ]
+    uses: [ offset, rA.nz ]
+
+  - name: lfdu
+    desc: Load Floating-Point Double with Update
+    bitmask: 0xfc000000
+    pattern: 0xcc000000
+    args: [ frD, offset, rA ]
+    defs: [ frD, rA ]
+    uses: [ offset, rA ]
+
+  - name: lfdux
+    desc: Load Floating-Point Double with Update Indexed
+    bitmask: 0xfc0007ff
+    pattern: 0x7c0004ee
+    args: [ frD, rA, rB ]
+    defs: [ frD, rA ]
+    uses: [ rA, rB ]
+
+  - name: lfdx
+    desc: Load Floating-Point Double Indexed
+    bitmask: 0xfc0007ff
+    pattern: 0x7c0004ae
+    args: [ frD, rA, rB ]
+    defs: [ frD ]
+    uses: [ rA.nz, rB ]
+
+  - name: lfs
+    desc: Load Floating-Point Single
+    bitmask: 0xfc000000
+    pattern: 0xc0000000
+    args: [ frD, offset, rA ]
+    defs: [ frD ]
+    uses: [ offset, rA.nz ]
+
+  - name: lfsu
+    desc: Load Floating-Point Single with Update
+    bitmask: 0xfc000000
+    pattern: 0xc4000000
+    args: [ frD, offset, rA ]
+    defs: [ frD, rA ]
+    uses: [ offset, rA ]
+
+  - name: lfsux
+    desc: Load Floating-Point Single with Update Indexed
+    bitmask: 0xfc0007ff
+    pattern: 0x7c00046e
+    args: [ frD, rA, rB ]
+    defs: [ frD, rA ]
+    uses: [ rA, rB ]
+
+  - name: lfsx
+    desc: Load Floating-Point Single Indexed
+    bitmask: 0xfc0007ff
+    pattern: 0x7c00042e
+    args: [ frD, rA, rB ]
+    defs: [ frD ]
+    uses: [ rA.nz, rB ]
+
+  - name: lha
+    desc: Load Half Word Algebraic
+    bitmask: 0xfc000000
+    pattern: 0xa8000000
+    args: [ rD, offset, rA ]
+    defs: [ rD ]
+    uses: [ offset, rA.nz ]
+
+  - name: lhau
+    desc: Load Half Word Algebraic with Update
+    bitmask: 0xfc000000
+    pattern: 0xac000000
+    args: [ rD, offset, rA ]
+    defs: [ rD, rA ]
+    uses: [ offset, rA ]
+
+  - name: lhaux
+    desc: Load Half Word Algebraic with Update Indexed
+    bitmask: 0xfc0007ff
+    pattern: 0x7c0002ee
+    args: [ rD, rA, rB ]
+    defs: [ rD, rA ]
+    uses: [ rA, rB ]
+
+  - name: lhax
+    desc: Load Half Word Algebraic Indexed
+    bitmask: 0xfc0007ff
+    pattern: 0x7c0002ae
+    args: [ rD, rA, rB ]
+    defs: [ rD ]
+    uses: [ rA.nz, rB ]
+
+  - name: lhbrx
+    desc: Load Half Word Byte-Reverse Indexed
+    bitmask: 0xfc0007ff
+    pattern: 0x7c00062c
+    args: [ rD, rA, rB ]
+    defs: [ rD ]
+    uses: [ rA.nz, rB ]
+
+  - name: lhz
+    desc: Load Half Word and Zero
+    bitmask: 0xfc000000
+    pattern: 0xa0000000
+    args: [ rD, offset, rA ]
+    defs: [ rD ]
+    uses: [ offset, rA.nz ]
+
+  - name: lhzu
+    desc: Load Half Word and Zero with Update
+    bitmask: 0xfc000000
+    pattern: 0xa4000000
+    args: [ rD, offset, rA ]
+    defs: [ rD, rA ]
+    uses: [ offset, rA ]
+
+  - name: lhzux
+    desc: Load Half Word and Zero with Update Indexed
+    bitmask: 0xfc0007ff
+    pattern: 0x7c00026e
+    args: [ rD, rA, rB ]
+    defs: [ rD, rA ]
+    uses: [ rA, rB ]
+
+  - name: lhzx
+    desc: Load Half Word and Zero Indexed
+    bitmask: 0xfc0007ff
+    pattern: 0x7c00022e
+    args: [ rD, rA, rB ]
+    defs: [ rD ]
+    uses: [ rA.nz, rB ]
+
+  # TODO lmw has much more defs
+  - name: lmw
+    desc: Load Multiple Word
+    bitmask: 0xfc000000
+    pattern: 0xb8000000
+    args: [ rD, offset, rA ]
+    defs: [ rD ]
+    uses: [ offset, rA.nz ]
+
+  - name: lswi
+    desc: Load String Word Immediate
+    bitmask: 0xfc0007ff
+    pattern: 0x7c0004aa
+    args: [ rD, rA, NB ]
+    defs: [ rD ]
+    uses: [ rA.nz ]
+
+  - name: lswx
+    desc: Load String Word Indexed
+    bitmask: 0xfc0007ff
+    pattern: 0x7c00042a
+    args: [ rD, rA, rB ]
+    defs: [ rD ]
+    uses: [ rA.nz, rB ]
+
+  - name: lwarx
+    desc: Load String Word and Reverse Indexed
+    bitmask: 0xfc0007ff
+    pattern: 0x7c000028
+    args: [ rD, rA, rB ]
+    defs: [ rD ]
+    uses: [ rA.nz, rB ]
+
+  - name: lwbrx
+    desc: Load String Word and Byte-Reverse Indexed
+    bitmask: 0xfc0007ff
+    pattern: 0x7c00042c
+    args: [ rD, rA, rB ]
+    defs: [ rD ]
+    uses: [ rA.nz, rB ]
+
+  - name: lwz
+    desc: Load Word and Zero
+    bitmask: 0xfc000000
+    pattern: 0x80000000
+    args: [ rD, offset, rA ]
+    defs: [ rD ]
+    uses: [ offset, rA.nz ]
+
+  - name: lwzu
+    desc: Load Word and Zero with Update
+    bitmask: 0xfc000000
+    pattern: 0x84000000
+    args: [ rD, offset, rA ]
+    defs: [ rD, rA ]
+    uses: [ offset, rA ]
+
+  - name: lwzux
+    desc: Load Word and Zero with Update Indexed
+    bitmask: 0xfc0007ff
+    pattern: 0x7c00006e
+    args: [ rD, rA, rB ]
+    defs: [ rD, rA ]
+    uses: [ rA, rB ]
+
+  - name: lwzx
+    desc: Load Word and Zero Indexed
+    bitmask: 0xfc0007ff
+    pattern: 0x7c00002e
+    args: [ rD, rA, rB ]
+    defs: [ rD ]
+    uses: [ rA.nz, rB ]
+
+  - name: mcrf
+    desc: Move Condition Register Field
+    bitmask: 0xfc300fff
+    pattern: 0x4c000000
+    args: [ crfD, crfS ]
+    defs: [ crfD ]
+    uses: [ crfS ]
+
+  - name: mcrfs
+    desc: Move to Condition Register from FPSCR
+    bitmask: 0xfc30ffff
+    pattern: 0xfc000080
+    args: [ crfD, crfS ]
+    defs: [ crfD ]
+    uses: [ crfS ]
+
+  - name: mcrxr
+    desc: Move to Condition Register from XER
+    bitmask: 0xfc30ffff
+    pattern: 0x7c000400
+    args: [ crfD ]
+    defs: [ crfD, xer ]
+
+  - name: mfcr
+    desc: Move from Condition Register
+    bitmask: 0xfc1fffff
+    pattern: 0x7c000026
+    args: [ crfD ]
+    defs: [ crfD ]
+
+  - name: mffs
+    desc: Move from FPSCR
+    bitmask: 0xfc1ffffe
+    pattern: 0xfc00048e
+    modifiers: [ Rc ]
+    args: [ crfD ]
+    defs: [ crfD ]
+
+  - name: mfmsr
+    desc: Move from Machine State Register
+    bitmask: 0xfc1fffff
+    pattern: 0x7c0000a6
+    args: [ rD ]
+    defs: [ rD ]
+
+  - name: mfspr
+    desc: Move from Special-Purpose Register
+    bitmask: 0xfc0007ff
+    pattern: 0x7c0002a6
+    args: [ rD, spr ]
+    defs: [ rD ]
+
+  - name: mfsr
+    desc: Move from Segment Register
+    bitmask: 0xfc10ffff
+    pattern: 0x7c0004a6
+    args: [ rD, sr ]
+    defs: [ rD ]
+
+  - name: mfsrin
+    desc: Move from Segment Register Indirect
+    bitmask: 0xfc1f07ff
+    pattern: 0x7c000526
+    args: [ rD, rB ]
+    defs: [ rD ]
+    uses: [ rB ]
+
+  - name: mftb
+    desc: Move from Time Base
+    bitmask: 0xfc0007ff
+    pattern: 0x7c0002e6
+    args: [ rD, tbr ]
+    defs: [ rD ]
+
+  - name: mtcrf
+    desc: Move to Condition Register Fields
+    bitmask: 0xfc100fff
+    pattern: 0x7c000120
+    args: [ crm, rS ]
+    uses: [ rS ]
+
+  - name: mtfsb0
+    desc: Move to FPSCR Bit 0
+    bitmask: 0xfc1ffffe
+    pattern: 0xfc00008c
+    modifiers: [ Rc ]
+    args: [ crbD ]
+    defs: [ crbD ]
+
+  - name: mtfsb1
+    desc: Move to FPSCR Bit 1
+    bitmask: 0xfc1ffffe
+    pattern: 0xfc00004c
+    modifiers: [ Rc ]
+    args: [ crbD ]
+    defs: [ crbD ]
+
+  - name: mtfsf
+    desc: Move to FPSCR Fields
+    bitmask: 0xfe0107fe
+    pattern: 0xfc00058e
+    modifiers: [ Rc ]
+    args: [ mtfsf_FM, frB ]
+    uses: [ frB ]
+
+  - name: mtfsfi
+    desc: Move to FPSCR Field Immediate
+    bitmask: 0xfc7f0ffe
+    pattern: 0xfc00010c
+    modifiers: [ Rc ]
+    args: [ crfD, mtfsf_IMM ]
+    defs: [ crfD ]
+
+  - name: mtmsr
+    desc: Move to Machine State Register
+    bitmask: 0xfc1fffff
+    pattern: 0x7c000124
+    args: [ rS ]
+    uses: [ rS ]
+
+  - name: mtspr
+    desc: Move to Special-Purpose Register
+    bitmask: 0xfc0007ff
+    pattern: 0x7c0003a6
+    args: [ spr, rS ]
+    uses: [ rS ]
+
+  - name: mtsr
+    desc: Move to Segment Register
+    bitmask: 0xfc10ffff
+    pattern: 0x7c0001a4
+    args: [ sr, rS ]
+    uses: [ rS ]
+
+  - name: mtsrin
+    desc: Move to Segment Register Indirect
+    bitmask: 0xfc1f07ff
+    pattern: 0x7c0001e4
+    args: [ rS, rB ]
+    uses: [ rS, rB ]
+
+  - name: mulhw
+    desc: Multiply High Word
+    bitmask: 0xfc0007fe
+    pattern: 0x7c000096
+    modifiers: [ Rc ]
+    args: [ rD, rA, rB ]
+    defs: [ rD ]
+    uses: [ rA, rB ]
+
+  - name: mulhwu
+    desc: Multiply High Word Unsigned
+    bitmask: 0xfc0007fe
+    pattern: 0x7c000016
+    modifiers: [ Rc ]
+    args: [ rD, rA, rB ]
+    defs: [ rD ]
+    uses: [ rA, rB ]
+
+  - name: mulli
+    desc: Multiply Low Immediate
+    bitmask: 0xfc000000
+    pattern: 0x1c000000
+    modifiers: [ Rc ]
+    args: [ rD, rA, simm ]
+    defs: [ rD ]
+    uses: [ rA ]
+
+  - name: mullw
+    desc: Multiply Low Word
+    bitmask: 0xfc0003fe
+    pattern: 0x7c0001d6
+    modifiers: [ OE, Rc ]
+    args: [ rD, rA, rB ]
+    defs: [ rD ]
+    uses: [ rA, rB ]
+
+  - name: nand
+    desc: NAND
+    bitmask: 0xfc0007fe
+    pattern: 0x7c0003b8
+    modifiers: [ Rc ]
+    args: [ rA, rS, rB ]
+    defs: [ rA ]
+    uses: [ rS, rB ]
+
+  - name: neg
+    desc: Negate
+    bitmask: 0xfc00fffe
+    pattern: 0x7c0000d0
+    modifiers: [ OE, Rc ]
+    args: [ rD, rA ]
+    defs: [ rD ]
+    uses: [ rA ]
+
+  - name: nor
+    desc: NOR
+    bitmask: 0xfc0007fe
+    pattern: 0x7c0000f8
+    modifiers: [ Rc ]
+    args: [ rA, rS, rB ]
+    defs: [ rA ]
+    uses: [ rS, rB ]
+
+  - name: or
+    desc: OR
+    bitmask: 0xfc0007fe
+    pattern: 0x7c000378
+    modifiers: [ Rc ]
+    args: [ rA, rS, rB ]
+    defs: [ rA ]
+    uses: [ rS, rB ]
+
+  - name: orc
+    desc: OR with Complement
+    bitmask: 0xfc0007fe
+    pattern: 0x7c000338
+    modifiers: [ Rc ]
+    args: [ rA, rS, rB ]
+    defs: [ rA ]
+    uses: [ rS, rB ]
+
+  - name: ori
+    desc: OR Immediate
+    bitmask: 0xfc000000
+    pattern: 0x60000000
+    args: [ rA, rS, uimm ]
+    defs: [ rA ]
+    uses: [ rS ]
+
+  - name: oris
+    desc: OR Immediate Shifted
+    bitmask: 0xfc000000
+    pattern: 0x64000000
+    args: [ rA, rS, uimm ]
+    defs: [ rA ]
+    uses: [ rS ]
+
+  - name: psq_l
+    desc: Paired Single Quantized Load
+    bitmask: 0xfc000000
+    pattern: 0xe0000000
+    args: [ frD, offset, rA, ps_W, ps_l ]
+    defs: [ frD ]
+    uses: [ rA.nz ]
+
+  - name: psq_lu
+    desc: Paired Single Quantized Load with Update
+    bitmask: 0xfc000000
+    pattern: 0xe4000000
+    args: [ frD, offset, rA, ps_W, ps_l ]
+    defs: [ frD, rA ]
+    uses: [ rA ]
+
+  - name: psq_lux
+    desc: Paired Single Quantized Load with Update Indexed
+    bitmask: 0xfc00007f
+    pattern: 0x1000004c
+    args: [ frD, rA, rB, ps_W, ps_l ]
+    defs: [ frD, rA ]
+    uses: [ rA, rB ]
+
+  - name: psq_lx
+    desc: Paired Single Quantized Load Indexed
+    bitmask: 0xfc00007f
+    pattern: 0x1000000c
+    args: [ frD, rA, rB, ps_W, ps_l ]
+    defs: [ frD ]
+    uses: [ rA.nz, rB ]
+
+  - name: psq_st
+    desc: Paired Single Quantized Store
+    bitmask: 0xfc000000
+    pattern: 0xf0000000
+    args: [ frS, offset, rA, ps_W, ps_l ]
+    uses: [ frS, rA.nz ]
+
+  - name: psq_stu
+    desc: Paired Single Quantized Store with Update
+    bitmask: 0xfc000000
+    pattern: 0xf4000000
+    args: [ frS, offset, rA, ps_W, ps_l ]
+    defs: [ rA ]
+    uses: [ frS, rA ]
+
+  - name: psq_stux
+    desc: Paired Single Quantized Store with Update Indexed
+    bitmask: 0xfc00007f
+    pattern: 0x1000004e
+    args: [ frS, rA, rB, ps_W, ps_l ]
+    defs: [ rA ]
+    uses: [ frS, rA, rB ]
+
+  - name: psq_stx
+    desc: Paired Single Quantized Store Indexed
+    bitmask: 0xfc00007f
+    pattern: 0x1000000e
+    args: [ frS, rA, rB, ps_W, ps_l ]
+    uses: [ frS, rA.nz, rB ]
+
+  - name: ps_abs
+    desc: Paired Single Absolute Value
+    bitmask: 0xfc1f07fe
+    pattern: 0x10000210
+    modifiers: [ Rc ]
+    args: [ frD, frB ]
+    defs: [ frD ]
+    uses: [ frB ]
+
+  - name: ps_add
+    desc: Paired Single Add
+    bitmask: 0xfc0007fe
+    pattern: 0x1000002a
+    modifiers: [ Rc ]
+    args: [ frD, frA, frB ]
+    defs: [ frD ]
+    uses: [ frA, frB ]
+
+  - name: ps_cmpo0
+    desc: Paired Singles Compare Ordered High
+    bitmask: 0xfc6007ff
+    pattern: 0x10000040
+    args: [ crfD, frA, frB ]
+    defs: [ crfD ]
+    uses: [ frA.nz, frB ]
+
+  - name: ps_cmpo1
+    desc: Paired Singles Compare Ordered Low
+    bitmask: 0xfc6007ff
+    pattern: 0x100000c0
+    args: [ crfD, frA, frB ]
+    defs: [ crfD ]
+    uses: [ frA.nz, frB ]
+
+  - name: ps_cmpu0
+    desc: Paired Singles Compare Unordered High
+    bitmask: 0xfc6007ff
+    pattern: 0x10000000
+    args: [ crfD, frA, frB ]
+    defs: [ crfD ]
+    uses: [ frA.nz, frB ]
+
+  - name: ps_cmpu1
+    desc: Paired Singles Compare Unordered Low
+    bitmask: 0xfc6007ff
+    pattern: 0x10000080
+    args: [ crfD, frA, frB ]
+    defs: [ crfD ]
+    uses: [ frA.nz, frB ]
+
+  - name: ps_div
+    desc: Paired Single Divide
+    bitmask: 0xfc0007fe
+    pattern: 0x10000024
+    modifiers: [ Rc ]
+    args: [ frD, frA, frB ]
+    defs: [ frD ]
+    uses: [ frA, frB ]
+
+  - name: ps_madd
+    desc: Paired Single Multiply-Add
+    bitmask: 0xfc00003e
+    pattern: 0x1000003a
+    modifiers: [ Rc ]
+    args: [ frD, frA, frC, frB ]
+    defs: [ frD ]
+    uses: [ frA, frC, frB ]
+
+  - name: ps_madds0
+    desc: Paired Single Multiply-Add Scalar high
+    bitmask: 0xfc00003e
+    pattern: 0x1000001c
+    modifiers: [ Rc ]
+    args: [ frD, frA, frC, frB ]
+    defs: [ frD ]
+    uses: [ frA, frC, frB ]
+
+  - name: ps_madds1
+    desc: Paired Single Multiply-Add Scalar low
+    bitmask: 0xfc00003e
+    pattern: 0x1000001e
+    modifiers: [ Rc ]
+    args: [ frD, frA, frC, frB ]
+    defs: [ frD ]
+    uses: [ frA, frC, frB ]
+
+  - name: ps_merge00
+    desc: Paired Single MERGE high
+    bitmask: 0xfc0007fe
+    pattern: 0x10000420
+    modifiers: [ Rc ]
+    args: [ frD, frA, frB ]
+    defs: [ frD ]
+    uses: [ frA, frB ]
+
+  - name: ps_merge01
+    desc: Paired Single MERGE direct
+    bitmask: 0xfc0007fe
+    pattern: 0x10000460
+    modifiers: [ Rc ]
+    args: [ frD, frA, frB ]
+    defs: [ frD ]
+    uses: [ frA, frB ]
+
+  - name: ps_merge10
+    desc: Paired Single MERGE swapped
+    bitmask: 0xfc0007fe
+    pattern: 0x100004a0
+    modifiers: [ Rc ]
+    args: [ frD, frA, frB ]
+    defs: [ frD ]
+    uses: [ frA, frB ]
+
+  - name: ps_merge11
+    desc: Paired Single MERGE low
+    bitmask: 0xfc0007fe
+    pattern: 0x100004e0
+    modifiers: [ Rc ]
+    args: [ frD, frA, frB ]
+    defs: [ frD ]
+    uses: [ frA, frB ]
+
+  - name: ps_mr
+    desc: Paired Single Move Register
+    bitmask: 0xfc1f07fe
+    pattern: 0x10000090
+    modifiers: [ Rc ]
+    args: [ frD, frA, frB ]
+    defs: [ frD ]
+    uses: [ frB ]
+
+  - name: ps_msub
+    desc: Paired Single Multiply-Subtract
+    bitmask: 0xfc00003e
+    pattern: 0x10000038
+    modifiers: [ Rc ]
+    args: [ frD, frA, frC, frB ]
+    defs: [ frD ]
+    uses: [ frA, frC, frB ]
+
+  - name: ps_mul
+    desc: Paired Single Multiply
+    bitmask: 0xfc00f83e
+    pattern: 0x10000032
+    modifiers: [ Rc ]
+    args: [ frD, frA, frC ]
+    defs: [ frD ]
+    uses: [ frA, frC ]
+
+  - name: ps_muls0
+    desc: Paired Single Multiply Scalar high
+    bitmask: 0xfc00f83e
+    pattern: 0x10000018
+    modifiers: [ Rc ]
+    args: [ frD, frA, frC ]
+    defs: [ frD ]
+    uses: [ frA, frC ]
+
+  - name: ps_muls1
+    desc: Paired Single Multiply Scalar low
+    bitmask: 0xfc00f83e
+    pattern: 0x1000001a
+    modifiers: [ Rc ]
+    args: [ frD, frA, frC ]
+    defs: [ frD ]
+    uses: [ frA, frC ]
+
+  - name: ps_nabs
+    desc: Paired Single Negative Absolute Value
+    bitmask: 0xfc1f07fe
+    pattern: 0x10000110
+    modifiers: [ Rc ]
+    args: [ frD, frB ]
+    defs: [ frD ]
+    uses: [ frB ]
+
+  - name: ps_neg
+    desc: Paired Single Negate
+    bitmask: 0xfc1f07fe
+    pattern: 0x10000050
+    modifiers: [ Rc ]
+    args: [ frD, frB ]
+    defs: [ frD ]
+    uses: [ frB ]
+
+  - name: ps_nmadd
+    desc: Paired Single Negative Multiply-Add
+    bitmask: 0xfc00003e
+    pattern: 0x1000003e
+    modifiers: [ Rc ]
+    args: [ frD, frA, frC, frB ]
+    defs: [ frD ]
+    uses: [ frA, frC, frB ]
+
+  - name: ps_nmsub
+    desc: Paired Single Negative Multiply-Subtract
+    bitmask: 0xfc00003e
+    pattern: 0x1000003c
+    modifiers: [ Rc ]
+    args: [ frD, frA, frC, frB ]
+    defs: [ frD ]
+    uses: [ frA, frC, frB ]
+
+  - name: ps_res
+    desc: Paired Single Reciprocal Estimate
+    bitmask: 0xfc1f07fe
+    pattern: 0x10000030
+    modifiers: [ Rc ]
+    args: [ frD, frB ]
+    defs: [ frD ]
+    uses: [ frB ]
+
+  - name: ps_rsqrte
+    desc: Paired Single Reciprocal Square Root Estimate
+    bitmask: 0xfc1f07fe
+    pattern: 0x10000034
+    modifiers: [ Rc ]
+    args: [ frD, frB ]
+    defs: [ frD ]
+    uses: [ frB ]
+
+  - name: ps_sel
+    desc: Paired Single Select
+    bitmask: 0xfc00003e
+    pattern: 0x1000002e
+    modifiers: [ Rc ]
+    args: [ frD, frA, frC, frB ]
+    defs: [ frD ]
+    uses: [ frA, frC, frB ]
+
+  - name: ps_sub
+    desc: Paired Single Subtract
+    bitmask: 0xfc0007fe
+    pattern: 0x10000028
+    modifiers: [ Rc ]
+    args: [ frD, frA, frB ]
+    defs: [ frD ]
+    uses: [ frA, frB ]
+
+  - name: ps_sum0
+    desc: Paired Single vector SUM high
+    bitmask: 0xfc00003e
+    pattern: 0x10000014
+    modifiers: [ Rc ]
+    args: [ frD, frA, frC, frB ]
+    defs: [ frD ]
+    uses: [ frA, frC, frB ]
+
+  - name: ps_sum1
+    desc: Paired Single vector SUM low
+    bitmask: 0xfc00003e
+    pattern: 0x10000016
+    modifiers: [ Rc ]
+    args: [ frD, frA, frC, frB ]
+    defs: [ frD ]
+    uses: [ frA, frC, frB ]
+
+  - name: rfi
+    desc: Return from Interrupt
+    bitmask: 0xfffff801
+    pattern: 0x4c000000
+
+  - name: rlwimi
+    desc: Rotate Left Word Immediate then Mask Insert
+    bitmask: 0xfc000000
+    pattern: 0x50000000
+    modifiers: [ Rc ]
+    args: [ rA, rS, SH, MB, ME ]
+    defs: [ rA ]
+    uses: [ rA, rS, SH ]
+
+  - name: rlwinm
+    desc: Rotate Left Word Immediate then AND with Mask
+    bitmask: 0xfc000000
+    pattern: 0x54000000
+    modifiers: [ Rc ]
+    args: [ rA, rS, SH, MB, ME ]
+    defs: [ rA ]
+    uses: [ rS, SH ]
+
+  - name: rlwnm
+    desc: Rotate Left Word then AND with Mask
+    bitmask: 0xfc000000
+    pattern: 0x5c000000
+    modifiers: [ Rc ]
+    args: [ rA, rS, rB, MB, ME ]
+    defs: [ rA ]
+    uses: [ rS, rB ]
+
+  - name: sc
+    desc: System Call
+    bitmask: 0xffffffff
+    pattern: 0x44000002
+
+  - name: slw
+    desc: Shift Left Word
+    bitmask: 0xfc0007fe
+    pattern: 0x7c000030
+    modifiers: [ Rc ]
+    args: [ rA, rS, rB ]
+    defs: [ rA ]
+    uses: [ rS, rB ]
+
+  - name: sraw
+    desc: Shift Right Algebraic Word
+    bitmask: 0xfc0007fe
+    pattern: 0x7c000630
+    modifiers: [ Rc ]
+    args: [ rA, rS, rB ]
+    defs: [ rA ]
+    uses: [ rS, rB ]
+
+  - name: srawi
+    desc: Shift Right Algebraic Word Immediate
+    bitmask: 0xfc0007fe
+    pattern: 0x7c000670
+    modifiers: [ Rc ]
+    args: [ rA, rS, SH ]
+    defs: [ rA ]
+    uses: [ rS ]
+
+  - name: srw
+    desc: Shift Right Word
+    bitmask: 0xfc0007fe
+    pattern: 0x7c000430
+    modifiers: [ Rc ]
+    args: [ rS, rA, rB ]
+    defs: [ rA ]
+    uses: [ rA, rB ]
+
+  - name: stb
+    desc: Store Byte
+    bitmask: 0xfc000000
+    pattern: 0x98000000
+    args: [ rS, offset, rA ]
+    uses: [ rS, rA.nz ]
+
+  - name: stbu
+    desc: Store Byte with Update
+    bitmask: 0xfc000000
+    pattern: 0x9c000000
+    args: [ rS, offset, rA ]
+    defs: [ rA ]
+    uses: [ rS, rA ]
+
+  - name: stbux
+    desc: Store Byte with Update Indexed
+    bitmask: 0xfc0003ff
+    pattern: 0x7c0001ee
+    args: [ rS, rA, rB ]
+    defs: [ rA ]
+    uses: [ rS, rA, rB ]
+
+  - name: stbx
+    desc: Store Byte Indexed
+    bitmask: 0xfc0003ff
+    pattern: 0x7c0001ae
+    args: [ rS, rA, rB ]
+    uses: [ rS, rA.nz, rB ]
+
+  - name: stfd
+    desc: Store Floating-Point Double
+    bitmask: 0xfc000000
+    pattern: 0xd8000000
+    args: [ frS, offset, rA ]
+    uses: [ frS, rA.nz ]
+
+  - name: stfdu
+    desc: Store Floating-Point Double with Update
+    bitmask: 0xfc000000
+    pattern: 0xdc000000
+    args: [ frS, offset, rA ]
+    defs: [ rA ]
+    uses: [ frS, rA ]
+
+  - name: stfdux
+    desc: Store Floating-Point Double with Update Indexed
+    bitmask: 0xfc0007ff
+    pattern: 0x7c0005ee
+    args: [ frS, rA, rB ]
+    defs: [ rA ]
+    uses: [ frS, rA, rB ]
+
+  - name: stfdx
+    desc: Store Floating-Point Double Indexed
+    bitmask: 0xfc0007ff
+    pattern: 0x7c0005ae
+    args: [ frS, rA, rB ]
+    uses: [ frS, rA.nz, rB ]
+
+  - name: stfiwx
+    desc: Store Floating-Point as Integer Word Indexed
+    bitmask: 0xfc0007ff
+    pattern: 0x7c0007ae
+    args: [ frS, rA, rB ]
+    uses: [ frS, rA.nz, rB ]
+
+  - name: stfs
+    desc: Store Floating-Point Single
+    bitmask: 0xfc000000
+    pattern: 0xd0000000
+    args: [ frS, offset, rA ]
+    uses: [ frS, rA.nz ]
+
+  - name: stfsu
+    desc: Store Floating-Point Single with Update
+    bitmask: 0xfc000000
+    pattern: 0xd4000000
+    args: [ frS, offset, rA ]
+    defs: [ rA ]
+    uses: [ frS, rA ]
+
+  - name: stfsux
+    desc: Store Floating-Point Single with Update Indexed
+    bitmask: 0xfc0007ff
+    pattern: 0x7c00056e
+    args: [ frS, rA, rB ]
+    defs: [ rA ]
+    uses: [ frS, rA, rB ]
+
+  - name: stfsx
+    desc: Store Floating-Point Single Indexed
+    bitmask: 0xfc0007ff
+    pattern: 0x7c00052e
+    args: [ frS, rA, rB ]
+    uses: [ frS, rA.nz, rB ]
+
+  - name: sth
+    desc: Store Half Word
+    bitmask: 0xfc000000
+    pattern: 0xb0000000
+    args: [ rS, offset, rA ]
+    uses: [ rS, rA.nz ]
+
+  - name: sthbrx
+    desc: Store Half Word Byte-Reverse Indexed
+    bitmask: 0xfc0007ff
+    pattern: 0x7c00072c
+    args: [ rS, rA, rB ]
+    uses: [ rS, rA.nz, rB ]
+
+  - name: sthu
+    desc: Store Half Word with Update
+    bitmask: 0xfc000000
+    pattern: 0xb4000000
+    args: [ rS, offset, rA ]
+    defs: [ rA ]
+    uses: [ rS, rA ]
+
+  - name: sthux
+    desc: Store Half Word with Update Indexed
+    bitmask: 0xfc0007ff
+    pattern: 0x7c00036e
+    args: [ rS, rA, rB ]
+    defs: [ rA ]
+    uses: [ rS, rA, rB ]
+
+  - name: sthx
+    desc: Store Half Word Indexed
+    bitmask: 0xfc0007ff
+    pattern: 0x7c00032e
+    args: [ rS, rA, rB ]
+    uses: [ rS, rA.nz, rB ]
+
+  - name: stmw
+    desc: Store Multiple Word
+    bitmask: 0xfc000000
+    pattern: 0xbc000000
+    args: [ rS, offset, rA ]
+    uses: [ rS, rA.nz ]
+
+  - name: stswi
+    desc: Store String Word Immediate
+    bitmask: 0xfc0007ff
+    pattern: 0x7c0005aa
+    args: [ rS, rA, NB ]
+    uses: [ rS, rA.nz ]
+
+  - name: stswx
+    desc: Store String Word Indexed
+    bitmask: 0xfc0007ff
+    pattern: 0x7c00052a
+    args: [ rS, rA, rB ]
+    uses: [ rS, rA.nz, rB ]
+
+  - name: stw
+    desc: Store Word
+    bitmask: 0xfc000000
+    pattern: 0x90000000
+    args: [ rS, offset, rA ]
+    uses: [ rS, rA.nz ]
+
+  - name: stwbrx
+    desc: Store Word Byte-Reverse Indexed
+    bitmask: 0xfc0007ff
+    pattern: 0x7c00052c
+    args: [ rS, rA, rB ]
+    uses: [ rS, rA.nz, rB ]
+
+  - name: stwcx.
+    desc: Store Word Conditional Indexed
+    bitmask: 0xfc0007ff
+    pattern: 0x7c00012d
+    args: [ rS, rA, rB ]
+    uses: [ rS, rA.nz, rB ]
+
+  - name: stwu
+    desc: Store Word with Update
+    bitmask: 0xfc000000
+    pattern: 0x94000000
+    args: [ rS, offset, rA ]
+    defs: [ rA ]
+    uses: [ rS, rA ]
+
+  - name: stwux
+    desc: Store Word Indexed
+    bitmask: 0xfc0007ff
+    pattern: 0x7c00016e
+    args: [ rS, rA, rB ]
+    defs: [ rA ]
+    uses: [ rS, rA, rB ]
+
+  - name: stwx
+    desc: Store Word Indexed
+    bitmask: 0xfc0007ff
+    pattern: 0x7c00012e
+    args: [ rS, rA, rB ]
+    uses: [ rS, rA.nz, rB ]
+
+  - name: subf
+    desc: Subtract From Carrying
+    bitmask: 0xfc0003fe
+    pattern: 0x7c000050
+    modifiers: [ OE, Rc ]
+    args: [ rD, rA, rB ]
+    defs: [ rD ]
+    uses: [ rA, rB ]
+
+  - name: subfc
+    desc: Subtract from Carrying
+    bitmask: 0xfc0003fe
+    pattern: 0x7c000010
+    modifiers: [ OE, Rc ]
+    args: [ rD, rA, rB ]
+    defs: [ rD ]
+    uses: [ rA, rB ]
+
+  - name: subfe
+    desc: Subtract from Extended
+    bitmask: 0xfc0003fe
+    pattern: 0x7c000110
+    modifiers: [ OE, Rc ]
+    args: [ rD, rA, rB ]
+    defs: [ rD ]
+    uses: [ rA, rB ]
+
+  - name: subfic
+    desc: Subtract from Immediate Carrying
+    bitmask: 0xfc000000
+    pattern: 0x20000000
+    args: [ rD, rA, simm ]
+    defs: [ rD ]
+    uses: [ rA ]
+
+  - name: subfme
+    desc: Subtract from Minus One Extended
+    bitmask: 0xfc00fbfe
+    pattern: 0x7c0001d0
+    modifiers: [ OE, Rc ]
+    args: [ rD, rA ]
+    defs: [ rD ]
+    uses: [ rA ]
+
+  - name: subfze
+    desc: Subtract from Zero Extended
+    bitmask: 0xfc00fbfe
+    pattern: 0x7c000190
+    modifiers: [ OE, Rc ]
+    args: [ rD, rA ]
+    defs: [ rD ]
+    uses: [ rA ]
+
+  - name: sync
+    desc: Synchronize
+    bitmask: 0xffffffff
+    pattern: 0x7c0004ac
+
+  - name: tlbie
+    desc: Translation Lookaside Buffer Invalidate Entry
+    bitmask: 0xffff07ff
+    pattern: 0x7c000264
+    args: [ rB ]
+    uses: [ rB ]
+
+  - name: tlbsync
+    desc: TLB Synchronize
+    bitmask: 0xffffffff
+    pattern: 0x7c00046c
+
+  - name: tw
+    desc: Trap Word
+    bitmask: 0xfc0007ff
+    pattern: 0x7c000008
+    args: [ TO, rA, rB ]
+    uses: [ rA, rB ]
+
+  - name: twi
+    desc: Trap Word Immediate
+    bitmask: 0xfc000000
+    pattern: 0xc0000000
+    args: [ TO, rA, simm ]
+    uses: [ rA ]
+
+  - name: xor
+    desc: XOR
+    bitmask: 0xfc0007fe
+    pattern: 0x7c000278
+    args: [ rA, rS, rB ]
+    defs: [ rA ]
+    uses: [ rS, rB ]
+
+  - name: xori
+    desc: XOR Immediate
+    bitmask: 0xfc000000
+    pattern: 0x68000000
+    args: [ rA, rS, uimm ]
+    defs: [ rA ]
+    uses: [ rS ]
+
+  - name: xoris
+    desc: XOR Immediate Shifted
+    bitmask: 0xfc000000
+    pattern: 0x6c000000
+    args: [ rA, rS, uimm ]
+    defs: [ rA ]
+    uses: [ rS ]
+
+mnemonics:
+  # Arithmetic
+  - name: lis
+    opcode: addis
+    args: [ rD, uimm ]
+    condition: rA == 0
+  - name: li
+    opcode: addi
+    args: [ rD, simm ]
+    condition: rA == 0
+  - name: mr
+    opcode: or
+    args: [ rA, rS ]
+    condition: rS == rB
+  - name: nop
+    opcode: ori
+    condition: rA == 0 && rS == 0 && uimm == 0
+
+  # Rotates/Shifts
+  - name: clrlwi
+    opcode: rlwinm
+    args: [ rA, rS, MB ]
+    condition: SH == 0 && ME == 31
+  - name: rotlwi
+    opcode: rlwinm
+    args: [ rA, rS, SH ]
+    condition: MB == 0 && ME == 31
+  - name: slwi
+    opcode: rlwinm
+    args: [ rA, rS, ME ]
+    condition: MB == 0 && 31 - SH == ME
+  - name: srwi
+    opcode: rlwinm
+    args: [ rA, rS, MB ]
+    condition: ME == 31 && 32 - MB == SH
+
+  # Compares
+  - name: cmpw
+    opcode: cmp
+    args: [ rA, rB ]
+    condition: crfD == 0
+  - name: cmpw
+    opcode: cmp
+    args: [ crfD, rA, rB ]
+  - name: cmplw
+    opcode: cmpl
+    args: [ rA, rB ]
+    condition: crfD == 0
+  - name: cmplw
+    opcode: cmpl
+    args: [ crfD, rA, rB ]
+  - name: cmpwi
+    opcode: cmpi
+    args: [ rA, simm ]
+    condition: crfD == 0
+  - name: cmpwi
+    opcode: cmpi
+    args: [ crfD, rA, simm ]
+    condition: crfD == 0
+  - name: cmplwi
+    opcode: cmpli
+    args: [ rA, uimm ]
+    condition: crfD == 0
+  - name: cmplwi
+    opcode: cmpli
+    args: [ crfD, rA, uimm ]
+    condition: crfD == 0
+
+  # Misc
+  - name: twgti
+    opcode: twi
+    args: [ rA, simm ]
+    condition: TO == 8
+  - name: twllei
+    opcode: twi
+    args: [ rA, simm ]
+    condition: TO == 6
+  - name: twui
+    args: [ rA, simm ]
+    condition: TO == 31
+
+  # Move to special-purpose register
+  - name: mtxer
+    opcode: mtspr
+    args: [ rS ]
+    condition: spr == 1
+  - name: mtlr
+    opcode: mtspr
+    args: [ rS ]
+    condition: spr == 8
+  - name: mtctr
+    opcode: mtspr
+    args: [ rS ]
+    condition: spr == 9
+  - name: mtdsisr
+    opcode: mtspr
+    args: [ rS ]
+    condition: spr == 18
+  - name: mtdbatu
+    opcode: mtspr
+    args: [ rS ]
+    condition: spr == 397
+  - name: mttdu
+    opcode: mtspr
+    args: [ rS ]
+    condition: spr == 571
+
+  # Move from special-purpose register
+  - name: mfxer
+    opcode: mfspr
+    args: [ rD ]
+    condition: spr == 1
+  - name: mflr
+    opcode: mfspr
+    args: [ rD ]
+    condition: spr == 8
+  - name: mfctr
+    opcode: mfspr
+    args: [ rD ]
+    condition: spr == 9
+  - name: mfdsisr
+    opcode: mfspr
+    args: [ rD ]
+    condition: spr == 18
+  - name: mfdbatu
+    opcode: mfspr
+    args: [ rD ]
+    condition: spr == 397
+  - name: mftdu
+    opcode: mfspr
+    args: [ rD ]
+    condition: spr == 571
+
+  # Branch Conditional
+  # bc branch if negative
+  - name: blt
+    opcode: bc
+    modifiers: [ AA, LK ]
+    args: [ BD ]
+    condition: BO == 12 && BI & 0b11 == 0b00 && crfS == 0
+  - name: blt
+    opcode: bc
+    modifiers: [ AA, LK ]
+    args: [ crfS, BD ]
+    condition: BO == 12 && BI & 0b11 == 0b00
+  # bc branch if not positive
+  - name: ble
+    opcode: bc
+    modifiers: [ AA, LK ]
+    args: [ BD ]
+    condition: BO == 4 && BI & 0b11 == 0b01 && crfS == 0
+  - name: ble
+    opcode: bc
+    modifiers: [ AA, LK ]
+    args: [ crfS, BD ]
+    condition: BO == 4 && BI & 0b11 == 0b01
+  # bc branch if zero
+  - name: beq
+    opcode: bc
+    modifiers: [ AA, LK ]
+    args: [ BD ]
+    condition: BO == 12 && BI & 0b11 == 0b10 && crfS == 0
+  - name: beq
+    opcode: bc
+    modifiers: [ AA, LK ]
+    args: [ crfS, BD ]
+    condition: BO == 12 && BI & 0b11 == 0b10
+  # bc branch if not negative
+  - name: bge
+    opcode: bc
+    modifiers: [ AA, LK ]
+    args: [ BD ]
+    condition: BO == 4 && BI & 0b11 == 0b00 && crfS == 0
+  - name: bge
+    opcode: bc
+    modifiers: [ AA, LK ]
+    args: [ crfS, BD ]
+    condition: BO == 4 && BI & 0b11 == 0b00
+  # bc branch if positive
+  - name: bgt
+    opcode: bc
+    modifiers: [ AA, LK ]
+    args: [ BD ]
+    condition: BO == 12 && BI & 0b11 == 0b01 && crfS == 0
+  - name: bgt
+    opcode: bc
+    modifiers: [ AA, LK ]
+    args: [ crfS, BD ]
+    condition: BO == 12 && BI & 0b11 == 0b01
+  # bc branch if not zero
+  - name: bne
+    opcode: bc
+    modifiers: [ AA, LK ]
+    args: [ BD ]
+    condition: BO == 4 && BI & 0b11 == 0b10 && crfS == 0
+  - name: bne
+    opcode: bc
+    modifiers: [ AA, LK ]
+    args: [ crfS, BD ]
+    condition: BO == 4 && BI & 0b11 == 0b10
+  # bc branch if summary overflow
+  - name: bso
+    opcode: bc
+    modifiers: [ AA, LK ]
+    args: [ BD ]
+    condition: BO == 12 && BI & 0b11 == 0b11 && crfS == 0
+  - name: bso
+    opcode: bc
+    modifiers: [ AA, LK ]
+    args: [ crfS, BD ]
+    condition: BO == 12 && BI & 0b11 == 0b11
+  # bc branch if not summary overflow
+  - name: bns
+    opcode: bc
+    modifiers: [ AA, LK ]
+    args: [ BD ]
+    condition: BO == 4 && BI & 0b11 == 0b11 && crfS == 0
+  - name: bns
+    opcode: bc
+    modifiers: [ AA, LK ]
+    args: [ crfS, BD ]
+    condition: BO == 4 && BI & 0b11 == 0b11
+
+  - name: bdnz
+    opcode: bc
+    modifiers: [ AA, LK ]
+    args: [ BD ]
+    condition: BO == 16 && BI == 0
+  - name: bdz
+    opcode: bc
+    modifiers: [ AA, LK ]
+    args: [ BD ]
+    condition: BO == 18 && BI == 0
+  # TODO support conditional bd...
+
+  # Branch Conditional to Count Register
+  # bcctr branch always
+  - name: bctr
+    opcode: bcctr
+    modifiers: [ LK ]
+    condition: BO == 20 && BI == 0
+  # bcctr branch if negative
+  - name: bltctr
+    opcode: bcctr
+    modifiers: [ LK ]
+    condition: BO == 12 && BI & 0b11 == 0b00 && crfS == 0
+  - name: bltctr
+    opcode: bcctr
+    modifiers: [ LK ]
+    args: [ crfS ]
+    condition: BO == 12 && BI & 0b11 == 0b00
+  # bcctr branch if not positive
+  - name: blectr
+    opcode: bcctr
+    modifiers: [ LK ]
+    condition: BO == 4 && BI & 0b11 == 0b01 && crfS == 0
+  - name: blectr
+    opcode: bcctr
+    modifiers: [ LK ]
+    args: [ crfS ]
+    condition: BO == 4 && BI & 0b11 == 0b01
+  # bcctr branch if zero
+  - name: beqctr
+    opcode: bcctr
+    modifiers: [ LK ]
+    condition: BO == 12 && BI & 0b11 == 0b10 && crfS == 0
+  - name: beqctr
+    opcode: bcctr
+    modifiers: [ LK ]
+    args: [ crfS ]
+    condition: BO == 12 && BI & 0b11 == 0b10
+  # bcctr branch if not negative
+  - name: bgectr
+    opcode: bcctr
+    modifiers: [ LK ]
+    condition: BO == 4 && BI & 0b11 == 0b00 && crfS == 0
+  - name: bgectr
+    opcode: bcctr
+    modifiers: [ LK ]
+    args: [ crfS ]
+    condition: BO == 4 && BI & 0b11 == 0b00
+  # bcctr branch if positive
+  - name: bgtctr
+    opcode: bcctr
+    modifiers: [ LK ]
+    condition: BO == 12 && BI & 0b11 == 0b01 && crfS == 0
+  - name: bgtctr
+    opcode: bcctr
+    modifiers: [ LK ]
+    args: [ crfS ]
+    condition: BO == 12 && BI & 0b11 == 0b01
+  # bcctr branch if not zero
+  - name: bnectr
+    opcode: bcctr
+    modifiers: [ LK ]
+    condition: BO == 4 && BI & 0b11 == 0b10 && crfS == 0
+  - name: bnectr
+    opcode: bcctr
+    modifiers: [ LK ]
+    args: [ crfS ]
+    condition: BO == 4 && BI & 0b11 == 0b10
+  # bcctr branch if summary overflow
+  - name: bsoctr
+    opcode: bcctr
+    modifiers: [ LK ]
+    condition: BO == 12 && BI & 0b11 == 0b11 && crfS == 0
+  - name: bsoctr
+    opcode: bcctr
+    modifiers: [ LK ]
+    args: [ crfS ]
+    condition: BO == 12 && BI & 0b11 == 0b11
+  # bcctr branch if not summary overflow
+  - name: bnsctr
+    opcode: bcctr
+    modifiers: [ LK ]
+    condition: BO == 4 && BI & 0b11 == 0b11 && crfS == 0
+  - name: bnsctr
+    opcode: bcctr
+    modifiers: [ LK ]
+    args: [ crfS ]
+    condition: BO == 4 && BI & 0b11 == 0b11
+
+  # Branch Conditional to Link Register
+
+  # bclr branch always
+  - name: blr
+    opcode: bclr
+    modifiers: [ LK ]
+    condition: BO == 20 && BI == 0
+  # bclr branch if negative
+  - name: bltlr
+    opcode: bclr
+    modifiers: [ LK ]
+    condition: BO == 12 && BI & 0b11 == 0b00 && crfS == 0
+  - name: bltlr
+    opcode: bclr
+    modifiers: [ LK ]
+    args: [ crfS ]
+    condition: BO == 12 && BI & 0b11 == 0b00
+  # bclr branch if not positive
+  - name: blelr
+    opcode: bclr
+    modifiers: [ LK ]
+    condition: BO == 4 && BI & 0b11 == 0b01 && crfS == 0
+  - name: blelr
+    opcode: bclr
+    modifiers: [ LK ]
+    args: [ crfS ]
+    condition: BO == 4 && BI & 0b11 == 0b01
+  # bclr branch if zero
+  - name: beqlr
+    opcode: bclr
+    modifiers: [ LK ]
+    condition: BO == 12 && BI & 0b11 == 0b10 && crfS == 0
+  - name: beqlr
+    opcode: bclr
+    modifiers: [ LK ]
+    args: [ crfS ]
+    condition: BO == 12 && BI & 0b11 == 0b10
+  # bclr branch if not negative
+  - name: bgelr
+    opcode: bclr
+    modifiers: [ LK ]
+    condition: BO == 4 && BI & 0b11 == 0b00 && crfS == 0
+  - name: bgelr
+    opcode: bclr
+    modifiers: [ LK ]
+    args: [ crfS ]
+    condition: BO == 4 && BI & 0b11 == 0b00
+  # bclr branch if positive
+  - name: bgtlr
+    opcode: bclr
+    modifiers: [ LK ]
+    condition: BO == 12 && BI & 0b11 == 0b01 && crfS == 0
+  - name: bgtlr
+    opcode: bclr
+    modifiers: [ LK ]
+    args: [ crfS ]
+    condition: BO == 12 && BI & 0b11 == 0b01
+  # bclr branch if not zero
+  - name: bnelr
+    opcode: bclr
+    modifiers: [ LK ]
+    condition: BO == 4 && BI & 0b11 == 0b10 && crfS == 0
+  - name: bnelr
+    opcode: bclr
+    modifiers: [ LK ]
+    args: [ crfS ]
+    condition: BO == 4 && BI & 0b11 == 0b10
+  # bclr branch if summary overflow
+  - name: bsolr
+    opcode: bclr
+    modifiers: [ LK ]
+    condition: BO == 12 && BI & 0b11 == 0b11 && crfS == 0
+  - name: bsolr
+    opcode: bclr
+    modifiers: [ LK ]
+    args: [ crfS ]
+    condition: BO == 12 && BI & 0b11 == 0b11
+  # bclr branch if not summary overflow
+  - name: bnslr
+    opcode: bclr
+    modifiers: [ LK ]
+    condition: BO == 4 && BI & 0b11 == 0b11 && crfS == 0
+  - name: bnslr
+    opcode: bclr
+    modifiers: [ LK ]
+    args: [ crfS ]
+    condition: BO == 4 && BI & 0b11 == 0b11

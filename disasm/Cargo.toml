@@ -1,7 +1,7 @@
 [package]
 name = "ppc750cl"
-version = "0.1.1"
-edition = "2018"
+version = "0.2.0"
+edition = "2021"
 authors = ["Richard Patel <me@terorie.dev>"]
 license = "GPL-3.0-or-later"
 description = "Disassembler for PowerPC 750CL"
@@ -9,5 +9,5 @@ keywords = ["powerpc", "wii", "gamecube"]
 repository = "https://github.com/terorie/ppc750cl"
 
 [dependencies]
-num-traits = "0.2.14"
-ppc750cl-macros = { path = "../macros", version = "0.1.1" }
+num-traits = "0.2"
+serde = "1.0"

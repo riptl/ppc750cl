@@ -8,6 +8,7 @@ use petgraph::algo::dominators::Dominators;
 use petgraph::graph::{DefaultIx, NodeIndex};
 use petgraph::Graph;
 
+use ppc750cl::formatter::FormattedIns;
 use ppc750cl::{Ins, Opcode};
 
 use crate::slices::{BasicSlices, CodeIdx};
@@ -53,18 +54,21 @@ impl<'a> BasicBlock<'a> {
         for ins in code {
             match ins.op {
                 Opcode::Addis => {
-                    if ins.a() == 0 {
+                    if ins.field_rA() == 0 {
                         // lis
-                        defs.insert(ins.d(), ins.uimm());
+                        defs.insert(ins.field_rD() as u8, ins.field_uimm() as u16);
                     } else {
-                        defs.remove(&ins.d());
+                        defs.remove(&(ins.field_rD() as u8));
                     }
                 }
                 Opcode::Addi => {
-                    if let Some(hi) = defs.get(&ins.a()) {
-                        data_refs.insert(ins.addr / 4, ((*hi as u32) << 16) + (ins.uimm() as u32));
+                    if let Some(hi) = defs.get(&(ins.field_rA() as u8)) {
+                        data_refs.insert(
+                            ins.addr / 4,
+                            ((*hi as u32) << 16) + (ins.field_uimm() as u32),
+                        );
                     }
-                    defs.remove(&ins.d());
+                    defs.remove(&(ins.field_rD() as u8));
                 }
                 _ => (),
             }
@@ -88,7 +92,7 @@ impl<'a> Debug for BasicBlock<'a> {
             self.range.end * 4
         )?;
         for ins in self.code {
-            writeln!(f, "{}", ins.to_string())?;
+            writeln!(f, "{}", FormattedIns(ins.clone()))?;
             if let Some(addr) = self.data_refs.get(&(ins.addr / 4)) {
                 writeln!(f, "  ref: {:0>#8x}", addr)?;
             }
@@ -151,8 +155,8 @@ impl<'a> FlowGraph<'a> {
             // Get last instruction of left block.
             // Unless it's an unconditional branch, we can connect the blocks.
             let last_ins = &src_block.code.last().unwrap();
-            if last_ins.code == Opcode::BLR
-                || (last_ins.op == Opcode::B && last_ins.bo() == 0b10100)
+            if last_ins.code == 0x4E800020
+                || (last_ins.op == Opcode::B && last_ins.field_BO() == 0b10100)
             {
                 continue;
             }

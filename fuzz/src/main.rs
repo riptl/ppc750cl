@@ -1,10 +1,11 @@
+use std::io::Write;
+use std::ops::Range;
 use std::sync::atomic::{AtomicU32, Ordering};
 use std::sync::Arc;
 use std::time::{Duration, Instant};
 
-use ppc750cl::formatter::SimpleFormatter;
+use ppc750cl::formatter::FormattedIns;
 use ppc750cl::Ins;
-use std::ops::Range;
 
 fn main() {
     let start = Instant::now();
@@ -62,7 +63,6 @@ impl MultiFuzzer {
             //      for most of the time.
             handle.join().expect("thread panicked");
         }
-        disasm(0xFFFF_FFFF);
     }
 }
 
@@ -81,11 +81,14 @@ impl Fuzzer {
     }
 
     fn dispatch(&self) -> std::thread::JoinHandle<()> {
+        let mut devnull = DevNull;
+
         let counter = Arc::clone(&self.counter);
         let range = self.range.clone();
         std::thread::spawn(move || {
             for x in range.clone() {
-                disasm(x);
+                let ins = Ins::new(x, 0x8000_0000);
+                writeln!(&mut devnull, "{}", FormattedIns(ins)).unwrap();
                 if x % (1 << 19) == 0 {
                     counter.store(x, Ordering::Relaxed);
                 }
@@ -93,13 +96,6 @@ impl Fuzzer {
             counter.store(range.end, Ordering::Relaxed);
         })
     }
-}
-
-fn disasm(x: u32) {
-    let devnull = DevNull;
-    let mut formatter = SimpleFormatter { writer: devnull };
-    let ins = Ins::new(x, 0x8000_0000u32);
-    ins.write_string(&mut formatter).unwrap();
 }
 
 struct DevNull;
