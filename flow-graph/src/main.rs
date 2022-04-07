@@ -1,4 +1,3 @@
-use clap::clap_app;
 use petgraph::dot::{Config as DotConfig, Dot};
 
 use ppc750cl::{disasm_iter, Ins};
@@ -11,14 +10,29 @@ use crate::slices::BasicSlices;
 use dol::Dol;
 
 fn main() {
-    let matches = clap_app!(myapp =>
-        (version: "1.0")
-        (about: "Control flow graph analysis for PowerPC 750CL")
-        (@arg START: --start +required +takes_value "Start address")
-        (@arg STOP: --stop +required +takes_value "Stop address")
-        (@arg INPUT: +required "Binary input file")
-    )
-    .get_matches();
+    let matches = clap::Command::new("ppc750cl-flow-graph")
+        .version("0.1.1")
+        .about("Control flow graph analysis for PowerPC 750CL")
+        .arg(
+            clap::Arg::new("START")
+                .long("--start")
+                .required(true)
+                .takes_value(true)
+                .help("Start address"),
+        )
+        .arg(
+            clap::Arg::new("STOP")
+                .long("--stop")
+                .required(true)
+                .takes_value(true)
+                .help("Stop address"),
+        )
+        .arg(
+            clap::Arg::new("INPUT")
+                .required(true)
+                .help("Binary input file"),
+        )
+        .get_matches();
 
     let start_addr = matches.value_of("START").unwrap();
     let start_addr: u32 = ::parse_int::parse(start_addr).expect("Invalid address flag");
