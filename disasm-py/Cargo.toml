@@ -1,6 +1,6 @@
 [package]
 name = "ppc750cl-py"
-version = "0.1.1"
+version = "0.2.0"
 edition = "2021"
 authors = ["Richard Patel <me@terorie.dev>"]
 license = "GPL-3.0-or-later"
@@ -17,4 +17,4 @@ default = ["extension-module"]
 
 [dependencies]
 pyo3 = { version = "0.16", features = ["multiple-pymethods"] }
-ppc750cl = { version = "0.1.1", path = "../disasm" }
+ppc750cl = { version = "0.2.0", path = "../disasm" }

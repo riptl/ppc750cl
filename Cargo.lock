@@ -278,7 +278,7 @@ dependencies = [
 
 [[package]]
 name = "ppc750cl"
-version = "0.1.1"
+version = "0.2.0"
 dependencies = [
  "num-traits",
  "serde",
@@ -286,7 +286,7 @@ dependencies = [
 
 [[package]]
 name = "ppc750cl-flow-graph"
-version = "0.1.1"
+version = "0.2.0"
 dependencies = [
  "clap",
  "dol",
@@ -298,7 +298,7 @@ dependencies = [
 
 [[package]]
 name = "ppc750cl-fuzz"
-version = "0.1.1"
+version = "0.2.0"
 dependencies = [
  "num_cpus",
  "ppc750cl",
@@ -306,7 +306,7 @@ dependencies = [
 
 [[package]]
 name = "ppc750cl-genisa"
-version = "0.1.1"
+version = "0.2.0"
 dependencies = [
  "itertools",
  "proc-macro2",
@@ -318,7 +318,7 @@ dependencies = [
 
 [[package]]
 name = "ppc750cl-py"
-version = "0.1.1"
+version = "0.2.0"
 dependencies = [
  "ppc750cl",
  "pyo3",
@@ -326,7 +326,7 @@ dependencies = [
 
 [[package]]
 name = "ppc750cl-rand"
-version = "0.1.1"
+version = "0.2.0"
 dependencies = [
  "ppc750cl",
  "rand_core",

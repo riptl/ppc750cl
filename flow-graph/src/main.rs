@@ -11,7 +11,7 @@ use dol::Dol;
 
 fn main() {
     let matches = clap::Command::new("ppc750cl-flow-graph")
-        .version("0.1.1")
+        .version("0.2.0")
         .about("Control flow graph analysis for PowerPC 750CL")
         .arg(
             clap::Arg::new("START")
