@@ -14,13 +14,18 @@ impl Ins {
     }
 
     #[getter]
-    fn code(&self) -> PyResult<u32> {
-        Ok(self.0.code)
+    fn code(&self) -> u32 {
+        self.0.code
     }
 
     #[getter]
-    fn addr(&self) -> PyResult<u32> {
-        Ok(self.0.addr)
+    fn addr(&self) -> u32 {
+        self.0.addr
+    }
+
+    #[getter]
+    fn opcode(&self) -> &'static str {
+        self.0.op.mnemonic()
     }
 
     fn __str__(&self) -> String {
