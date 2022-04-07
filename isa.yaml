@@ -1319,9 +1319,9 @@ opcodes:
     bitmask: 0xfc1f07fe
     pattern: 0x10000210
     modifiers: [ Rc ]
-    args: [ frD, frA, frB ]
+    args: [ frD, frB ]
     defs: [ frD ]
-    uses: [ frA, frB ]
+    uses: [ frB ]
 
   - name: ps_add
     desc: Paired Single Add
@@ -1678,16 +1678,16 @@ opcodes:
     desc: Store Floating-Point Double
     bitmask: 0xfc000000
     pattern: 0xd8000000
-    args: [ rS, offset, rA ]
-    uses: [ rS, rA.nz ]
+    args: [ frS, offset, rA ]
+    uses: [ frS, rA.nz ]
 
   - name: stfdu
     desc: Store Floating-Point Double with Update
     bitmask: 0xfc000000
     pattern: 0xdc000000
-    args: [ rS, offset, rA ]
+    args: [ frS, offset, rA ]
     defs: [ rA ]
-    uses: [ rS, rA ]
+    uses: [ frS, rA ]
 
   - name: stfdux
     desc: Store Floating-Point Double with Update Indexed
@@ -1715,16 +1715,16 @@ opcodes:
     desc: Store Floating-Point Single
     bitmask: 0xfc000000
     pattern: 0xd0000000
-    args: [ rS, offset, rA ]
-    uses: [ rS, rA.nz ]
+    args: [ frS, offset, rA ]
+    uses: [ frS, rA.nz ]
 
   - name: stfsu
     desc: Store Floating-Point Single with Update
     bitmask: 0xfc000000
     pattern: 0xd4000000
-    args: [ rS, offset, rA ]
+    args: [ frS, offset, rA ]
     defs: [ rA ]
-    uses: [ rS, rA ]
+    uses: [ frS, rA ]
 
   - name: stfsux
     desc: Store Floating-Point Single with Update Indexed

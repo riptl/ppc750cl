@@ -1836,7 +1836,6 @@ impl Ins {
             ],
             Opcode::PsAbs => vec![
                 Field::frD(FPR(((self.code >> 21u8) & 0x1f) as _)),
-                Field::frA(FPR(((self.code >> 16u8) & 0x1f) as _)),
                 Field::frB(FPR(((self.code >> 11u8) & 0x1f) as _)),
             ],
             Opcode::PsAdd => vec![
@@ -2048,12 +2047,12 @@ impl Ins {
                 Field::rB(GPR(((self.code >> 11u8) & 0x1f) as _)),
             ],
             Opcode::Stfd => vec![
-                Field::rS(GPR(((self.code >> 21u8) & 0x1f) as _)),
+                Field::frS(FPR(((self.code >> 21u8) & 0x1f) as _)),
                 Field::offset(Offset(((self.code >> 0u8) & 0xffff) as _)),
                 Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
             ],
             Opcode::Stfdu => vec![
-                Field::rS(GPR(((self.code >> 21u8) & 0x1f) as _)),
+                Field::frS(FPR(((self.code >> 21u8) & 0x1f) as _)),
                 Field::offset(Offset(((self.code >> 0u8) & 0xffff) as _)),
                 Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
             ],
@@ -2073,12 +2072,12 @@ impl Ins {
                 Field::rB(GPR(((self.code >> 11u8) & 0x1f) as _)),
             ],
             Opcode::Stfs => vec![
-                Field::rS(GPR(((self.code >> 21u8) & 0x1f) as _)),
+                Field::frS(FPR(((self.code >> 21u8) & 0x1f) as _)),
                 Field::offset(Offset(((self.code >> 0u8) & 0xffff) as _)),
                 Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
             ],
             Opcode::Stfsu => vec![
-                Field::rS(GPR(((self.code >> 21u8) & 0x1f) as _)),
+                Field::frS(FPR(((self.code >> 21u8) & 0x1f) as _)),
                 Field::offset(Offset(((self.code >> 0u8) & 0xffff) as _)),
                 Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
             ],
@@ -3368,10 +3367,7 @@ impl Ins {
                 uses
             }
             Opcode::PsAbs => {
-                let mut uses = vec![
-                    Field::frA(FPR(((self.code >> 16u8) & 0x1f) as _)),
-                    Field::frB(FPR(((self.code >> 11u8) & 0x1f) as _)),
-                ];
+                let mut uses = vec![Field::frB(FPR(((self.code >> 11u8) & 0x1f) as _))];
                 uses
             }
             Opcode::PsAdd => {
@@ -3652,7 +3648,7 @@ impl Ins {
                 uses
             }
             Opcode::Stfd => {
-                let mut uses = vec![Field::rS(GPR(((self.code >> 21u8) & 0x1f) as _))];
+                let mut uses = vec![Field::frS(FPR(((self.code >> 21u8) & 0x1f) as _))];
                 if ((self.code >> 16u8) & 0x1f) != 0 {
                     uses.push(Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)));
                 }
@@ -3660,7 +3656,7 @@ impl Ins {
             }
             Opcode::Stfdu => {
                 let mut uses = vec![
-                    Field::rS(GPR(((self.code >> 21u8) & 0x1f) as _)),
+                    Field::frS(FPR(((self.code >> 21u8) & 0x1f) as _)),
                     Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
                 ];
                 uses
@@ -3694,7 +3690,7 @@ impl Ins {
                 uses
             }
             Opcode::Stfs => {
-                let mut uses = vec![Field::rS(GPR(((self.code >> 21u8) & 0x1f) as _))];
+                let mut uses = vec![Field::frS(FPR(((self.code >> 21u8) & 0x1f) as _))];
                 if ((self.code >> 16u8) & 0x1f) != 0 {
                     uses.push(Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)));
                 }
@@ -3702,7 +3698,7 @@ impl Ins {
             }
             Opcode::Stfsu => {
                 let mut uses = vec![
-                    Field::rS(GPR(((self.code >> 21u8) & 0x1f) as _)),
+                    Field::frS(FPR(((self.code >> 21u8) & 0x1f) as _)),
                     Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
                 ];
                 uses

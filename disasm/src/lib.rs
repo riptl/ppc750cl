@@ -101,7 +101,7 @@ impl<N: PrimInt> UpperHex for ReallySigned<N> {
 // General-purpose register.
 field_arg!(GPR, u8, "r{}");
 // Floating-point register (direct or paired-singles mode).
-field_arg!(FPR, u8, "fr{}");
+field_arg!(FPR, u8, "f{}");
 // Segment register.
 field_arg!(SR, u8);
 // Special-purpose register.
@@ -109,15 +109,15 @@ field_arg!(SPR, u16);
 // Condition register field.
 field_arg!(CRField, u8, "crb{}");
 // Condition register bit (index + condition case).
-field_arg!(CRBit, u8, "crf{}");
+field_arg!(CRBit, u8, "cr{}");
 // Paired-single graphics quantization register
-field_arg!(GQR, u8);
+field_arg!(GQR, u8, "qr{}");
 // Unsigned immediate.
 field_arg!(Uimm, u16, "{:#x}");
 // Signed immediate.
 field_arg!(Simm, i16, "{:#x}", ReallySigned);
 // Offset for indirect memory reference.
-field_arg!(Offset, i32, "{:#x}", ReallySigned);
+field_arg!(Offset, i16, "{:#x}", ReallySigned);
 // Branch destination.
 field_arg!(BranchDest, i32, "{:#x}", ReallySigned);
 // Opaque zero or one argument.
