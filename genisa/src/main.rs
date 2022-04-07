@@ -232,6 +232,7 @@ impl Isa {
                 Illegal = -1,
                 #enum_variants
             }
+            #[allow(clippy::all)]
             impl Opcode {
                 #mnemonic_fn
                 #detect_fn
@@ -328,7 +329,7 @@ impl Isa {
         for simple in &self.mnemonics {
             mnemonics_by_opcode
                 .entry(&simple.opcode)
-                .or_insert_with(|| Vec::new())
+                .or_insert_with(Vec::new)
                 .push(simple)
         }
         // Generate match arms for each opcode.
@@ -444,7 +445,7 @@ impl Isa {
                     for arg in &mnemonic.args {
                         let field = field_by_name
                             .get(arg)
-                            .expect(&format!("field not found: {}", arg));
+                            .unwrap_or_else(|| panic!("field not found: {}", arg));
                         let variant = Ident::new(field.arg.as_ref().unwrap(), Span::call_site());
                         let value = field.express_value_self();
                         args.push(quote!(Argument::#variant(#variant(#value as _)),));
@@ -476,6 +477,7 @@ impl Isa {
         let simplified_ins_match_arms = token_stream!(simplified_ins_match_arms);
         // Generate final fields function.
         let ins_impl = quote! {
+            #[allow(clippy::all)]
             impl Ins {
                 pub(crate) fn _fields(&self) -> Vec<Field> {
                     match self.op {
@@ -513,12 +515,7 @@ impl Isa {
                         #simplified_ins_match_arms
                         _ => {}
                     }
-                    SimplifiedIns {
-                        mnemonic: self.op.mnemonic(),
-                        modifiers: self._modifiers(),
-                        args: vec![],
-                        ins: self,
-                    }
+                    SimplifiedIns::basic_form(self)
                 }
             }
         };
@@ -528,7 +525,7 @@ impl Isa {
 
 /// Converts the given key into an identifier.
 fn to_rust_ident(key: &str) -> TokenTree {
-    TokenTree::Ident(Ident::new(&key.replace(".", "_"), Span::call_site()))
+    TokenTree::Ident(Ident::new(&key.replace('.', "_"), Span::call_site()))
 }
 
 /// Converts the given key into an enum variant key.

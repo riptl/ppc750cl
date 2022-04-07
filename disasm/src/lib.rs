@@ -345,3 +345,18 @@ impl Display for SimplifiedIns {
         Ok(())
     }
 }
+
+impl SimplifiedIns {
+    pub(crate) fn basic_form(ins: Ins) -> Self {
+        Self {
+            mnemonic: ins.op.mnemonic(),
+            modifiers: ins.modifiers(),
+            args: ins
+                .fields()
+                .iter()
+                .flat_map(|field| field.argument())
+                .collect(),
+            ins,
+        }
+    }
+}

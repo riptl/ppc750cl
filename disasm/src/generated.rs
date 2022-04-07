@@ -225,6 +225,7 @@ pub enum Opcode {
     Xori,
     Xoris,
 }
+#[allow(clippy::all)]
 impl Opcode {
     pub(crate) fn _mnemonic(self) -> &'static str {
         match self {
@@ -1165,6 +1166,7 @@ pub enum Field {
     ctr,
     lr,
 }
+#[allow(clippy::all)]
 impl Ins {
     pub(crate) fn _fields(&self) -> Vec<Field> {
         match self.op {
@@ -5272,11 +5274,6 @@ impl Ins {
             }
             _ => {}
         }
-        SimplifiedIns {
-            mnemonic: self.op.mnemonic(),
-            modifiers: self._modifiers(),
-            args: vec![],
-            ins: self,
-        }
+        SimplifiedIns::basic_form(self)
     }
 }
