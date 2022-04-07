@@ -1,6 +1,5 @@
 use pyo3::prelude::*;
 use pyo3::types::PyBytes;
-use pyo3::{PyIterProtocol, PyObjectProtocol};
 
 use ppc750cl::formatter::FormattedIns;
 
@@ -23,18 +22,15 @@ impl Ins {
     fn addr(&self) -> PyResult<u32> {
         Ok(self.0.addr)
     }
+
+    fn __str__(&self) -> String {
+        FormattedIns(self.0.clone()).to_string()
+    }
 }
 
 impl From<ppc750cl::Ins> for Ins {
     fn from(ins: ppc750cl::Ins) -> Self {
         Self(ins)
-    }
-}
-
-#[pyproto]
-impl<'a> PyObjectProtocol<'a> for Ins {
-    fn __str__(&self) -> String {
-        FormattedIns(self.0.clone()).to_string()
     }
 }
 
@@ -46,8 +42,8 @@ struct DisasmIterator {
     left: usize,
 }
 
-#[pyproto]
-impl PyIterProtocol for DisasmIterator {
+#[pymethods]
+impl DisasmIterator {
     fn __iter__(slf: PyRef<Self>) -> PyRef<DisasmIterator> {
         slf
     }
