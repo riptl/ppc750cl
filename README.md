@@ -19,6 +19,16 @@ pip install maturin
 maturin build -m ./disasm-py/Cargo.toml
 ```
 
+Install module in dev env
+
+```
+maturin develop -m ./disasm-py/Cargo.toml
+python
+>>> import ppc750cl
+>>> str(ppc750cl.Ins(addr=0x80006969, code=0x10400420))
+'ps_merge00 f2, f0, f0'
+```
+
 ### Instruction Set
 
 For those unfamiliar with PowerPC, here are some basics.
