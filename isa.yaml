@@ -279,15 +279,15 @@ opcodes:
 
   - name: bcctr
     desc: Branch Conditional to Count Register
-    bitmask: 0xfc00ffff
-    pattern: 0x4c000210
+    bitmask: 0xfc007ffe
+    pattern: 0x4c000420
     modifiers: [ LK ]
     args: [ BO, BI ]
     uses: [ ctr ]
 
   - name: bclr
     desc: Branch Conditional to Link Register
-    bitmask: 0xfc00fffe
+    bitmask: 0xfc007ffe
     pattern: 0x4c000020
     modifiers: [ LK ]
     args: [ BO, BI ]
@@ -2033,10 +2033,6 @@ mnemonics:
   - name: twui
     args: [ rA, simm ]
     condition: TO == 31
-  # Branches
-  - name: blr
-    opcode: bclr
-    condition: BO == 20 && BI == 0
 
   # Move to special-purpose register
   - name: mtxer
@@ -2091,7 +2087,6 @@ mnemonics:
     condition: spr == 571
 
   # Branch Conditional
-
   # bc branch if negative
   - name: blt
     opcode: bc
@@ -2103,7 +2098,6 @@ mnemonics:
     modifiers: [ AA, LK ]
     args: [ crfS, BD ]
     condition: BO == 12 && BI & 0b11 == 0b00
-
   # bc branch if not positive
   - name: ble
     opcode: bc
@@ -2115,7 +2109,6 @@ mnemonics:
     modifiers: [ AA, LK ]
     args: [ crfS, BD ]
     condition: BO == 4 && BI & 0b11 == 0b01
-
   # bc branch if zero
   - name: beq
     opcode: bc
@@ -2127,7 +2120,6 @@ mnemonics:
     modifiers: [ AA, LK ]
     args: [ crfS, BD ]
     condition: BO == 12 && BI & 0b11 == 0b10
-
   # bc branch if not negative
   - name: bge
     opcode: bc
@@ -2139,7 +2131,6 @@ mnemonics:
     modifiers: [ AA, LK ]
     args: [ crfS, BD ]
     condition: BO == 4 && BI & 0b11 == 0b00
-
   # bc branch if positive
   - name: bgt
     opcode: bc
@@ -2151,7 +2142,6 @@ mnemonics:
     modifiers: [ AA, LK ]
     args: [ crfS, BD ]
     condition: BO == 12 && BI & 0b11 == 0b01
-
   # bc branch if not zero
   - name: bne
     opcode: bc
@@ -2163,7 +2153,6 @@ mnemonics:
     modifiers: [ AA, LK ]
     args: [ crfS, BD ]
     condition: BO == 4 && BI & 0b11 == 0b10
-
   # bc branch if summary overflow
   - name: bso
     opcode: bc
@@ -2175,7 +2164,6 @@ mnemonics:
     modifiers: [ AA, LK ]
     args: [ crfS, BD ]
     condition: BO == 12 && BI & 0b11 == 0b11
-
   # bc branch if not summary overflow
   - name: bns
     opcode: bc
@@ -2201,85 +2189,176 @@ mnemonics:
   # TODO support conditional bd...
 
   # Branch Conditional to Count Register
+  # bcctr branch always
+  - name: bctr
+    opcode: bcctr
+    modifiers: [ LK ]
+    condition: BO == 20 && BI == 0
+  # bcctr branch if negative
   - name: bltctr
     opcode: bcctr
     modifiers: [ LK ]
-    args: [ crfS, BD ]
-    condition: BO == 12
+    condition: BO == 12 && BI & 0b11 == 0b00 && crfS == 0
+  - name: bltctr
+    opcode: bcctr
+    modifiers: [ LK ]
+    args: [ crfS ]
+    condition: BO == 12 && BI & 0b11 == 0b00
+  # bcctr branch if not positive
   - name: blectr
     opcode: bcctr
     modifiers: [ LK ]
-    args: [ crfS, BD ]
-    condition: BO == 4
+    condition: BO == 4 && BI & 0b11 == 0b01 && crfS == 0
+  - name: blectr
+    opcode: bcctr
+    modifiers: [ LK ]
+    args: [ crfS ]
+    condition: BO == 4 && BI & 0b11 == 0b01
+  # bcctr branch if zero
   - name: beqctr
     opcode: bcctr
     modifiers: [ LK ]
-    args: [ crfS, BD ]
-    condition: BO == 12
+    condition: BO == 12 && BI & 0b11 == 0b10 && crfS == 0
+  - name: beqctr
+    opcode: bcctr
+    modifiers: [ LK ]
+    args: [ crfS ]
+    condition: BO == 12 && BI & 0b11 == 0b10
+  # bcctr branch if not negative
   - name: bgectr
     opcode: bcctr
     modifiers: [ LK ]
-    args: [ crfS, BD ]
-    condition: BO == 4
+    condition: BO == 4 && BI & 0b11 == 0b00 && crfS == 0
+  - name: bgectr
+    opcode: bcctr
+    modifiers: [ LK ]
+    args: [ crfS ]
+    condition: BO == 4 && BI & 0b11 == 0b00
+  # bcctr branch if positive
   - name: bgtctr
     opcode: bcctr
     modifiers: [ LK ]
-    args: [ crfS, BD ]
-    condition: BO == 12
+    condition: BO == 12 && BI & 0b11 == 0b01 && crfS == 0
+  - name: bgtctr
+    opcode: bcctr
+    modifiers: [ LK ]
+    args: [ crfS ]
+    condition: BO == 12 && BI & 0b11 == 0b01
+  # bcctr branch if not zero
   - name: bnectr
     opcode: bcctr
     modifiers: [ LK ]
-    args: [ crfS, BD ]
-    condition: BO == 4
+    condition: BO == 4 && BI & 0b11 == 0b10 && crfS == 0
+  - name: bnectr
+    opcode: bcctr
+    modifiers: [ LK ]
+    args: [ crfS ]
+    condition: BO == 4 && BI & 0b11 == 0b10
+  # bcctr branch if summary overflow
   - name: bsoctr
     opcode: bcctr
     modifiers: [ LK ]
-    args: [ crfS, BD ]
-    condition: BO == 12
+    condition: BO == 12 && BI & 0b11 == 0b11 && crfS == 0
+  - name: bsoctr
+    opcode: bcctr
+    modifiers: [ LK ]
+    args: [ crfS ]
+    condition: BO == 12 && BI & 0b11 == 0b11
+  # bcctr branch if not summary overflow
   - name: bnsctr
     opcode: bcctr
     modifiers: [ LK ]
-    args: [ crfS, BD ]
-    condition: BO == 4
+    condition: BO == 4 && BI & 0b11 == 0b11 && crfS == 0
+  - name: bnsctr
+    opcode: bcctr
+    modifiers: [ LK ]
+    args: [ crfS ]
+    condition: BO == 4 && BI & 0b11 == 0b11
 
   # Branch Conditional to Link Register
+
+  # bclr branch always
+  - name: blr
+    opcode: bclr
+    modifiers: [ LK ]
+    condition: BO == 20 && BI == 0
+  # bclr branch if negative
   - name: bltlr
     opcode: bclr
     modifiers: [ LK ]
-    args: [ crfS, BD ]
-    condition: BO == 12
+    condition: BO == 12 && BI & 0b11 == 0b00 && crfS == 0
+  - name: bltlr
+    opcode: bclr
+    modifiers: [ LK ]
+    args: [ crfS ]
+    condition: BO == 12 && BI & 0b11 == 0b00
+  # bclr branch if not positive
   - name: blelr
     opcode: bclr
     modifiers: [ LK ]
-    args: [ crfS, BD ]
-    condition: BO == 4
+    condition: BO == 4 && BI & 0b11 == 0b01 && crfS == 0
+  - name: blelr
+    opcode: bclr
+    modifiers: [ LK ]
+    args: [ crfS ]
+    condition: BO == 4 && BI & 0b11 == 0b01
+  # bclr branch if zero
   - name: beqlr
     opcode: bclr
     modifiers: [ LK ]
-    args: [ crfS, BD ]
-    condition: BO == 12
+    condition: BO == 12 && BI & 0b11 == 0b10 && crfS == 0
+  - name: beqlr
+    opcode: bclr
+    modifiers: [ LK ]
+    args: [ crfS ]
+    condition: BO == 12 && BI & 0b11 == 0b10
+  # bclr branch if not negative
   - name: bgelr
     opcode: bclr
     modifiers: [ LK ]
-    args: [ crfS, BD ]
-    condition: BO == 4
+    condition: BO == 4 && BI & 0b11 == 0b00 && crfS == 0
+  - name: bgelr
+    opcode: bclr
+    modifiers: [ LK ]
+    args: [ crfS ]
+    condition: BO == 4 && BI & 0b11 == 0b00
+  # bclr branch if positive
   - name: bgtlr
     opcode: bclr
     modifiers: [ LK ]
-    args: [ crfS, BD ]
-    condition: BO == 12
+    condition: BO == 12 && BI & 0b11 == 0b01 && crfS == 0
+  - name: bgtlr
+    opcode: bclr
+    modifiers: [ LK ]
+    args: [ crfS ]
+    condition: BO == 12 && BI & 0b11 == 0b01
+  # bclr branch if not zero
   - name: bnelr
     opcode: bclr
     modifiers: [ LK ]
-    args: [ crfS, BD ]
-    condition: BO == 4
+    condition: BO == 4 && BI & 0b11 == 0b10 && crfS == 0
+  - name: bnelr
+    opcode: bclr
+    modifiers: [ LK ]
+    args: [ crfS ]
+    condition: BO == 4 && BI & 0b11 == 0b10
+  # bclr branch if summary overflow
   - name: bsolr
     opcode: bclr
     modifiers: [ LK ]
-    args: [ crfS, BD ]
-    condition: BO == 12
+    condition: BO == 12 && BI & 0b11 == 0b11 && crfS == 0
+  - name: bsolr
+    opcode: bclr
+    modifiers: [ LK ]
+    args: [ crfS ]
+    condition: BO == 12 && BI & 0b11 == 0b11
+  # bclr branch if not summary overflow
   - name: bnslr
     opcode: bclr
     modifiers: [ LK ]
-    args: [ crfS, BD ]
-    condition: BO == 4
+    condition: BO == 4 && BI & 0b11 == 0b11 && crfS == 0
+  - name: bnslr
+    opcode: bclr
+    modifiers: [ LK ]
+    args: [ crfS ]
+    condition: BO == 4 && BI & 0b11 == 0b11

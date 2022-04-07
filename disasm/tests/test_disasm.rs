@@ -108,7 +108,6 @@ fn test_ins_bc() {
     assert_asm!(0x408600D8, "bne cr1, 0xd8");
     assert_asm!(0x4086FECC, "bne cr1, -0x134");
     assert_asm!(0x409C000C, "bge cr7, 0xc");
-    // assert_asm!(0x40A10010, "ble+ 0x10");
     assert_asm!(0x4180000C, "blt 0xc");
     assert_asm!(0x4180F9C0, "blt -0x640");
     assert_asm!(0x4181021C, "bgt 0x21c");
@@ -124,15 +123,12 @@ fn test_ins_bc() {
     assert_asm!(0x4200F560, "bdnz -0xaa0");
 }
 
-/*
 #[test]
 fn test_ins_bcctr() {
     assert_asm!(0x4E800420, "bctr");
     assert_asm!(0x4E800421, "bctrl");
 }
- */
 
-/*
 #[test]
 fn test_ins_bclr() {
     assert_asm!(0x4C800020, "bgelr");
@@ -146,7 +142,6 @@ fn test_ins_bclr() {
     assert_asm!(0x4E800020, "blr");
     assert_asm!(0x4E800021, "blrl");
 }
- */
 
 #[test]
 fn test_ins_cmp() {

@@ -500,10 +500,10 @@ impl Opcode {
         if code & 0xfc000000 == 0x40000000 {
             return Opcode::Bc;
         }
-        if code & 0xfc00ffff == 0x4c000210 {
+        if code & 0xfc007ffe == 0x4c000420 {
             return Opcode::Bcctr;
         }
-        if code & 0xfc00fffe == 0x4c000020 {
+        if code & 0xfc007ffe == 0x4c000020 {
             return Opcode::Bclr;
         }
         if code & 0xfc4007ff == 0x7c000000 {
@@ -5022,7 +5022,22 @@ impl Ins {
                 }
             }
             Opcode::Bcctr => {
-                if ((self.code >> 21u8) & 0x1f) == 12 {
+                if ((self.code >> 21u8) & 0x1f) == 20 && ((self.code >> 16u8) & 0x1f) == 0 {
+                    return SimplifiedIns {
+                        mnemonic: "bctr",
+                        modifiers: {
+                            let mut m = Modifiers::default();
+                            m.lk = self.bit(31);
+                            m
+                        },
+                        args: vec![],
+                        ins: self,
+                    };
+                }
+                if ((self.code >> 21u8) & 0x1f) == 12
+                    && ((self.code >> 16u8) & 0x1f) & 0b11 == 0b00
+                    && ((self.code >> 18u8) & 0x7) == 0
+                {
                     return SimplifiedIns {
                         mnemonic: "bltctr",
                         modifiers: {
@@ -5030,17 +5045,27 @@ impl Ins {
                             m.lk = self.bit(31);
                             m
                         },
-                        args: vec![
-                            Argument::CRBit(CRBit(((self.code >> 18u8) & 0x7) as _)),
-                            Argument::BranchDest(BranchDest(
-                                (((((self.code >> 2u8) & 0x3fff) ^ 0x2000).wrapping_sub(0x2000))
-                                    << 2u8) as _,
-                            )),
-                        ],
+                        args: vec![],
                         ins: self,
                     };
                 }
-                if ((self.code >> 21u8) & 0x1f) == 4 {
+                if ((self.code >> 21u8) & 0x1f) == 12 && ((self.code >> 16u8) & 0x1f) & 0b11 == 0b00
+                {
+                    return SimplifiedIns {
+                        mnemonic: "bltctr",
+                        modifiers: {
+                            let mut m = Modifiers::default();
+                            m.lk = self.bit(31);
+                            m
+                        },
+                        args: vec![Argument::CRBit(CRBit(((self.code >> 18u8) & 0x7) as _))],
+                        ins: self,
+                    };
+                }
+                if ((self.code >> 21u8) & 0x1f) == 4
+                    && ((self.code >> 16u8) & 0x1f) & 0b11 == 0b01
+                    && ((self.code >> 18u8) & 0x7) == 0
+                {
                     return SimplifiedIns {
                         mnemonic: "blectr",
                         modifiers: {
@@ -5048,17 +5073,27 @@ impl Ins {
                             m.lk = self.bit(31);
                             m
                         },
-                        args: vec![
-                            Argument::CRBit(CRBit(((self.code >> 18u8) & 0x7) as _)),
-                            Argument::BranchDest(BranchDest(
-                                (((((self.code >> 2u8) & 0x3fff) ^ 0x2000).wrapping_sub(0x2000))
-                                    << 2u8) as _,
-                            )),
-                        ],
+                        args: vec![],
                         ins: self,
                     };
                 }
-                if ((self.code >> 21u8) & 0x1f) == 12 {
+                if ((self.code >> 21u8) & 0x1f) == 4 && ((self.code >> 16u8) & 0x1f) & 0b11 == 0b01
+                {
+                    return SimplifiedIns {
+                        mnemonic: "blectr",
+                        modifiers: {
+                            let mut m = Modifiers::default();
+                            m.lk = self.bit(31);
+                            m
+                        },
+                        args: vec![Argument::CRBit(CRBit(((self.code >> 18u8) & 0x7) as _))],
+                        ins: self,
+                    };
+                }
+                if ((self.code >> 21u8) & 0x1f) == 12
+                    && ((self.code >> 16u8) & 0x1f) & 0b11 == 0b10
+                    && ((self.code >> 18u8) & 0x7) == 0
+                {
                     return SimplifiedIns {
                         mnemonic: "beqctr",
                         modifiers: {
@@ -5066,17 +5101,27 @@ impl Ins {
                             m.lk = self.bit(31);
                             m
                         },
-                        args: vec![
-                            Argument::CRBit(CRBit(((self.code >> 18u8) & 0x7) as _)),
-                            Argument::BranchDest(BranchDest(
-                                (((((self.code >> 2u8) & 0x3fff) ^ 0x2000).wrapping_sub(0x2000))
-                                    << 2u8) as _,
-                            )),
-                        ],
+                        args: vec![],
                         ins: self,
                     };
                 }
-                if ((self.code >> 21u8) & 0x1f) == 4 {
+                if ((self.code >> 21u8) & 0x1f) == 12 && ((self.code >> 16u8) & 0x1f) & 0b11 == 0b10
+                {
+                    return SimplifiedIns {
+                        mnemonic: "beqctr",
+                        modifiers: {
+                            let mut m = Modifiers::default();
+                            m.lk = self.bit(31);
+                            m
+                        },
+                        args: vec![Argument::CRBit(CRBit(((self.code >> 18u8) & 0x7) as _))],
+                        ins: self,
+                    };
+                }
+                if ((self.code >> 21u8) & 0x1f) == 4
+                    && ((self.code >> 16u8) & 0x1f) & 0b11 == 0b00
+                    && ((self.code >> 18u8) & 0x7) == 0
+                {
                     return SimplifiedIns {
                         mnemonic: "bgectr",
                         modifiers: {
@@ -5084,17 +5129,27 @@ impl Ins {
                             m.lk = self.bit(31);
                             m
                         },
-                        args: vec![
-                            Argument::CRBit(CRBit(((self.code >> 18u8) & 0x7) as _)),
-                            Argument::BranchDest(BranchDest(
-                                (((((self.code >> 2u8) & 0x3fff) ^ 0x2000).wrapping_sub(0x2000))
-                                    << 2u8) as _,
-                            )),
-                        ],
+                        args: vec![],
                         ins: self,
                     };
                 }
-                if ((self.code >> 21u8) & 0x1f) == 12 {
+                if ((self.code >> 21u8) & 0x1f) == 4 && ((self.code >> 16u8) & 0x1f) & 0b11 == 0b00
+                {
+                    return SimplifiedIns {
+                        mnemonic: "bgectr",
+                        modifiers: {
+                            let mut m = Modifiers::default();
+                            m.lk = self.bit(31);
+                            m
+                        },
+                        args: vec![Argument::CRBit(CRBit(((self.code >> 18u8) & 0x7) as _))],
+                        ins: self,
+                    };
+                }
+                if ((self.code >> 21u8) & 0x1f) == 12
+                    && ((self.code >> 16u8) & 0x1f) & 0b11 == 0b01
+                    && ((self.code >> 18u8) & 0x7) == 0
+                {
                     return SimplifiedIns {
                         mnemonic: "bgtctr",
                         modifiers: {
@@ -5102,17 +5157,27 @@ impl Ins {
                             m.lk = self.bit(31);
                             m
                         },
-                        args: vec![
-                            Argument::CRBit(CRBit(((self.code >> 18u8) & 0x7) as _)),
-                            Argument::BranchDest(BranchDest(
-                                (((((self.code >> 2u8) & 0x3fff) ^ 0x2000).wrapping_sub(0x2000))
-                                    << 2u8) as _,
-                            )),
-                        ],
+                        args: vec![],
                         ins: self,
                     };
                 }
-                if ((self.code >> 21u8) & 0x1f) == 4 {
+                if ((self.code >> 21u8) & 0x1f) == 12 && ((self.code >> 16u8) & 0x1f) & 0b11 == 0b01
+                {
+                    return SimplifiedIns {
+                        mnemonic: "bgtctr",
+                        modifiers: {
+                            let mut m = Modifiers::default();
+                            m.lk = self.bit(31);
+                            m
+                        },
+                        args: vec![Argument::CRBit(CRBit(((self.code >> 18u8) & 0x7) as _))],
+                        ins: self,
+                    };
+                }
+                if ((self.code >> 21u8) & 0x1f) == 4
+                    && ((self.code >> 16u8) & 0x1f) & 0b11 == 0b10
+                    && ((self.code >> 18u8) & 0x7) == 0
+                {
                     return SimplifiedIns {
                         mnemonic: "bnectr",
                         modifiers: {
@@ -5120,17 +5185,27 @@ impl Ins {
                             m.lk = self.bit(31);
                             m
                         },
-                        args: vec![
-                            Argument::CRBit(CRBit(((self.code >> 18u8) & 0x7) as _)),
-                            Argument::BranchDest(BranchDest(
-                                (((((self.code >> 2u8) & 0x3fff) ^ 0x2000).wrapping_sub(0x2000))
-                                    << 2u8) as _,
-                            )),
-                        ],
+                        args: vec![],
                         ins: self,
                     };
                 }
-                if ((self.code >> 21u8) & 0x1f) == 12 {
+                if ((self.code >> 21u8) & 0x1f) == 4 && ((self.code >> 16u8) & 0x1f) & 0b11 == 0b10
+                {
+                    return SimplifiedIns {
+                        mnemonic: "bnectr",
+                        modifiers: {
+                            let mut m = Modifiers::default();
+                            m.lk = self.bit(31);
+                            m
+                        },
+                        args: vec![Argument::CRBit(CRBit(((self.code >> 18u8) & 0x7) as _))],
+                        ins: self,
+                    };
+                }
+                if ((self.code >> 21u8) & 0x1f) == 12
+                    && ((self.code >> 16u8) & 0x1f) & 0b11 == 0b11
+                    && ((self.code >> 18u8) & 0x7) == 0
+                {
                     return SimplifiedIns {
                         mnemonic: "bsoctr",
                         modifiers: {
@@ -5138,17 +5213,27 @@ impl Ins {
                             m.lk = self.bit(31);
                             m
                         },
-                        args: vec![
-                            Argument::CRBit(CRBit(((self.code >> 18u8) & 0x7) as _)),
-                            Argument::BranchDest(BranchDest(
-                                (((((self.code >> 2u8) & 0x3fff) ^ 0x2000).wrapping_sub(0x2000))
-                                    << 2u8) as _,
-                            )),
-                        ],
+                        args: vec![],
                         ins: self,
                     };
                 }
-                if ((self.code >> 21u8) & 0x1f) == 4 {
+                if ((self.code >> 21u8) & 0x1f) == 12 && ((self.code >> 16u8) & 0x1f) & 0b11 == 0b11
+                {
+                    return SimplifiedIns {
+                        mnemonic: "bsoctr",
+                        modifiers: {
+                            let mut m = Modifiers::default();
+                            m.lk = self.bit(31);
+                            m
+                        },
+                        args: vec![Argument::CRBit(CRBit(((self.code >> 18u8) & 0x7) as _))],
+                        ins: self,
+                    };
+                }
+                if ((self.code >> 21u8) & 0x1f) == 4
+                    && ((self.code >> 16u8) & 0x1f) & 0b11 == 0b11
+                    && ((self.code >> 18u8) & 0x7) == 0
+                {
                     return SimplifiedIns {
                         mnemonic: "bnsctr",
                         modifiers: {
@@ -5156,13 +5241,20 @@ impl Ins {
                             m.lk = self.bit(31);
                             m
                         },
-                        args: vec![
-                            Argument::CRBit(CRBit(((self.code >> 18u8) & 0x7) as _)),
-                            Argument::BranchDest(BranchDest(
-                                (((((self.code >> 2u8) & 0x3fff) ^ 0x2000).wrapping_sub(0x2000))
-                                    << 2u8) as _,
-                            )),
-                        ],
+                        args: vec![],
+                        ins: self,
+                    };
+                }
+                if ((self.code >> 21u8) & 0x1f) == 4 && ((self.code >> 16u8) & 0x1f) & 0b11 == 0b11
+                {
+                    return SimplifiedIns {
+                        mnemonic: "bnsctr",
+                        modifiers: {
+                            let mut m = Modifiers::default();
+                            m.lk = self.bit(31);
+                            m
+                        },
+                        args: vec![Argument::CRBit(CRBit(((self.code >> 18u8) & 0x7) as _))],
                         ins: self,
                     };
                 }
@@ -5171,12 +5263,19 @@ impl Ins {
                 if ((self.code >> 21u8) & 0x1f) == 20 && ((self.code >> 16u8) & 0x1f) == 0 {
                     return SimplifiedIns {
                         mnemonic: "blr",
-                        modifiers: Modifiers::default(),
+                        modifiers: {
+                            let mut m = Modifiers::default();
+                            m.lk = self.bit(31);
+                            m
+                        },
                         args: vec![],
                         ins: self,
                     };
                 }
-                if ((self.code >> 21u8) & 0x1f) == 12 {
+                if ((self.code >> 21u8) & 0x1f) == 12
+                    && ((self.code >> 16u8) & 0x1f) & 0b11 == 0b00
+                    && ((self.code >> 18u8) & 0x7) == 0
+                {
                     return SimplifiedIns {
                         mnemonic: "bltlr",
                         modifiers: {
@@ -5184,17 +5283,27 @@ impl Ins {
                             m.lk = self.bit(31);
                             m
                         },
-                        args: vec![
-                            Argument::CRBit(CRBit(((self.code >> 18u8) & 0x7) as _)),
-                            Argument::BranchDest(BranchDest(
-                                (((((self.code >> 2u8) & 0x3fff) ^ 0x2000).wrapping_sub(0x2000))
-                                    << 2u8) as _,
-                            )),
-                        ],
+                        args: vec![],
                         ins: self,
                     };
                 }
-                if ((self.code >> 21u8) & 0x1f) == 4 {
+                if ((self.code >> 21u8) & 0x1f) == 12 && ((self.code >> 16u8) & 0x1f) & 0b11 == 0b00
+                {
+                    return SimplifiedIns {
+                        mnemonic: "bltlr",
+                        modifiers: {
+                            let mut m = Modifiers::default();
+                            m.lk = self.bit(31);
+                            m
+                        },
+                        args: vec![Argument::CRBit(CRBit(((self.code >> 18u8) & 0x7) as _))],
+                        ins: self,
+                    };
+                }
+                if ((self.code >> 21u8) & 0x1f) == 4
+                    && ((self.code >> 16u8) & 0x1f) & 0b11 == 0b01
+                    && ((self.code >> 18u8) & 0x7) == 0
+                {
                     return SimplifiedIns {
                         mnemonic: "blelr",
                         modifiers: {
@@ -5202,17 +5311,27 @@ impl Ins {
                             m.lk = self.bit(31);
                             m
                         },
-                        args: vec![
-                            Argument::CRBit(CRBit(((self.code >> 18u8) & 0x7) as _)),
-                            Argument::BranchDest(BranchDest(
-                                (((((self.code >> 2u8) & 0x3fff) ^ 0x2000).wrapping_sub(0x2000))
-                                    << 2u8) as _,
-                            )),
-                        ],
+                        args: vec![],
                         ins: self,
                     };
                 }
-                if ((self.code >> 21u8) & 0x1f) == 12 {
+                if ((self.code >> 21u8) & 0x1f) == 4 && ((self.code >> 16u8) & 0x1f) & 0b11 == 0b01
+                {
+                    return SimplifiedIns {
+                        mnemonic: "blelr",
+                        modifiers: {
+                            let mut m = Modifiers::default();
+                            m.lk = self.bit(31);
+                            m
+                        },
+                        args: vec![Argument::CRBit(CRBit(((self.code >> 18u8) & 0x7) as _))],
+                        ins: self,
+                    };
+                }
+                if ((self.code >> 21u8) & 0x1f) == 12
+                    && ((self.code >> 16u8) & 0x1f) & 0b11 == 0b10
+                    && ((self.code >> 18u8) & 0x7) == 0
+                {
                     return SimplifiedIns {
                         mnemonic: "beqlr",
                         modifiers: {
@@ -5220,17 +5339,27 @@ impl Ins {
                             m.lk = self.bit(31);
                             m
                         },
-                        args: vec![
-                            Argument::CRBit(CRBit(((self.code >> 18u8) & 0x7) as _)),
-                            Argument::BranchDest(BranchDest(
-                                (((((self.code >> 2u8) & 0x3fff) ^ 0x2000).wrapping_sub(0x2000))
-                                    << 2u8) as _,
-                            )),
-                        ],
+                        args: vec![],
                         ins: self,
                     };
                 }
-                if ((self.code >> 21u8) & 0x1f) == 4 {
+                if ((self.code >> 21u8) & 0x1f) == 12 && ((self.code >> 16u8) & 0x1f) & 0b11 == 0b10
+                {
+                    return SimplifiedIns {
+                        mnemonic: "beqlr",
+                        modifiers: {
+                            let mut m = Modifiers::default();
+                            m.lk = self.bit(31);
+                            m
+                        },
+                        args: vec![Argument::CRBit(CRBit(((self.code >> 18u8) & 0x7) as _))],
+                        ins: self,
+                    };
+                }
+                if ((self.code >> 21u8) & 0x1f) == 4
+                    && ((self.code >> 16u8) & 0x1f) & 0b11 == 0b00
+                    && ((self.code >> 18u8) & 0x7) == 0
+                {
                     return SimplifiedIns {
                         mnemonic: "bgelr",
                         modifiers: {
@@ -5238,17 +5367,27 @@ impl Ins {
                             m.lk = self.bit(31);
                             m
                         },
-                        args: vec![
-                            Argument::CRBit(CRBit(((self.code >> 18u8) & 0x7) as _)),
-                            Argument::BranchDest(BranchDest(
-                                (((((self.code >> 2u8) & 0x3fff) ^ 0x2000).wrapping_sub(0x2000))
-                                    << 2u8) as _,
-                            )),
-                        ],
+                        args: vec![],
                         ins: self,
                     };
                 }
-                if ((self.code >> 21u8) & 0x1f) == 12 {
+                if ((self.code >> 21u8) & 0x1f) == 4 && ((self.code >> 16u8) & 0x1f) & 0b11 == 0b00
+                {
+                    return SimplifiedIns {
+                        mnemonic: "bgelr",
+                        modifiers: {
+                            let mut m = Modifiers::default();
+                            m.lk = self.bit(31);
+                            m
+                        },
+                        args: vec![Argument::CRBit(CRBit(((self.code >> 18u8) & 0x7) as _))],
+                        ins: self,
+                    };
+                }
+                if ((self.code >> 21u8) & 0x1f) == 12
+                    && ((self.code >> 16u8) & 0x1f) & 0b11 == 0b01
+                    && ((self.code >> 18u8) & 0x7) == 0
+                {
                     return SimplifiedIns {
                         mnemonic: "bgtlr",
                         modifiers: {
@@ -5256,17 +5395,27 @@ impl Ins {
                             m.lk = self.bit(31);
                             m
                         },
-                        args: vec![
-                            Argument::CRBit(CRBit(((self.code >> 18u8) & 0x7) as _)),
-                            Argument::BranchDest(BranchDest(
-                                (((((self.code >> 2u8) & 0x3fff) ^ 0x2000).wrapping_sub(0x2000))
-                                    << 2u8) as _,
-                            )),
-                        ],
+                        args: vec![],
                         ins: self,
                     };
                 }
-                if ((self.code >> 21u8) & 0x1f) == 4 {
+                if ((self.code >> 21u8) & 0x1f) == 12 && ((self.code >> 16u8) & 0x1f) & 0b11 == 0b01
+                {
+                    return SimplifiedIns {
+                        mnemonic: "bgtlr",
+                        modifiers: {
+                            let mut m = Modifiers::default();
+                            m.lk = self.bit(31);
+                            m
+                        },
+                        args: vec![Argument::CRBit(CRBit(((self.code >> 18u8) & 0x7) as _))],
+                        ins: self,
+                    };
+                }
+                if ((self.code >> 21u8) & 0x1f) == 4
+                    && ((self.code >> 16u8) & 0x1f) & 0b11 == 0b10
+                    && ((self.code >> 18u8) & 0x7) == 0
+                {
                     return SimplifiedIns {
                         mnemonic: "bnelr",
                         modifiers: {
@@ -5274,17 +5423,27 @@ impl Ins {
                             m.lk = self.bit(31);
                             m
                         },
-                        args: vec![
-                            Argument::CRBit(CRBit(((self.code >> 18u8) & 0x7) as _)),
-                            Argument::BranchDest(BranchDest(
-                                (((((self.code >> 2u8) & 0x3fff) ^ 0x2000).wrapping_sub(0x2000))
-                                    << 2u8) as _,
-                            )),
-                        ],
+                        args: vec![],
                         ins: self,
                     };
                 }
-                if ((self.code >> 21u8) & 0x1f) == 12 {
+                if ((self.code >> 21u8) & 0x1f) == 4 && ((self.code >> 16u8) & 0x1f) & 0b11 == 0b10
+                {
+                    return SimplifiedIns {
+                        mnemonic: "bnelr",
+                        modifiers: {
+                            let mut m = Modifiers::default();
+                            m.lk = self.bit(31);
+                            m
+                        },
+                        args: vec![Argument::CRBit(CRBit(((self.code >> 18u8) & 0x7) as _))],
+                        ins: self,
+                    };
+                }
+                if ((self.code >> 21u8) & 0x1f) == 12
+                    && ((self.code >> 16u8) & 0x1f) & 0b11 == 0b11
+                    && ((self.code >> 18u8) & 0x7) == 0
+                {
                     return SimplifiedIns {
                         mnemonic: "bsolr",
                         modifiers: {
@@ -5292,17 +5451,27 @@ impl Ins {
                             m.lk = self.bit(31);
                             m
                         },
-                        args: vec![
-                            Argument::CRBit(CRBit(((self.code >> 18u8) & 0x7) as _)),
-                            Argument::BranchDest(BranchDest(
-                                (((((self.code >> 2u8) & 0x3fff) ^ 0x2000).wrapping_sub(0x2000))
-                                    << 2u8) as _,
-                            )),
-                        ],
+                        args: vec![],
                         ins: self,
                     };
                 }
-                if ((self.code >> 21u8) & 0x1f) == 4 {
+                if ((self.code >> 21u8) & 0x1f) == 12 && ((self.code >> 16u8) & 0x1f) & 0b11 == 0b11
+                {
+                    return SimplifiedIns {
+                        mnemonic: "bsolr",
+                        modifiers: {
+                            let mut m = Modifiers::default();
+                            m.lk = self.bit(31);
+                            m
+                        },
+                        args: vec![Argument::CRBit(CRBit(((self.code >> 18u8) & 0x7) as _))],
+                        ins: self,
+                    };
+                }
+                if ((self.code >> 21u8) & 0x1f) == 4
+                    && ((self.code >> 16u8) & 0x1f) & 0b11 == 0b11
+                    && ((self.code >> 18u8) & 0x7) == 0
+                {
                     return SimplifiedIns {
                         mnemonic: "bnslr",
                         modifiers: {
@@ -5310,13 +5479,20 @@ impl Ins {
                             m.lk = self.bit(31);
                             m
                         },
-                        args: vec![
-                            Argument::CRBit(CRBit(((self.code >> 18u8) & 0x7) as _)),
-                            Argument::BranchDest(BranchDest(
-                                (((((self.code >> 2u8) & 0x3fff) ^ 0x2000).wrapping_sub(0x2000))
-                                    << 2u8) as _,
-                            )),
-                        ],
+                        args: vec![],
+                        ins: self,
+                    };
+                }
+                if ((self.code >> 21u8) & 0x1f) == 4 && ((self.code >> 16u8) & 0x1f) & 0b11 == 0b11
+                {
+                    return SimplifiedIns {
+                        mnemonic: "bnslr",
+                        modifiers: {
+                            let mut m = Modifiers::default();
+                            m.lk = self.bit(31);
+                            m
+                        },
+                        args: vec![Argument::CRBit(CRBit(((self.code >> 18u8) & 0x7) as _))],
                         ins: self,
                     };
                 }
