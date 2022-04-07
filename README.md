@@ -46,3 +46,16 @@ The file [isa.yaml](./isa.yaml) contains a full definition of the PowerPC 750CL 
 It powers the disassembler, assembler, and Rust/Python bindings code analysis tools.
 
 Similarly to LLVM TableGen, the program `ppc750cl-genisa` generates a Rust file implementing an instruction decoder.
+
+### Safety & Correctness
+
+- This project does not use `unsafe` Rust code outside of testing utils.
+- The disassembler has been fuzzed over all ~4.29 billion possible instructions (via `ppc750cl-fuzz`).
+- It is safe to run the disassembler over untrusted byte arrays.
+- However no guarantees on correctness are made (yet). Expect bugs.
+
+### Performance
+
+- Performance isn't great but acceptable.
+- Disassembling & printing: 600k insn/s (2.4 MB/s)
+- Disassembling only: 6M insn/s (24 MB/s)
