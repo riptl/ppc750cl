@@ -9,5 +9,5 @@ repository = "https://github.com/terorie/ppc750cl"
 
 [dependencies]
 ppc750cl = { path = "../disasm", version = "0.1.1" }
-rand_core = "0.5"
-sfmt = "0.6"
+rand_core = "0.6"
+sfmt = "0.7"
