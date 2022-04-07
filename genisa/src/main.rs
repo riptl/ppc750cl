@@ -9,7 +9,7 @@ use itertools::Itertools;
 use proc_macro2::{Ident, Literal, Span, TokenStream, TokenTree};
 use quote::quote;
 use serde::{Deserialize, Deserializer};
-use syn::{LitInt, LitStr};
+use syn::{LitChar, LitInt, LitStr};
 
 macro_rules! token_stream {
     ($stream:ident) => {
@@ -194,6 +194,7 @@ impl Field {
             quote!(usize)
         };
         quote! {
+            #[inline(always)]
             pub fn #field_variant(&self) -> #ret_type {
                 #value as _
             }
@@ -236,12 +237,32 @@ pub(crate) struct Mnemonic {
 pub(crate) struct Modifier {
     name: String,
     suffix: char,
+    bit: u8,
+}
+
+impl Modifier {
+    fn express_value_self(&self) -> TokenStream {
+        let modifier_bit = self.bit as usize;
+        quote!(self.bit(#modifier_bit))
+    }
+
+    fn construct_accessor(&self) -> TokenStream {
+        let field_variant = to_rust_ident("field_", &self.name);
+        let value = self.express_value_self();
+        quote! {
+            #[inline(always)]
+            pub fn #field_variant(&self) -> bool {
+                #value
+            }
+        }
+    }
 }
 
 #[derive(Deserialize, Default)]
 #[serde(default)]
 pub(crate) struct Isa {
     fields: Vec<Field>,
+    modifiers: Vec<Modifier>,
     opcodes: Vec<Opcode>,
     mnemonics: Vec<Mnemonic>,
 }
@@ -294,8 +315,7 @@ impl Isa {
             .iter()
             .map(|opcode| {
                 let variant = opcode.variant_identifier()?;
-                let literal =
-                    Literal::string(opcode.name.strip_suffix('.').unwrap_or(&opcode.name));
+                let literal = Literal::string(&opcode.name);
                 Ok(quote! {
                     Opcode::#variant => #literal,
                 })
@@ -370,6 +390,10 @@ impl Isa {
         for field in &self.fields {
             field_by_name.insert(field.name.clone(), field);
         }
+        let mut modifier_by_name = HashMap::<String, &Modifier>::new();
+        for modifier in &self.modifiers {
+            modifier_by_name.insert(modifier.name.clone(), modifier);
+        }
         // Map mnemonics by opcode.
         let mut mnemonics_by_opcode = HashMap::<&String, Vec<&Mnemonic>>::new();
         for simple in &self.mnemonics {
@@ -382,7 +406,7 @@ impl Isa {
         let mut field_match_arms = Vec::new();
         let mut def_match_arms = Vec::new();
         let mut use_match_arms = Vec::new();
-        let mut modifier_match_arms = Vec::new();
+        let mut suffix_match_arms = Vec::new();
         let mut simplified_ins_match_arms = Vec::new();
         for opcode in &self.opcodes {
             // Generate fields of opcode.
@@ -402,13 +426,9 @@ impl Isa {
             });
 
             // Generate modifiers.
-            let modifiers = ModifiersExpr {
-                modifiers: opcode.modifiers.clone(),
-                side_effects: opcode.side_effects.clone(),
-            }
-            .build()?;
-            modifier_match_arms.push(quote! {
-                Opcode::#ident => #modifiers,
+            let suffix = express_suffix(&modifier_by_name, opcode)?;
+            suffix_match_arms.push(quote! {
+                Opcode::#ident => #suffix,
             });
 
             // Generate defs.
@@ -480,12 +500,6 @@ impl Isa {
                     )?);
                     // Emit branch.
                     let mnemonic_lit = LitStr::new(&mnemonic.name, Span::call_site());
-                    // Extract modifier bits.
-                    let modifiers = ModifiersExpr {
-                        modifiers: mnemonic.modifiers.clone(),
-                        side_effects: vec![],
-                    }
-                    .build()?;
                     // Extract arguments.
                     let mut args = Vec::new();
                     for arg in &mnemonic.args {
@@ -501,7 +515,6 @@ impl Isa {
                         {
                             return SimplifiedIns {
                                 mnemonic: #mnemonic_lit,
-                                modifiers: #modifiers,
                                 args: vec![#args],
                                 ins: self,
                             };
@@ -519,7 +532,7 @@ impl Isa {
         let field_match_arms = token_stream!(field_match_arms);
         let def_match_arms = token_stream!(def_match_arms);
         let use_match_arms = token_stream!(use_match_arms);
-        let modifier_match_arms = token_stream!(modifier_match_arms);
+        let suffix_match_arms = token_stream!(suffix_match_arms);
         let simplified_ins_match_arms = token_stream!(simplified_ins_match_arms);
         let field_accessors = self
             .fields
@@ -527,6 +540,12 @@ impl Isa {
             .map(|field| field.construct_accessor())
             .collect::<Vec<_>>();
         let field_accessors = token_stream!(field_accessors);
+        let modifier_accessors = self
+            .modifiers
+            .iter()
+            .map(|modifier| modifier.construct_accessor())
+            .collect::<Vec<_>>();
+        let modifier_accessors = token_stream!(modifier_accessors);
         // Generate final fields function.
         let ins_impl = quote! {
             #[allow(clippy::all, unused_mut)]
@@ -552,10 +571,10 @@ impl Isa {
                     }
                 }
 
-                pub(crate) fn _modifiers(&self) -> Modifiers {
+                pub(crate) fn _suffix(&self) -> String {
                     match self.op {
-                        Opcode::Illegal => Modifiers::default(),
-                        #modifier_match_arms
+                        Opcode::Illegal => String::new(),
+                        #suffix_match_arms
                     }
                 }
 
@@ -570,6 +589,7 @@ impl Isa {
             #[allow(clippy::all, non_snake_case)]
             impl Ins {
                 #field_accessors
+                #modifier_accessors
             }
         };
         Ok(ins_impl)
@@ -624,56 +644,6 @@ fn to_rust_variant_str(key: &str) -> Result<String> {
     }
 }
 
-#[derive(Default)]
-pub(crate) struct ModifiersExpr {
-    pub(crate) modifiers: Vec<String>,
-    pub(crate) side_effects: Vec<String>,
-}
-
-impl ModifiersExpr {
-    fn build(&self) -> Result<TokenStream> {
-        if self.modifiers.is_empty() && self.side_effects.is_empty() {
-            return Ok(Self::build_empty());
-        }
-        let mut statements: Vec<TokenTree> = Vec::new();
-        for modifier in &self.modifiers {
-            statements.extend(match modifier.as_str() {
-                "OE" => quote! { m.oe = self.bit(21); },
-                "Rc" => quote! { m.rc = self.bit(31); },
-                "AA" => quote! { m.aa = self.bit(30); },
-                "LK" => quote! { m.lk = self.bit(31); },
-                _ => {
-                    return Err(format!("unsupported modifier {}", modifier).into());
-                }
-            })
-        }
-        for modifier in &self.side_effects {
-            statements.extend(match modifier.as_str() {
-                // TODO dedup modifiers
-                "OE" => quote! { m.oe = true; },
-                "Rc" => quote! { m.rc = true; },
-                "AA" => quote! { m.aa = true; },
-                "LK" => quote! { m.lk = true; },
-                _ => {
-                    return Err(format!("unsupported modifier {}", modifier).into());
-                }
-            })
-        }
-        let statements = token_stream!(statements);
-        Ok(quote! {
-            {
-                let mut m = Modifiers::default();
-                #statements
-                m
-            }
-        })
-    }
-
-    fn build_empty() -> TokenStream {
-        quote!(Modifiers::default())
-    }
-}
-
 /// Compiles conditions such as `S == B` into valid Rust expressions on a PowerPC instruction.
 fn compile_mnemonic_condition(
     field_by_name: &HashMap<String, &Field>,
@@ -689,4 +659,35 @@ fn compile_mnemonic_condition(
         token.into()
     });
     Ok(TokenStream::from_iter(token_iter))
+}
+
+fn express_suffix(
+    modifier_by_name: &HashMap<String, &Modifier>,
+    opcode: &Opcode,
+) -> Result<TokenStream> {
+    Ok(if opcode.modifiers.is_empty() {
+        quote!(String::new())
+    } else {
+        let mut chars = Vec::new();
+        for mod_name in &opcode.modifiers {
+            let modifier: &Modifier = modifier_by_name
+                .get(mod_name)
+                .ok_or_else(|| Error::from(format!("undefined modifier {}", mod_name)))?;
+            let lit_char = LitChar::new(modifier.suffix, Span::call_site());
+            let modifier_bit = modifier.express_value_self();
+            chars.push(quote! {
+                if #modifier_bit {
+                    s.push(#lit_char);
+                }
+            });
+        }
+        let chars = token_stream!(chars);
+        quote!({
+            {
+                let mut s = String::with_capacity(4);
+                #chars
+                s
+            }
+        })
+    })
 }

@@ -15,7 +15,6 @@ pub mod prelude {
     pub use crate::Argument;
     pub use crate::Field::*;
     pub use crate::Ins;
-    pub use crate::Modifiers;
     pub use crate::Opcode::*;
     pub use crate::SimplifiedIns;
     pub use crate::{
@@ -210,32 +209,6 @@ impl Field {
     }
 }
 
-#[derive(Debug, Default)]
-pub struct Modifiers {
-    pub oe: bool,
-    pub rc: bool,
-    pub lk: bool,
-    pub aa: bool,
-}
-
-impl std::fmt::Display for Modifiers {
-    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        if self.aa {
-            write!(f, "a")?;
-        }
-        if self.lk {
-            write!(f, "l")?;
-        }
-        if self.oe {
-            write!(f, "o")?;
-        }
-        if self.rc {
-            write!(f, ".")?;
-        }
-        Ok(())
-    }
-}
-
 impl Opcode {
     /// Detects the opcode of a machine code instruction.
     pub fn detect(code: u32) -> Self {
@@ -289,9 +262,9 @@ impl Ins {
         self._fields() // auto-generated
     }
 
-    /// Gets the modifiers of an instruction.
-    pub fn modifiers(&self) -> Modifiers {
-        self._modifiers() // auto-generated
+    /// Gets the suffix of an instruction mnemonic.
+    pub fn suffix(&self) -> String {
+        self._suffix() // auto-generated
     }
 
     /// Gets the defs of an instruction.
@@ -314,10 +287,9 @@ impl Ins {
         bits(self.code, range)
     }
 
-    /*
     pub fn branch_offset(&self) -> Option<i32> {
         match self.op {
-            Opcode::B => Some(self.li()),
+            Opcode::B => Some(self.field_LI() as i32),
             Opcode::Bc | Opcode::Bcctr | Opcode::Bclr => Some(self.field_BD() as i32),
             _ => None,
         }
@@ -332,20 +304,18 @@ impl Ins {
             }
         })
     }
-     */
 }
 
 /// A simplified PowerPC 750CL instruction.
 pub struct SimplifiedIns {
     pub ins: Ins,
     pub mnemonic: &'static str,
-    pub modifiers: Modifiers,
     pub args: Vec<Argument>,
 }
 
 impl Display for SimplifiedIns {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}{} ", self.mnemonic, self.modifiers)?;
+        write!(f, "{}{} ", self.mnemonic, self.ins.suffix())?;
         let mut writing_offset = false;
         for (i, argument) in self.args.iter().enumerate() {
             write!(f, "{}", argument)?;
@@ -370,7 +340,6 @@ impl SimplifiedIns {
     pub(crate) fn basic_form(ins: Ins) -> Self {
         Self {
             mnemonic: ins.op.mnemonic(),
-            modifiers: ins.modifiers(),
             args: ins
                 .fields()
                 .iter()

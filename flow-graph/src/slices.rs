@@ -24,7 +24,7 @@ impl BasicSlices {
             let is_control_flow_ins = match ins.op {
                 // Direct branches are control flow instructions if they don't save the link register.
                 // If they do, we encountered a function call.
-                Opcode::B | Opcode::Bc => ins.lk() == 0,
+                Opcode::B | Opcode::Bc => !ins.field_LK(),
                 // Switch table
                 Opcode::Bcctr => panic!("jump tables not supported yet"),
                 _ => false,

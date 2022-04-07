@@ -4,5 +4,6 @@ members = [
     "dol",
     "fuzz",
     "genisa",
+    "flow-graph",
     "rand",
 ]

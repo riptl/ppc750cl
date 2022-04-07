@@ -141,12 +141,16 @@ fields:
 modifiers:
   - name: OE
     suffix: o
+    bit: 21
   - name: Rc
     suffix: .
+    bit: 31
   - name: LK
     suffix: l
+    bit: 31
   - name: AA
     suffix: a
+    bit: 30
 
 opcodes:
   - name: add

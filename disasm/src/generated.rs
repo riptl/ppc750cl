@@ -235,14 +235,14 @@ impl Opcode {
             Opcode::Adde => "adde",
             Opcode::Addi => "addi",
             Opcode::Addic => "addic",
-            Opcode::Addic_ => "addic",
+            Opcode::Addic_ => "addic.",
             Opcode::Addis => "addis",
             Opcode::Addme => "addme",
             Opcode::Addze => "addze",
             Opcode::And => "and",
             Opcode::Andc => "andc",
-            Opcode::Andi_ => "andi",
-            Opcode::Andis_ => "andis",
+            Opcode::Andi_ => "andi.",
+            Opcode::Andis_ => "andis.",
             Opcode::B => "b",
             Opcode::Bc => "bc",
             Opcode::Bcctr => "bcctr",
@@ -434,7 +434,7 @@ impl Opcode {
             Opcode::Stswx => "stswx",
             Opcode::Stw => "stw",
             Opcode::Stwbrx => "stwbrx",
-            Opcode::Stwcx_ => "stwcx",
+            Opcode::Stwcx_ => "stwcx.",
             Opcode::Stwu => "stwu",
             Opcode::Stwux => "stwux",
             Opcode::Stwx => "stwx",
@@ -4010,639 +4010,849 @@ impl Ins {
             }
         }
     }
-    pub(crate) fn _modifiers(&self) -> Modifiers {
+    pub(crate) fn _suffix(&self) -> String {
         match self.op {
-            Opcode::Illegal => Modifiers::default(),
+            Opcode::Illegal => String::new(),
             Opcode::Add => {
-                let mut m = Modifiers::default();
-                m.oe = self.bit(21);
-                m.rc = self.bit(31);
-                m
+                let mut s = String::with_capacity(4);
+                if self.bit(21usize) {
+                    s.push('o');
+                }
+                if self.bit(31usize) {
+                    s.push('.');
+                }
+                s
             }
             Opcode::Addc => {
-                let mut m = Modifiers::default();
-                m.oe = self.bit(21);
-                m.rc = self.bit(31);
-                m
+                let mut s = String::with_capacity(4);
+                if self.bit(21usize) {
+                    s.push('o');
+                }
+                if self.bit(31usize) {
+                    s.push('.');
+                }
+                s
             }
             Opcode::Adde => {
-                let mut m = Modifiers::default();
-                m.oe = self.bit(21);
-                m.rc = self.bit(31);
-                m
+                let mut s = String::with_capacity(4);
+                if self.bit(21usize) {
+                    s.push('o');
+                }
+                if self.bit(31usize) {
+                    s.push('.');
+                }
+                s
             }
-            Opcode::Addi => Modifiers::default(),
-            Opcode::Addic => Modifiers::default(),
-            Opcode::Addic_ => {
-                let mut m = Modifiers::default();
-                m.rc = true;
-                m
-            }
-            Opcode::Addis => Modifiers::default(),
+            Opcode::Addi => String::new(),
+            Opcode::Addic => String::new(),
+            Opcode::Addic_ => String::new(),
+            Opcode::Addis => String::new(),
             Opcode::Addme => {
-                let mut m = Modifiers::default();
-                m.oe = self.bit(21);
-                m.rc = self.bit(31);
-                m
+                let mut s = String::with_capacity(4);
+                if self.bit(21usize) {
+                    s.push('o');
+                }
+                if self.bit(31usize) {
+                    s.push('.');
+                }
+                s
             }
             Opcode::Addze => {
-                let mut m = Modifiers::default();
-                m.oe = self.bit(21);
-                m.rc = self.bit(31);
-                m
+                let mut s = String::with_capacity(4);
+                if self.bit(21usize) {
+                    s.push('o');
+                }
+                if self.bit(31usize) {
+                    s.push('.');
+                }
+                s
             }
             Opcode::And => {
-                let mut m = Modifiers::default();
-                m.rc = self.bit(31);
-                m
+                let mut s = String::with_capacity(4);
+                if self.bit(31usize) {
+                    s.push('.');
+                }
+                s
             }
             Opcode::Andc => {
-                let mut m = Modifiers::default();
-                m.rc = self.bit(31);
-                m
+                let mut s = String::with_capacity(4);
+                if self.bit(31usize) {
+                    s.push('.');
+                }
+                s
             }
-            Opcode::Andi_ => {
-                let mut m = Modifiers::default();
-                m.rc = true;
-                m
-            }
-            Opcode::Andis_ => {
-                let mut m = Modifiers::default();
-                m.rc = true;
-                m
-            }
+            Opcode::Andi_ => String::new(),
+            Opcode::Andis_ => String::new(),
             Opcode::B => {
-                let mut m = Modifiers::default();
-                m.aa = self.bit(30);
-                m.lk = self.bit(31);
-                m
+                let mut s = String::with_capacity(4);
+                if self.bit(30usize) {
+                    s.push('a');
+                }
+                if self.bit(31usize) {
+                    s.push('l');
+                }
+                s
             }
             Opcode::Bc => {
-                let mut m = Modifiers::default();
-                m.aa = self.bit(30);
-                m.lk = self.bit(31);
-                m
+                let mut s = String::with_capacity(4);
+                if self.bit(30usize) {
+                    s.push('a');
+                }
+                if self.bit(31usize) {
+                    s.push('l');
+                }
+                s
             }
             Opcode::Bcctr => {
-                let mut m = Modifiers::default();
-                m.lk = self.bit(31);
-                m
+                let mut s = String::with_capacity(4);
+                if self.bit(31usize) {
+                    s.push('l');
+                }
+                s
             }
             Opcode::Bclr => {
-                let mut m = Modifiers::default();
-                m.lk = self.bit(31);
-                m
+                let mut s = String::with_capacity(4);
+                if self.bit(31usize) {
+                    s.push('l');
+                }
+                s
             }
-            Opcode::Cmp => Modifiers::default(),
-            Opcode::Cmpi => Modifiers::default(),
-            Opcode::Cmpl => Modifiers::default(),
-            Opcode::Cmpli => Modifiers::default(),
+            Opcode::Cmp => String::new(),
+            Opcode::Cmpi => String::new(),
+            Opcode::Cmpl => String::new(),
+            Opcode::Cmpli => String::new(),
             Opcode::Cntlzw => {
-                let mut m = Modifiers::default();
-                m.rc = self.bit(31);
-                m
+                let mut s = String::with_capacity(4);
+                if self.bit(31usize) {
+                    s.push('.');
+                }
+                s
             }
-            Opcode::Crand => Modifiers::default(),
-            Opcode::Crandc => Modifiers::default(),
-            Opcode::Creqv => Modifiers::default(),
-            Opcode::Crnand => Modifiers::default(),
-            Opcode::Crnor => Modifiers::default(),
-            Opcode::Cror => Modifiers::default(),
-            Opcode::Crorc => Modifiers::default(),
-            Opcode::Crxor => Modifiers::default(),
-            Opcode::Dcbf => Modifiers::default(),
-            Opcode::Dcbi => Modifiers::default(),
-            Opcode::Dcbst => Modifiers::default(),
-            Opcode::Dcbt => Modifiers::default(),
-            Opcode::Dcbtst => Modifiers::default(),
-            Opcode::Dcbz => Modifiers::default(),
-            Opcode::DcbzL => Modifiers::default(),
+            Opcode::Crand => String::new(),
+            Opcode::Crandc => String::new(),
+            Opcode::Creqv => String::new(),
+            Opcode::Crnand => String::new(),
+            Opcode::Crnor => String::new(),
+            Opcode::Cror => String::new(),
+            Opcode::Crorc => String::new(),
+            Opcode::Crxor => String::new(),
+            Opcode::Dcbf => String::new(),
+            Opcode::Dcbi => String::new(),
+            Opcode::Dcbst => String::new(),
+            Opcode::Dcbt => String::new(),
+            Opcode::Dcbtst => String::new(),
+            Opcode::Dcbz => String::new(),
+            Opcode::DcbzL => String::new(),
             Opcode::Divw => {
-                let mut m = Modifiers::default();
-                m.oe = self.bit(21);
-                m.rc = self.bit(31);
-                m
+                let mut s = String::with_capacity(4);
+                if self.bit(21usize) {
+                    s.push('o');
+                }
+                if self.bit(31usize) {
+                    s.push('.');
+                }
+                s
             }
             Opcode::Divwu => {
-                let mut m = Modifiers::default();
-                m.oe = self.bit(21);
-                m.rc = self.bit(31);
-                m
+                let mut s = String::with_capacity(4);
+                if self.bit(21usize) {
+                    s.push('o');
+                }
+                if self.bit(31usize) {
+                    s.push('.');
+                }
+                s
             }
-            Opcode::Eciwx => Modifiers::default(),
-            Opcode::Ecowx => Modifiers::default(),
-            Opcode::Eieio => Modifiers::default(),
+            Opcode::Eciwx => String::new(),
+            Opcode::Ecowx => String::new(),
+            Opcode::Eieio => String::new(),
             Opcode::Eqv => {
-                let mut m = Modifiers::default();
-                m.rc = self.bit(31);
-                m
+                let mut s = String::with_capacity(4);
+                if self.bit(31usize) {
+                    s.push('.');
+                }
+                s
             }
             Opcode::Extsb => {
-                let mut m = Modifiers::default();
-                m.rc = self.bit(31);
-                m
+                let mut s = String::with_capacity(4);
+                if self.bit(31usize) {
+                    s.push('.');
+                }
+                s
             }
             Opcode::Extsh => {
-                let mut m = Modifiers::default();
-                m.rc = self.bit(31);
-                m
+                let mut s = String::with_capacity(4);
+                if self.bit(31usize) {
+                    s.push('.');
+                }
+                s
             }
             Opcode::Fabs => {
-                let mut m = Modifiers::default();
-                m.rc = self.bit(31);
-                m
+                let mut s = String::with_capacity(4);
+                if self.bit(31usize) {
+                    s.push('.');
+                }
+                s
             }
             Opcode::Fadd => {
-                let mut m = Modifiers::default();
-                m.rc = self.bit(31);
-                m
+                let mut s = String::with_capacity(4);
+                if self.bit(31usize) {
+                    s.push('.');
+                }
+                s
             }
             Opcode::Fadds => {
-                let mut m = Modifiers::default();
-                m.rc = self.bit(31);
-                m
+                let mut s = String::with_capacity(4);
+                if self.bit(31usize) {
+                    s.push('.');
+                }
+                s
             }
-            Opcode::Fcmpo => Modifiers::default(),
-            Opcode::Fcmpu => Modifiers::default(),
+            Opcode::Fcmpo => String::new(),
+            Opcode::Fcmpu => String::new(),
             Opcode::Fctiw => {
-                let mut m = Modifiers::default();
-                m.rc = self.bit(31);
-                m
+                let mut s = String::with_capacity(4);
+                if self.bit(31usize) {
+                    s.push('.');
+                }
+                s
             }
             Opcode::Fctiwz => {
-                let mut m = Modifiers::default();
-                m.rc = self.bit(31);
-                m
+                let mut s = String::with_capacity(4);
+                if self.bit(31usize) {
+                    s.push('.');
+                }
+                s
             }
             Opcode::Fdiv => {
-                let mut m = Modifiers::default();
-                m.rc = self.bit(31);
-                m
+                let mut s = String::with_capacity(4);
+                if self.bit(31usize) {
+                    s.push('.');
+                }
+                s
             }
             Opcode::Fdivs => {
-                let mut m = Modifiers::default();
-                m.rc = self.bit(31);
-                m
+                let mut s = String::with_capacity(4);
+                if self.bit(31usize) {
+                    s.push('.');
+                }
+                s
             }
             Opcode::Fmadd => {
-                let mut m = Modifiers::default();
-                m.rc = self.bit(31);
-                m
+                let mut s = String::with_capacity(4);
+                if self.bit(31usize) {
+                    s.push('.');
+                }
+                s
             }
             Opcode::Fmadds => {
-                let mut m = Modifiers::default();
-                m.rc = self.bit(31);
-                m
+                let mut s = String::with_capacity(4);
+                if self.bit(31usize) {
+                    s.push('.');
+                }
+                s
             }
             Opcode::Fmr => {
-                let mut m = Modifiers::default();
-                m.rc = self.bit(31);
-                m
+                let mut s = String::with_capacity(4);
+                if self.bit(31usize) {
+                    s.push('.');
+                }
+                s
             }
             Opcode::Fmsub => {
-                let mut m = Modifiers::default();
-                m.rc = self.bit(31);
-                m
+                let mut s = String::with_capacity(4);
+                if self.bit(31usize) {
+                    s.push('.');
+                }
+                s
             }
             Opcode::Fmsubs => {
-                let mut m = Modifiers::default();
-                m.rc = self.bit(31);
-                m
+                let mut s = String::with_capacity(4);
+                if self.bit(31usize) {
+                    s.push('.');
+                }
+                s
             }
             Opcode::Fmul => {
-                let mut m = Modifiers::default();
-                m.rc = self.bit(31);
-                m
+                let mut s = String::with_capacity(4);
+                if self.bit(31usize) {
+                    s.push('.');
+                }
+                s
             }
             Opcode::Fmuls => {
-                let mut m = Modifiers::default();
-                m.rc = self.bit(31);
-                m
+                let mut s = String::with_capacity(4);
+                if self.bit(31usize) {
+                    s.push('.');
+                }
+                s
             }
             Opcode::Fnabs => {
-                let mut m = Modifiers::default();
-                m.rc = self.bit(31);
-                m
+                let mut s = String::with_capacity(4);
+                if self.bit(31usize) {
+                    s.push('.');
+                }
+                s
             }
             Opcode::Fneg => {
-                let mut m = Modifiers::default();
-                m.rc = self.bit(31);
-                m
+                let mut s = String::with_capacity(4);
+                if self.bit(31usize) {
+                    s.push('.');
+                }
+                s
             }
             Opcode::Fnmadd => {
-                let mut m = Modifiers::default();
-                m.rc = self.bit(31);
-                m
+                let mut s = String::with_capacity(4);
+                if self.bit(31usize) {
+                    s.push('.');
+                }
+                s
             }
             Opcode::Fnmadds => {
-                let mut m = Modifiers::default();
-                m.rc = self.bit(31);
-                m
+                let mut s = String::with_capacity(4);
+                if self.bit(31usize) {
+                    s.push('.');
+                }
+                s
             }
             Opcode::Fnmsub => {
-                let mut m = Modifiers::default();
-                m.rc = self.bit(31);
-                m
+                let mut s = String::with_capacity(4);
+                if self.bit(31usize) {
+                    s.push('.');
+                }
+                s
             }
             Opcode::Fnmsubs => {
-                let mut m = Modifiers::default();
-                m.rc = self.bit(31);
-                m
+                let mut s = String::with_capacity(4);
+                if self.bit(31usize) {
+                    s.push('.');
+                }
+                s
             }
             Opcode::Fres => {
-                let mut m = Modifiers::default();
-                m.rc = self.bit(31);
-                m
+                let mut s = String::with_capacity(4);
+                if self.bit(31usize) {
+                    s.push('.');
+                }
+                s
             }
             Opcode::Frsp => {
-                let mut m = Modifiers::default();
-                m.rc = self.bit(31);
-                m
+                let mut s = String::with_capacity(4);
+                if self.bit(31usize) {
+                    s.push('.');
+                }
+                s
             }
             Opcode::Frsqrte => {
-                let mut m = Modifiers::default();
-                m.rc = self.bit(31);
-                m
+                let mut s = String::with_capacity(4);
+                if self.bit(31usize) {
+                    s.push('.');
+                }
+                s
             }
             Opcode::Fsel => {
-                let mut m = Modifiers::default();
-                m.rc = self.bit(31);
-                m
+                let mut s = String::with_capacity(4);
+                if self.bit(31usize) {
+                    s.push('.');
+                }
+                s
             }
             Opcode::Fsub => {
-                let mut m = Modifiers::default();
-                m.rc = self.bit(31);
-                m
+                let mut s = String::with_capacity(4);
+                if self.bit(31usize) {
+                    s.push('.');
+                }
+                s
             }
             Opcode::Fsubs => {
-                let mut m = Modifiers::default();
-                m.rc = self.bit(31);
-                m
+                let mut s = String::with_capacity(4);
+                if self.bit(31usize) {
+                    s.push('.');
+                }
+                s
             }
             Opcode::Icbi => {
-                let mut m = Modifiers::default();
-                m.rc = self.bit(31);
-                m
+                let mut s = String::with_capacity(4);
+                if self.bit(31usize) {
+                    s.push('.');
+                }
+                s
             }
-            Opcode::Isync => Modifiers::default(),
-            Opcode::Lbz => Modifiers::default(),
-            Opcode::Lbzu => Modifiers::default(),
-            Opcode::Lbzux => Modifiers::default(),
-            Opcode::Lbzx => Modifiers::default(),
-            Opcode::Lfd => Modifiers::default(),
-            Opcode::Lfdu => Modifiers::default(),
-            Opcode::Lfdux => Modifiers::default(),
-            Opcode::Lfdx => Modifiers::default(),
-            Opcode::Lfs => Modifiers::default(),
-            Opcode::Lfsu => Modifiers::default(),
-            Opcode::Lfsux => Modifiers::default(),
-            Opcode::Lfsx => Modifiers::default(),
-            Opcode::Lha => Modifiers::default(),
-            Opcode::Lhau => Modifiers::default(),
-            Opcode::Lhaux => Modifiers::default(),
-            Opcode::Lhax => Modifiers::default(),
-            Opcode::Lhbrx => Modifiers::default(),
-            Opcode::Lhz => Modifiers::default(),
-            Opcode::Lhzu => Modifiers::default(),
-            Opcode::Lhzux => Modifiers::default(),
-            Opcode::Lhzx => Modifiers::default(),
-            Opcode::Lmw => Modifiers::default(),
-            Opcode::Lswi => Modifiers::default(),
-            Opcode::Lswx => Modifiers::default(),
-            Opcode::Lwarx => Modifiers::default(),
-            Opcode::Lwbrx => Modifiers::default(),
-            Opcode::Lwz => Modifiers::default(),
-            Opcode::Lwzu => Modifiers::default(),
-            Opcode::Lwzux => Modifiers::default(),
-            Opcode::Lwzx => Modifiers::default(),
-            Opcode::Mcrf => Modifiers::default(),
-            Opcode::Mcrfs => Modifiers::default(),
-            Opcode::Mcrxr => Modifiers::default(),
-            Opcode::Mfcr => Modifiers::default(),
+            Opcode::Isync => String::new(),
+            Opcode::Lbz => String::new(),
+            Opcode::Lbzu => String::new(),
+            Opcode::Lbzux => String::new(),
+            Opcode::Lbzx => String::new(),
+            Opcode::Lfd => String::new(),
+            Opcode::Lfdu => String::new(),
+            Opcode::Lfdux => String::new(),
+            Opcode::Lfdx => String::new(),
+            Opcode::Lfs => String::new(),
+            Opcode::Lfsu => String::new(),
+            Opcode::Lfsux => String::new(),
+            Opcode::Lfsx => String::new(),
+            Opcode::Lha => String::new(),
+            Opcode::Lhau => String::new(),
+            Opcode::Lhaux => String::new(),
+            Opcode::Lhax => String::new(),
+            Opcode::Lhbrx => String::new(),
+            Opcode::Lhz => String::new(),
+            Opcode::Lhzu => String::new(),
+            Opcode::Lhzux => String::new(),
+            Opcode::Lhzx => String::new(),
+            Opcode::Lmw => String::new(),
+            Opcode::Lswi => String::new(),
+            Opcode::Lswx => String::new(),
+            Opcode::Lwarx => String::new(),
+            Opcode::Lwbrx => String::new(),
+            Opcode::Lwz => String::new(),
+            Opcode::Lwzu => String::new(),
+            Opcode::Lwzux => String::new(),
+            Opcode::Lwzx => String::new(),
+            Opcode::Mcrf => String::new(),
+            Opcode::Mcrfs => String::new(),
+            Opcode::Mcrxr => String::new(),
+            Opcode::Mfcr => String::new(),
             Opcode::Mffs => {
-                let mut m = Modifiers::default();
-                m.rc = self.bit(31);
-                m
+                let mut s = String::with_capacity(4);
+                if self.bit(31usize) {
+                    s.push('.');
+                }
+                s
             }
-            Opcode::Mfmsr => Modifiers::default(),
-            Opcode::Mfspr => Modifiers::default(),
-            Opcode::Mfsr => Modifiers::default(),
-            Opcode::Mfsrin => Modifiers::default(),
-            Opcode::Mftb => Modifiers::default(),
-            Opcode::Mtcrf => Modifiers::default(),
+            Opcode::Mfmsr => String::new(),
+            Opcode::Mfspr => String::new(),
+            Opcode::Mfsr => String::new(),
+            Opcode::Mfsrin => String::new(),
+            Opcode::Mftb => String::new(),
+            Opcode::Mtcrf => String::new(),
             Opcode::Mtfsb0 => {
-                let mut m = Modifiers::default();
-                m.rc = self.bit(31);
-                m
+                let mut s = String::with_capacity(4);
+                if self.bit(31usize) {
+                    s.push('.');
+                }
+                s
             }
             Opcode::Mtfsb1 => {
-                let mut m = Modifiers::default();
-                m.rc = self.bit(31);
-                m
+                let mut s = String::with_capacity(4);
+                if self.bit(31usize) {
+                    s.push('.');
+                }
+                s
             }
             Opcode::Mtfsf => {
-                let mut m = Modifiers::default();
-                m.rc = self.bit(31);
-                m
+                let mut s = String::with_capacity(4);
+                if self.bit(31usize) {
+                    s.push('.');
+                }
+                s
             }
             Opcode::Mtfsfi => {
-                let mut m = Modifiers::default();
-                m.rc = self.bit(31);
-                m
+                let mut s = String::with_capacity(4);
+                if self.bit(31usize) {
+                    s.push('.');
+                }
+                s
             }
-            Opcode::Mtmsr => Modifiers::default(),
-            Opcode::Mtspr => Modifiers::default(),
-            Opcode::Mtsr => Modifiers::default(),
-            Opcode::Mtsrin => Modifiers::default(),
+            Opcode::Mtmsr => String::new(),
+            Opcode::Mtspr => String::new(),
+            Opcode::Mtsr => String::new(),
+            Opcode::Mtsrin => String::new(),
             Opcode::Mulhw => {
-                let mut m = Modifiers::default();
-                m.rc = self.bit(31);
-                m
+                let mut s = String::with_capacity(4);
+                if self.bit(31usize) {
+                    s.push('.');
+                }
+                s
             }
             Opcode::Mulhwu => {
-                let mut m = Modifiers::default();
-                m.rc = self.bit(31);
-                m
+                let mut s = String::with_capacity(4);
+                if self.bit(31usize) {
+                    s.push('.');
+                }
+                s
             }
             Opcode::Mulli => {
-                let mut m = Modifiers::default();
-                m.rc = self.bit(31);
-                m
+                let mut s = String::with_capacity(4);
+                if self.bit(31usize) {
+                    s.push('.');
+                }
+                s
             }
             Opcode::Mullw => {
-                let mut m = Modifiers::default();
-                m.oe = self.bit(21);
-                m.rc = self.bit(31);
-                m
+                let mut s = String::with_capacity(4);
+                if self.bit(21usize) {
+                    s.push('o');
+                }
+                if self.bit(31usize) {
+                    s.push('.');
+                }
+                s
             }
             Opcode::Nand => {
-                let mut m = Modifiers::default();
-                m.rc = self.bit(31);
-                m
+                let mut s = String::with_capacity(4);
+                if self.bit(31usize) {
+                    s.push('.');
+                }
+                s
             }
             Opcode::Neg => {
-                let mut m = Modifiers::default();
-                m.oe = self.bit(21);
-                m.rc = self.bit(31);
-                m
+                let mut s = String::with_capacity(4);
+                if self.bit(21usize) {
+                    s.push('o');
+                }
+                if self.bit(31usize) {
+                    s.push('.');
+                }
+                s
             }
             Opcode::Nor => {
-                let mut m = Modifiers::default();
-                m.rc = self.bit(31);
-                m
+                let mut s = String::with_capacity(4);
+                if self.bit(31usize) {
+                    s.push('.');
+                }
+                s
             }
             Opcode::Or => {
-                let mut m = Modifiers::default();
-                m.rc = self.bit(31);
-                m
+                let mut s = String::with_capacity(4);
+                if self.bit(31usize) {
+                    s.push('.');
+                }
+                s
             }
             Opcode::Orc => {
-                let mut m = Modifiers::default();
-                m.rc = self.bit(31);
-                m
+                let mut s = String::with_capacity(4);
+                if self.bit(31usize) {
+                    s.push('.');
+                }
+                s
             }
-            Opcode::Ori => Modifiers::default(),
-            Opcode::Oris => Modifiers::default(),
-            Opcode::PsqL => Modifiers::default(),
-            Opcode::PsqLu => Modifiers::default(),
-            Opcode::PsqLux => Modifiers::default(),
-            Opcode::PsqLx => Modifiers::default(),
-            Opcode::PsqSt => Modifiers::default(),
-            Opcode::PsqStu => Modifiers::default(),
-            Opcode::PsqStux => Modifiers::default(),
-            Opcode::PsqStx => Modifiers::default(),
+            Opcode::Ori => String::new(),
+            Opcode::Oris => String::new(),
+            Opcode::PsqL => String::new(),
+            Opcode::PsqLu => String::new(),
+            Opcode::PsqLux => String::new(),
+            Opcode::PsqLx => String::new(),
+            Opcode::PsqSt => String::new(),
+            Opcode::PsqStu => String::new(),
+            Opcode::PsqStux => String::new(),
+            Opcode::PsqStx => String::new(),
             Opcode::PsAbs => {
-                let mut m = Modifiers::default();
-                m.rc = self.bit(31);
-                m
+                let mut s = String::with_capacity(4);
+                if self.bit(31usize) {
+                    s.push('.');
+                }
+                s
             }
             Opcode::PsAdd => {
-                let mut m = Modifiers::default();
-                m.rc = self.bit(31);
-                m
+                let mut s = String::with_capacity(4);
+                if self.bit(31usize) {
+                    s.push('.');
+                }
+                s
             }
-            Opcode::PsCmpo0 => Modifiers::default(),
-            Opcode::PsCmpo1 => Modifiers::default(),
-            Opcode::PsCmpu0 => Modifiers::default(),
-            Opcode::PsCmpu1 => Modifiers::default(),
+            Opcode::PsCmpo0 => String::new(),
+            Opcode::PsCmpo1 => String::new(),
+            Opcode::PsCmpu0 => String::new(),
+            Opcode::PsCmpu1 => String::new(),
             Opcode::PsDiv => {
-                let mut m = Modifiers::default();
-                m.rc = self.bit(31);
-                m
+                let mut s = String::with_capacity(4);
+                if self.bit(31usize) {
+                    s.push('.');
+                }
+                s
             }
             Opcode::PsMadd => {
-                let mut m = Modifiers::default();
-                m.rc = self.bit(31);
-                m
+                let mut s = String::with_capacity(4);
+                if self.bit(31usize) {
+                    s.push('.');
+                }
+                s
             }
             Opcode::PsMadds0 => {
-                let mut m = Modifiers::default();
-                m.rc = self.bit(31);
-                m
+                let mut s = String::with_capacity(4);
+                if self.bit(31usize) {
+                    s.push('.');
+                }
+                s
             }
             Opcode::PsMadds1 => {
-                let mut m = Modifiers::default();
-                m.rc = self.bit(31);
-                m
+                let mut s = String::with_capacity(4);
+                if self.bit(31usize) {
+                    s.push('.');
+                }
+                s
             }
             Opcode::PsMerge00 => {
-                let mut m = Modifiers::default();
-                m.rc = self.bit(31);
-                m
+                let mut s = String::with_capacity(4);
+                if self.bit(31usize) {
+                    s.push('.');
+                }
+                s
             }
             Opcode::PsMerge01 => {
-                let mut m = Modifiers::default();
-                m.rc = self.bit(31);
-                m
+                let mut s = String::with_capacity(4);
+                if self.bit(31usize) {
+                    s.push('.');
+                }
+                s
             }
             Opcode::PsMerge10 => {
-                let mut m = Modifiers::default();
-                m.rc = self.bit(31);
-                m
+                let mut s = String::with_capacity(4);
+                if self.bit(31usize) {
+                    s.push('.');
+                }
+                s
             }
             Opcode::PsMerge11 => {
-                let mut m = Modifiers::default();
-                m.rc = self.bit(31);
-                m
+                let mut s = String::with_capacity(4);
+                if self.bit(31usize) {
+                    s.push('.');
+                }
+                s
             }
             Opcode::PsMr => {
-                let mut m = Modifiers::default();
-                m.rc = self.bit(31);
-                m
+                let mut s = String::with_capacity(4);
+                if self.bit(31usize) {
+                    s.push('.');
+                }
+                s
             }
             Opcode::PsMsub => {
-                let mut m = Modifiers::default();
-                m.rc = self.bit(31);
-                m
+                let mut s = String::with_capacity(4);
+                if self.bit(31usize) {
+                    s.push('.');
+                }
+                s
             }
             Opcode::PsMul => {
-                let mut m = Modifiers::default();
-                m.rc = self.bit(31);
-                m
+                let mut s = String::with_capacity(4);
+                if self.bit(31usize) {
+                    s.push('.');
+                }
+                s
             }
             Opcode::PsMuls0 => {
-                let mut m = Modifiers::default();
-                m.rc = self.bit(31);
-                m
+                let mut s = String::with_capacity(4);
+                if self.bit(31usize) {
+                    s.push('.');
+                }
+                s
             }
             Opcode::PsMuls1 => {
-                let mut m = Modifiers::default();
-                m.rc = self.bit(31);
-                m
+                let mut s = String::with_capacity(4);
+                if self.bit(31usize) {
+                    s.push('.');
+                }
+                s
             }
             Opcode::PsNabs => {
-                let mut m = Modifiers::default();
-                m.rc = self.bit(31);
-                m
+                let mut s = String::with_capacity(4);
+                if self.bit(31usize) {
+                    s.push('.');
+                }
+                s
             }
             Opcode::PsNeg => {
-                let mut m = Modifiers::default();
-                m.rc = self.bit(31);
-                m
+                let mut s = String::with_capacity(4);
+                if self.bit(31usize) {
+                    s.push('.');
+                }
+                s
             }
             Opcode::PsNmadd => {
-                let mut m = Modifiers::default();
-                m.rc = self.bit(31);
-                m
+                let mut s = String::with_capacity(4);
+                if self.bit(31usize) {
+                    s.push('.');
+                }
+                s
             }
             Opcode::PsNmsub => {
-                let mut m = Modifiers::default();
-                m.rc = self.bit(31);
-                m
+                let mut s = String::with_capacity(4);
+                if self.bit(31usize) {
+                    s.push('.');
+                }
+                s
             }
             Opcode::PsRes => {
-                let mut m = Modifiers::default();
-                m.rc = self.bit(31);
-                m
+                let mut s = String::with_capacity(4);
+                if self.bit(31usize) {
+                    s.push('.');
+                }
+                s
             }
             Opcode::PsRsqrte => {
-                let mut m = Modifiers::default();
-                m.rc = self.bit(31);
-                m
+                let mut s = String::with_capacity(4);
+                if self.bit(31usize) {
+                    s.push('.');
+                }
+                s
             }
             Opcode::PsSel => {
-                let mut m = Modifiers::default();
-                m.rc = self.bit(31);
-                m
+                let mut s = String::with_capacity(4);
+                if self.bit(31usize) {
+                    s.push('.');
+                }
+                s
             }
             Opcode::PsSub => {
-                let mut m = Modifiers::default();
-                m.rc = self.bit(31);
-                m
+                let mut s = String::with_capacity(4);
+                if self.bit(31usize) {
+                    s.push('.');
+                }
+                s
             }
             Opcode::PsSum0 => {
-                let mut m = Modifiers::default();
-                m.rc = self.bit(31);
-                m
+                let mut s = String::with_capacity(4);
+                if self.bit(31usize) {
+                    s.push('.');
+                }
+                s
             }
             Opcode::PsSum1 => {
-                let mut m = Modifiers::default();
-                m.rc = self.bit(31);
-                m
+                let mut s = String::with_capacity(4);
+                if self.bit(31usize) {
+                    s.push('.');
+                }
+                s
             }
-            Opcode::Rfi => Modifiers::default(),
+            Opcode::Rfi => String::new(),
             Opcode::Rlwimi => {
-                let mut m = Modifiers::default();
-                m.rc = self.bit(31);
-                m
+                let mut s = String::with_capacity(4);
+                if self.bit(31usize) {
+                    s.push('.');
+                }
+                s
             }
             Opcode::Rlwinm => {
-                let mut m = Modifiers::default();
-                m.rc = self.bit(31);
-                m
+                let mut s = String::with_capacity(4);
+                if self.bit(31usize) {
+                    s.push('.');
+                }
+                s
             }
             Opcode::Rlwnm => {
-                let mut m = Modifiers::default();
-                m.rc = self.bit(31);
-                m
+                let mut s = String::with_capacity(4);
+                if self.bit(31usize) {
+                    s.push('.');
+                }
+                s
             }
-            Opcode::Sc => Modifiers::default(),
+            Opcode::Sc => String::new(),
             Opcode::Slw => {
-                let mut m = Modifiers::default();
-                m.rc = self.bit(31);
-                m
+                let mut s = String::with_capacity(4);
+                if self.bit(31usize) {
+                    s.push('.');
+                }
+                s
             }
             Opcode::Sraw => {
-                let mut m = Modifiers::default();
-                m.rc = self.bit(31);
-                m
+                let mut s = String::with_capacity(4);
+                if self.bit(31usize) {
+                    s.push('.');
+                }
+                s
             }
             Opcode::Srawi => {
-                let mut m = Modifiers::default();
-                m.rc = self.bit(31);
-                m
+                let mut s = String::with_capacity(4);
+                if self.bit(31usize) {
+                    s.push('.');
+                }
+                s
             }
             Opcode::Srw => {
-                let mut m = Modifiers::default();
-                m.rc = self.bit(31);
-                m
+                let mut s = String::with_capacity(4);
+                if self.bit(31usize) {
+                    s.push('.');
+                }
+                s
             }
-            Opcode::Stb => Modifiers::default(),
-            Opcode::Stbu => Modifiers::default(),
-            Opcode::Stbux => Modifiers::default(),
-            Opcode::Stbx => Modifiers::default(),
-            Opcode::Stfd => Modifiers::default(),
-            Opcode::Stfdu => Modifiers::default(),
-            Opcode::Stfdux => Modifiers::default(),
-            Opcode::Stfdx => Modifiers::default(),
-            Opcode::Stfiwx => Modifiers::default(),
-            Opcode::Stfs => Modifiers::default(),
-            Opcode::Stfsu => Modifiers::default(),
-            Opcode::Stfsux => Modifiers::default(),
-            Opcode::Stfsx => Modifiers::default(),
-            Opcode::Sth => Modifiers::default(),
-            Opcode::Sthbrx => Modifiers::default(),
-            Opcode::Sthu => Modifiers::default(),
-            Opcode::Sthux => Modifiers::default(),
-            Opcode::Sthx => Modifiers::default(),
-            Opcode::Stmw => Modifiers::default(),
-            Opcode::Stswi => Modifiers::default(),
-            Opcode::Stswx => Modifiers::default(),
-            Opcode::Stw => Modifiers::default(),
-            Opcode::Stwbrx => Modifiers::default(),
-            Opcode::Stwcx_ => Modifiers::default(),
-            Opcode::Stwu => Modifiers::default(),
-            Opcode::Stwux => Modifiers::default(),
-            Opcode::Stwx => Modifiers::default(),
+            Opcode::Stb => String::new(),
+            Opcode::Stbu => String::new(),
+            Opcode::Stbux => String::new(),
+            Opcode::Stbx => String::new(),
+            Opcode::Stfd => String::new(),
+            Opcode::Stfdu => String::new(),
+            Opcode::Stfdux => String::new(),
+            Opcode::Stfdx => String::new(),
+            Opcode::Stfiwx => String::new(),
+            Opcode::Stfs => String::new(),
+            Opcode::Stfsu => String::new(),
+            Opcode::Stfsux => String::new(),
+            Opcode::Stfsx => String::new(),
+            Opcode::Sth => String::new(),
+            Opcode::Sthbrx => String::new(),
+            Opcode::Sthu => String::new(),
+            Opcode::Sthux => String::new(),
+            Opcode::Sthx => String::new(),
+            Opcode::Stmw => String::new(),
+            Opcode::Stswi => String::new(),
+            Opcode::Stswx => String::new(),
+            Opcode::Stw => String::new(),
+            Opcode::Stwbrx => String::new(),
+            Opcode::Stwcx_ => String::new(),
+            Opcode::Stwu => String::new(),
+            Opcode::Stwux => String::new(),
+            Opcode::Stwx => String::new(),
             Opcode::Subf => {
-                let mut m = Modifiers::default();
-                m.oe = self.bit(21);
-                m.rc = self.bit(31);
-                m
+                let mut s = String::with_capacity(4);
+                if self.bit(21usize) {
+                    s.push('o');
+                }
+                if self.bit(31usize) {
+                    s.push('.');
+                }
+                s
             }
             Opcode::Subfc => {
-                let mut m = Modifiers::default();
-                m.oe = self.bit(21);
-                m.rc = self.bit(31);
-                m
+                let mut s = String::with_capacity(4);
+                if self.bit(21usize) {
+                    s.push('o');
+                }
+                if self.bit(31usize) {
+                    s.push('.');
+                }
+                s
             }
             Opcode::Subfe => {
-                let mut m = Modifiers::default();
-                m.oe = self.bit(21);
-                m.rc = self.bit(31);
-                m
+                let mut s = String::with_capacity(4);
+                if self.bit(21usize) {
+                    s.push('o');
+                }
+                if self.bit(31usize) {
+                    s.push('.');
+                }
+                s
             }
-            Opcode::Subfic => Modifiers::default(),
+            Opcode::Subfic => String::new(),
             Opcode::Subfme => {
-                let mut m = Modifiers::default();
-                m.oe = self.bit(21);
-                m.rc = self.bit(31);
-                m
+                let mut s = String::with_capacity(4);
+                if self.bit(21usize) {
+                    s.push('o');
+                }
+                if self.bit(31usize) {
+                    s.push('.');
+                }
+                s
             }
             Opcode::Subfze => {
-                let mut m = Modifiers::default();
-                m.oe = self.bit(21);
-                m.rc = self.bit(31);
-                m
+                let mut s = String::with_capacity(4);
+                if self.bit(21usize) {
+                    s.push('o');
+                }
+                if self.bit(31usize) {
+                    s.push('.');
+                }
+                s
             }
-            Opcode::Sync => Modifiers::default(),
-            Opcode::Tlbie => Modifiers::default(),
-            Opcode::Tlbsync => Modifiers::default(),
-            Opcode::Tw => Modifiers::default(),
-            Opcode::Twi => Modifiers::default(),
-            Opcode::Xor => Modifiers::default(),
-            Opcode::Xori => Modifiers::default(),
-            Opcode::Xoris => Modifiers::default(),
+            Opcode::Sync => String::new(),
+            Opcode::Tlbie => String::new(),
+            Opcode::Tlbsync => String::new(),
+            Opcode::Tw => String::new(),
+            Opcode::Twi => String::new(),
+            Opcode::Xor => String::new(),
+            Opcode::Xori => String::new(),
+            Opcode::Xoris => String::new(),
         }
     }
     pub(crate) fn _simplified(self) -> SimplifiedIns {
@@ -4651,7 +4861,6 @@ impl Ins {
                 if ((self.code >> 16u8) & 0x1f) == 0 {
                     return SimplifiedIns {
                         mnemonic: "li",
-                        modifiers: Modifiers::default(),
                         args: vec![
                             Argument::GPR(GPR(((self.code >> 21u8) & 0x1f) as _)),
                             Argument::Simm(Simm(
@@ -4666,7 +4875,6 @@ impl Ins {
                 if ((self.code >> 16u8) & 0x1f) == 0 {
                     return SimplifiedIns {
                         mnemonic: "lis",
-                        modifiers: Modifiers::default(),
                         args: vec![
                             Argument::GPR(GPR(((self.code >> 21u8) & 0x1f) as _)),
                             Argument::Uimm(Uimm((self.code & 0xffff) as _)),
@@ -4682,12 +4890,6 @@ impl Ins {
                 {
                     return SimplifiedIns {
                         mnemonic: "blt",
-                        modifiers: {
-                            let mut m = Modifiers::default();
-                            m.aa = self.bit(30);
-                            m.lk = self.bit(31);
-                            m
-                        },
                         args: vec![Argument::BranchDest(BranchDest(
                             (((((self.code >> 2u8) & 0x3fff) ^ 0x2000).wrapping_sub(0x2000)) << 2u8)
                                 as _,
@@ -4699,12 +4901,6 @@ impl Ins {
                 {
                     return SimplifiedIns {
                         mnemonic: "blt",
-                        modifiers: {
-                            let mut m = Modifiers::default();
-                            m.aa = self.bit(30);
-                            m.lk = self.bit(31);
-                            m
-                        },
                         args: vec![
                             Argument::CRBit(CRBit(((self.code >> 18u8) & 0x7) as _)),
                             Argument::BranchDest(BranchDest(
@@ -4721,12 +4917,6 @@ impl Ins {
                 {
                     return SimplifiedIns {
                         mnemonic: "ble",
-                        modifiers: {
-                            let mut m = Modifiers::default();
-                            m.aa = self.bit(30);
-                            m.lk = self.bit(31);
-                            m
-                        },
                         args: vec![Argument::BranchDest(BranchDest(
                             (((((self.code >> 2u8) & 0x3fff) ^ 0x2000).wrapping_sub(0x2000)) << 2u8)
                                 as _,
@@ -4738,12 +4928,6 @@ impl Ins {
                 {
                     return SimplifiedIns {
                         mnemonic: "ble",
-                        modifiers: {
-                            let mut m = Modifiers::default();
-                            m.aa = self.bit(30);
-                            m.lk = self.bit(31);
-                            m
-                        },
                         args: vec![
                             Argument::CRBit(CRBit(((self.code >> 18u8) & 0x7) as _)),
                             Argument::BranchDest(BranchDest(
@@ -4760,12 +4944,6 @@ impl Ins {
                 {
                     return SimplifiedIns {
                         mnemonic: "beq",
-                        modifiers: {
-                            let mut m = Modifiers::default();
-                            m.aa = self.bit(30);
-                            m.lk = self.bit(31);
-                            m
-                        },
                         args: vec![Argument::BranchDest(BranchDest(
                             (((((self.code >> 2u8) & 0x3fff) ^ 0x2000).wrapping_sub(0x2000)) << 2u8)
                                 as _,
@@ -4777,12 +4955,6 @@ impl Ins {
                 {
                     return SimplifiedIns {
                         mnemonic: "beq",
-                        modifiers: {
-                            let mut m = Modifiers::default();
-                            m.aa = self.bit(30);
-                            m.lk = self.bit(31);
-                            m
-                        },
                         args: vec![
                             Argument::CRBit(CRBit(((self.code >> 18u8) & 0x7) as _)),
                             Argument::BranchDest(BranchDest(
@@ -4799,12 +4971,6 @@ impl Ins {
                 {
                     return SimplifiedIns {
                         mnemonic: "bge",
-                        modifiers: {
-                            let mut m = Modifiers::default();
-                            m.aa = self.bit(30);
-                            m.lk = self.bit(31);
-                            m
-                        },
                         args: vec![Argument::BranchDest(BranchDest(
                             (((((self.code >> 2u8) & 0x3fff) ^ 0x2000).wrapping_sub(0x2000)) << 2u8)
                                 as _,
@@ -4816,12 +4982,6 @@ impl Ins {
                 {
                     return SimplifiedIns {
                         mnemonic: "bge",
-                        modifiers: {
-                            let mut m = Modifiers::default();
-                            m.aa = self.bit(30);
-                            m.lk = self.bit(31);
-                            m
-                        },
                         args: vec![
                             Argument::CRBit(CRBit(((self.code >> 18u8) & 0x7) as _)),
                             Argument::BranchDest(BranchDest(
@@ -4838,12 +4998,6 @@ impl Ins {
                 {
                     return SimplifiedIns {
                         mnemonic: "bgt",
-                        modifiers: {
-                            let mut m = Modifiers::default();
-                            m.aa = self.bit(30);
-                            m.lk = self.bit(31);
-                            m
-                        },
                         args: vec![Argument::BranchDest(BranchDest(
                             (((((self.code >> 2u8) & 0x3fff) ^ 0x2000).wrapping_sub(0x2000)) << 2u8)
                                 as _,
@@ -4855,12 +5009,6 @@ impl Ins {
                 {
                     return SimplifiedIns {
                         mnemonic: "bgt",
-                        modifiers: {
-                            let mut m = Modifiers::default();
-                            m.aa = self.bit(30);
-                            m.lk = self.bit(31);
-                            m
-                        },
                         args: vec![
                             Argument::CRBit(CRBit(((self.code >> 18u8) & 0x7) as _)),
                             Argument::BranchDest(BranchDest(
@@ -4877,12 +5025,6 @@ impl Ins {
                 {
                     return SimplifiedIns {
                         mnemonic: "bne",
-                        modifiers: {
-                            let mut m = Modifiers::default();
-                            m.aa = self.bit(30);
-                            m.lk = self.bit(31);
-                            m
-                        },
                         args: vec![Argument::BranchDest(BranchDest(
                             (((((self.code >> 2u8) & 0x3fff) ^ 0x2000).wrapping_sub(0x2000)) << 2u8)
                                 as _,
@@ -4894,12 +5036,6 @@ impl Ins {
                 {
                     return SimplifiedIns {
                         mnemonic: "bne",
-                        modifiers: {
-                            let mut m = Modifiers::default();
-                            m.aa = self.bit(30);
-                            m.lk = self.bit(31);
-                            m
-                        },
                         args: vec![
                             Argument::CRBit(CRBit(((self.code >> 18u8) & 0x7) as _)),
                             Argument::BranchDest(BranchDest(
@@ -4916,12 +5052,6 @@ impl Ins {
                 {
                     return SimplifiedIns {
                         mnemonic: "bso",
-                        modifiers: {
-                            let mut m = Modifiers::default();
-                            m.aa = self.bit(30);
-                            m.lk = self.bit(31);
-                            m
-                        },
                         args: vec![Argument::BranchDest(BranchDest(
                             (((((self.code >> 2u8) & 0x3fff) ^ 0x2000).wrapping_sub(0x2000)) << 2u8)
                                 as _,
@@ -4933,12 +5063,6 @@ impl Ins {
                 {
                     return SimplifiedIns {
                         mnemonic: "bso",
-                        modifiers: {
-                            let mut m = Modifiers::default();
-                            m.aa = self.bit(30);
-                            m.lk = self.bit(31);
-                            m
-                        },
                         args: vec![
                             Argument::CRBit(CRBit(((self.code >> 18u8) & 0x7) as _)),
                             Argument::BranchDest(BranchDest(
@@ -4955,12 +5079,6 @@ impl Ins {
                 {
                     return SimplifiedIns {
                         mnemonic: "bns",
-                        modifiers: {
-                            let mut m = Modifiers::default();
-                            m.aa = self.bit(30);
-                            m.lk = self.bit(31);
-                            m
-                        },
                         args: vec![Argument::BranchDest(BranchDest(
                             (((((self.code >> 2u8) & 0x3fff) ^ 0x2000).wrapping_sub(0x2000)) << 2u8)
                                 as _,
@@ -4972,12 +5090,6 @@ impl Ins {
                 {
                     return SimplifiedIns {
                         mnemonic: "bns",
-                        modifiers: {
-                            let mut m = Modifiers::default();
-                            m.aa = self.bit(30);
-                            m.lk = self.bit(31);
-                            m
-                        },
                         args: vec![
                             Argument::CRBit(CRBit(((self.code >> 18u8) & 0x7) as _)),
                             Argument::BranchDest(BranchDest(
@@ -4991,12 +5103,6 @@ impl Ins {
                 if ((self.code >> 21u8) & 0x1f) == 16 && ((self.code >> 16u8) & 0x1f) == 0 {
                     return SimplifiedIns {
                         mnemonic: "bdnz",
-                        modifiers: {
-                            let mut m = Modifiers::default();
-                            m.aa = self.bit(30);
-                            m.lk = self.bit(31);
-                            m
-                        },
                         args: vec![Argument::BranchDest(BranchDest(
                             (((((self.code >> 2u8) & 0x3fff) ^ 0x2000).wrapping_sub(0x2000)) << 2u8)
                                 as _,
@@ -5007,12 +5113,6 @@ impl Ins {
                 if ((self.code >> 21u8) & 0x1f) == 18 && ((self.code >> 16u8) & 0x1f) == 0 {
                     return SimplifiedIns {
                         mnemonic: "bdz",
-                        modifiers: {
-                            let mut m = Modifiers::default();
-                            m.aa = self.bit(30);
-                            m.lk = self.bit(31);
-                            m
-                        },
                         args: vec![Argument::BranchDest(BranchDest(
                             (((((self.code >> 2u8) & 0x3fff) ^ 0x2000).wrapping_sub(0x2000)) << 2u8)
                                 as _,
@@ -5025,11 +5125,6 @@ impl Ins {
                 if ((self.code >> 21u8) & 0x1f) == 20 && ((self.code >> 16u8) & 0x1f) == 0 {
                     return SimplifiedIns {
                         mnemonic: "bctr",
-                        modifiers: {
-                            let mut m = Modifiers::default();
-                            m.lk = self.bit(31);
-                            m
-                        },
                         args: vec![],
                         ins: self,
                     };
@@ -5040,11 +5135,6 @@ impl Ins {
                 {
                     return SimplifiedIns {
                         mnemonic: "bltctr",
-                        modifiers: {
-                            let mut m = Modifiers::default();
-                            m.lk = self.bit(31);
-                            m
-                        },
                         args: vec![],
                         ins: self,
                     };
@@ -5053,11 +5143,6 @@ impl Ins {
                 {
                     return SimplifiedIns {
                         mnemonic: "bltctr",
-                        modifiers: {
-                            let mut m = Modifiers::default();
-                            m.lk = self.bit(31);
-                            m
-                        },
                         args: vec![Argument::CRBit(CRBit(((self.code >> 18u8) & 0x7) as _))],
                         ins: self,
                     };
@@ -5068,11 +5153,6 @@ impl Ins {
                 {
                     return SimplifiedIns {
                         mnemonic: "blectr",
-                        modifiers: {
-                            let mut m = Modifiers::default();
-                            m.lk = self.bit(31);
-                            m
-                        },
                         args: vec![],
                         ins: self,
                     };
@@ -5081,11 +5161,6 @@ impl Ins {
                 {
                     return SimplifiedIns {
                         mnemonic: "blectr",
-                        modifiers: {
-                            let mut m = Modifiers::default();
-                            m.lk = self.bit(31);
-                            m
-                        },
                         args: vec![Argument::CRBit(CRBit(((self.code >> 18u8) & 0x7) as _))],
                         ins: self,
                     };
@@ -5096,11 +5171,6 @@ impl Ins {
                 {
                     return SimplifiedIns {
                         mnemonic: "beqctr",
-                        modifiers: {
-                            let mut m = Modifiers::default();
-                            m.lk = self.bit(31);
-                            m
-                        },
                         args: vec![],
                         ins: self,
                     };
@@ -5109,11 +5179,6 @@ impl Ins {
                 {
                     return SimplifiedIns {
                         mnemonic: "beqctr",
-                        modifiers: {
-                            let mut m = Modifiers::default();
-                            m.lk = self.bit(31);
-                            m
-                        },
                         args: vec![Argument::CRBit(CRBit(((self.code >> 18u8) & 0x7) as _))],
                         ins: self,
                     };
@@ -5124,11 +5189,6 @@ impl Ins {
                 {
                     return SimplifiedIns {
                         mnemonic: "bgectr",
-                        modifiers: {
-                            let mut m = Modifiers::default();
-                            m.lk = self.bit(31);
-                            m
-                        },
                         args: vec![],
                         ins: self,
                     };
@@ -5137,11 +5197,6 @@ impl Ins {
                 {
                     return SimplifiedIns {
                         mnemonic: "bgectr",
-                        modifiers: {
-                            let mut m = Modifiers::default();
-                            m.lk = self.bit(31);
-                            m
-                        },
                         args: vec![Argument::CRBit(CRBit(((self.code >> 18u8) & 0x7) as _))],
                         ins: self,
                     };
@@ -5152,11 +5207,6 @@ impl Ins {
                 {
                     return SimplifiedIns {
                         mnemonic: "bgtctr",
-                        modifiers: {
-                            let mut m = Modifiers::default();
-                            m.lk = self.bit(31);
-                            m
-                        },
                         args: vec![],
                         ins: self,
                     };
@@ -5165,11 +5215,6 @@ impl Ins {
                 {
                     return SimplifiedIns {
                         mnemonic: "bgtctr",
-                        modifiers: {
-                            let mut m = Modifiers::default();
-                            m.lk = self.bit(31);
-                            m
-                        },
                         args: vec![Argument::CRBit(CRBit(((self.code >> 18u8) & 0x7) as _))],
                         ins: self,
                     };
@@ -5180,11 +5225,6 @@ impl Ins {
                 {
                     return SimplifiedIns {
                         mnemonic: "bnectr",
-                        modifiers: {
-                            let mut m = Modifiers::default();
-                            m.lk = self.bit(31);
-                            m
-                        },
                         args: vec![],
                         ins: self,
                     };
@@ -5193,11 +5233,6 @@ impl Ins {
                 {
                     return SimplifiedIns {
                         mnemonic: "bnectr",
-                        modifiers: {
-                            let mut m = Modifiers::default();
-                            m.lk = self.bit(31);
-                            m
-                        },
                         args: vec![Argument::CRBit(CRBit(((self.code >> 18u8) & 0x7) as _))],
                         ins: self,
                     };
@@ -5208,11 +5243,6 @@ impl Ins {
                 {
                     return SimplifiedIns {
                         mnemonic: "bsoctr",
-                        modifiers: {
-                            let mut m = Modifiers::default();
-                            m.lk = self.bit(31);
-                            m
-                        },
                         args: vec![],
                         ins: self,
                     };
@@ -5221,11 +5251,6 @@ impl Ins {
                 {
                     return SimplifiedIns {
                         mnemonic: "bsoctr",
-                        modifiers: {
-                            let mut m = Modifiers::default();
-                            m.lk = self.bit(31);
-                            m
-                        },
                         args: vec![Argument::CRBit(CRBit(((self.code >> 18u8) & 0x7) as _))],
                         ins: self,
                     };
@@ -5236,11 +5261,6 @@ impl Ins {
                 {
                     return SimplifiedIns {
                         mnemonic: "bnsctr",
-                        modifiers: {
-                            let mut m = Modifiers::default();
-                            m.lk = self.bit(31);
-                            m
-                        },
                         args: vec![],
                         ins: self,
                     };
@@ -5249,11 +5269,6 @@ impl Ins {
                 {
                     return SimplifiedIns {
                         mnemonic: "bnsctr",
-                        modifiers: {
-                            let mut m = Modifiers::default();
-                            m.lk = self.bit(31);
-                            m
-                        },
                         args: vec![Argument::CRBit(CRBit(((self.code >> 18u8) & 0x7) as _))],
                         ins: self,
                     };
@@ -5263,11 +5278,6 @@ impl Ins {
                 if ((self.code >> 21u8) & 0x1f) == 20 && ((self.code >> 16u8) & 0x1f) == 0 {
                     return SimplifiedIns {
                         mnemonic: "blr",
-                        modifiers: {
-                            let mut m = Modifiers::default();
-                            m.lk = self.bit(31);
-                            m
-                        },
                         args: vec![],
                         ins: self,
                     };
@@ -5278,11 +5288,6 @@ impl Ins {
                 {
                     return SimplifiedIns {
                         mnemonic: "bltlr",
-                        modifiers: {
-                            let mut m = Modifiers::default();
-                            m.lk = self.bit(31);
-                            m
-                        },
                         args: vec![],
                         ins: self,
                     };
@@ -5291,11 +5296,6 @@ impl Ins {
                 {
                     return SimplifiedIns {
                         mnemonic: "bltlr",
-                        modifiers: {
-                            let mut m = Modifiers::default();
-                            m.lk = self.bit(31);
-                            m
-                        },
                         args: vec![Argument::CRBit(CRBit(((self.code >> 18u8) & 0x7) as _))],
                         ins: self,
                     };
@@ -5306,11 +5306,6 @@ impl Ins {
                 {
                     return SimplifiedIns {
                         mnemonic: "blelr",
-                        modifiers: {
-                            let mut m = Modifiers::default();
-                            m.lk = self.bit(31);
-                            m
-                        },
                         args: vec![],
                         ins: self,
                     };
@@ -5319,11 +5314,6 @@ impl Ins {
                 {
                     return SimplifiedIns {
                         mnemonic: "blelr",
-                        modifiers: {
-                            let mut m = Modifiers::default();
-                            m.lk = self.bit(31);
-                            m
-                        },
                         args: vec![Argument::CRBit(CRBit(((self.code >> 18u8) & 0x7) as _))],
                         ins: self,
                     };
@@ -5334,11 +5324,6 @@ impl Ins {
                 {
                     return SimplifiedIns {
                         mnemonic: "beqlr",
-                        modifiers: {
-                            let mut m = Modifiers::default();
-                            m.lk = self.bit(31);
-                            m
-                        },
                         args: vec![],
                         ins: self,
                     };
@@ -5347,11 +5332,6 @@ impl Ins {
                 {
                     return SimplifiedIns {
                         mnemonic: "beqlr",
-                        modifiers: {
-                            let mut m = Modifiers::default();
-                            m.lk = self.bit(31);
-                            m
-                        },
                         args: vec![Argument::CRBit(CRBit(((self.code >> 18u8) & 0x7) as _))],
                         ins: self,
                     };
@@ -5362,11 +5342,6 @@ impl Ins {
                 {
                     return SimplifiedIns {
                         mnemonic: "bgelr",
-                        modifiers: {
-                            let mut m = Modifiers::default();
-                            m.lk = self.bit(31);
-                            m
-                        },
                         args: vec![],
                         ins: self,
                     };
@@ -5375,11 +5350,6 @@ impl Ins {
                 {
                     return SimplifiedIns {
                         mnemonic: "bgelr",
-                        modifiers: {
-                            let mut m = Modifiers::default();
-                            m.lk = self.bit(31);
-                            m
-                        },
                         args: vec![Argument::CRBit(CRBit(((self.code >> 18u8) & 0x7) as _))],
                         ins: self,
                     };
@@ -5390,11 +5360,6 @@ impl Ins {
                 {
                     return SimplifiedIns {
                         mnemonic: "bgtlr",
-                        modifiers: {
-                            let mut m = Modifiers::default();
-                            m.lk = self.bit(31);
-                            m
-                        },
                         args: vec![],
                         ins: self,
                     };
@@ -5403,11 +5368,6 @@ impl Ins {
                 {
                     return SimplifiedIns {
                         mnemonic: "bgtlr",
-                        modifiers: {
-                            let mut m = Modifiers::default();
-                            m.lk = self.bit(31);
-                            m
-                        },
                         args: vec![Argument::CRBit(CRBit(((self.code >> 18u8) & 0x7) as _))],
                         ins: self,
                     };
@@ -5418,11 +5378,6 @@ impl Ins {
                 {
                     return SimplifiedIns {
                         mnemonic: "bnelr",
-                        modifiers: {
-                            let mut m = Modifiers::default();
-                            m.lk = self.bit(31);
-                            m
-                        },
                         args: vec![],
                         ins: self,
                     };
@@ -5431,11 +5386,6 @@ impl Ins {
                 {
                     return SimplifiedIns {
                         mnemonic: "bnelr",
-                        modifiers: {
-                            let mut m = Modifiers::default();
-                            m.lk = self.bit(31);
-                            m
-                        },
                         args: vec![Argument::CRBit(CRBit(((self.code >> 18u8) & 0x7) as _))],
                         ins: self,
                     };
@@ -5446,11 +5396,6 @@ impl Ins {
                 {
                     return SimplifiedIns {
                         mnemonic: "bsolr",
-                        modifiers: {
-                            let mut m = Modifiers::default();
-                            m.lk = self.bit(31);
-                            m
-                        },
                         args: vec![],
                         ins: self,
                     };
@@ -5459,11 +5404,6 @@ impl Ins {
                 {
                     return SimplifiedIns {
                         mnemonic: "bsolr",
-                        modifiers: {
-                            let mut m = Modifiers::default();
-                            m.lk = self.bit(31);
-                            m
-                        },
                         args: vec![Argument::CRBit(CRBit(((self.code >> 18u8) & 0x7) as _))],
                         ins: self,
                     };
@@ -5474,11 +5414,6 @@ impl Ins {
                 {
                     return SimplifiedIns {
                         mnemonic: "bnslr",
-                        modifiers: {
-                            let mut m = Modifiers::default();
-                            m.lk = self.bit(31);
-                            m
-                        },
                         args: vec![],
                         ins: self,
                     };
@@ -5487,11 +5422,6 @@ impl Ins {
                 {
                     return SimplifiedIns {
                         mnemonic: "bnslr",
-                        modifiers: {
-                            let mut m = Modifiers::default();
-                            m.lk = self.bit(31);
-                            m
-                        },
                         args: vec![Argument::CRBit(CRBit(((self.code >> 18u8) & 0x7) as _))],
                         ins: self,
                     };
@@ -5501,7 +5431,6 @@ impl Ins {
                 if ((self.code >> 23u8) & 0x7) == 0 {
                     return SimplifiedIns {
                         mnemonic: "cmpw",
-                        modifiers: Modifiers::default(),
                         args: vec![
                             Argument::GPR(GPR(((self.code >> 16u8) & 0x1f) as _)),
                             Argument::GPR(GPR(((self.code >> 11u8) & 0x1f) as _)),
@@ -5514,7 +5443,6 @@ impl Ins {
                 if ((self.code >> 23u8) & 0x7) == 0 {
                     return SimplifiedIns {
                         mnemonic: "cmpwi",
-                        modifiers: Modifiers::default(),
                         args: vec![
                             Argument::GPR(GPR(((self.code >> 16u8) & 0x1f) as _)),
                             Argument::Simm(Simm(
@@ -5527,7 +5455,6 @@ impl Ins {
                 if ((self.code >> 23u8) & 0x7) == 0 {
                     return SimplifiedIns {
                         mnemonic: "cmpwi",
-                        modifiers: Modifiers::default(),
                         args: vec![
                             Argument::CRBit(CRBit(((self.code >> 23u8) & 0x7) as _)),
                             Argument::GPR(GPR(((self.code >> 16u8) & 0x1f) as _)),
@@ -5543,7 +5470,6 @@ impl Ins {
                 if ((self.code >> 23u8) & 0x7) == 0 {
                     return SimplifiedIns {
                         mnemonic: "cmplw",
-                        modifiers: Modifiers::default(),
                         args: vec![
                             Argument::GPR(GPR(((self.code >> 16u8) & 0x1f) as _)),
                             Argument::GPR(GPR(((self.code >> 11u8) & 0x1f) as _)),
@@ -5556,7 +5482,6 @@ impl Ins {
                 if ((self.code >> 23u8) & 0x7) == 0 {
                     return SimplifiedIns {
                         mnemonic: "cmplwi",
-                        modifiers: Modifiers::default(),
                         args: vec![
                             Argument::GPR(GPR(((self.code >> 16u8) & 0x1f) as _)),
                             Argument::Uimm(Uimm((self.code & 0xffff) as _)),
@@ -5567,7 +5492,6 @@ impl Ins {
                 if ((self.code >> 23u8) & 0x7) == 0 {
                     return SimplifiedIns {
                         mnemonic: "cmplwi",
-                        modifiers: Modifiers::default(),
                         args: vec![
                             Argument::CRBit(CRBit(((self.code >> 23u8) & 0x7) as _)),
                             Argument::GPR(GPR(((self.code >> 16u8) & 0x1f) as _)),
@@ -5581,7 +5505,6 @@ impl Ins {
                 if ((self.code >> 11u8) & 0x3ff) == 1 {
                     return SimplifiedIns {
                         mnemonic: "mfxer",
-                        modifiers: Modifiers::default(),
                         args: vec![Argument::GPR(GPR(((self.code >> 21u8) & 0x1f) as _))],
                         ins: self,
                     };
@@ -5589,7 +5512,6 @@ impl Ins {
                 if ((self.code >> 11u8) & 0x3ff) == 8 {
                     return SimplifiedIns {
                         mnemonic: "mflr",
-                        modifiers: Modifiers::default(),
                         args: vec![Argument::GPR(GPR(((self.code >> 21u8) & 0x1f) as _))],
                         ins: self,
                     };
@@ -5597,7 +5519,6 @@ impl Ins {
                 if ((self.code >> 11u8) & 0x3ff) == 9 {
                     return SimplifiedIns {
                         mnemonic: "mfctr",
-                        modifiers: Modifiers::default(),
                         args: vec![Argument::GPR(GPR(((self.code >> 21u8) & 0x1f) as _))],
                         ins: self,
                     };
@@ -5605,7 +5526,6 @@ impl Ins {
                 if ((self.code >> 11u8) & 0x3ff) == 18 {
                     return SimplifiedIns {
                         mnemonic: "mfdsisr",
-                        modifiers: Modifiers::default(),
                         args: vec![Argument::GPR(GPR(((self.code >> 21u8) & 0x1f) as _))],
                         ins: self,
                     };
@@ -5613,7 +5533,6 @@ impl Ins {
                 if ((self.code >> 11u8) & 0x3ff) == 397 {
                     return SimplifiedIns {
                         mnemonic: "mfdbatu",
-                        modifiers: Modifiers::default(),
                         args: vec![Argument::GPR(GPR(((self.code >> 21u8) & 0x1f) as _))],
                         ins: self,
                     };
@@ -5621,7 +5540,6 @@ impl Ins {
                 if ((self.code >> 11u8) & 0x3ff) == 571 {
                     return SimplifiedIns {
                         mnemonic: "mftdu",
-                        modifiers: Modifiers::default(),
                         args: vec![Argument::GPR(GPR(((self.code >> 21u8) & 0x1f) as _))],
                         ins: self,
                     };
@@ -5631,7 +5549,6 @@ impl Ins {
                 if ((self.code >> 11u8) & 0x3ff) == 1 {
                     return SimplifiedIns {
                         mnemonic: "mtxer",
-                        modifiers: Modifiers::default(),
                         args: vec![Argument::GPR(GPR(((self.code >> 21u8) & 0x1f) as _))],
                         ins: self,
                     };
@@ -5639,7 +5556,6 @@ impl Ins {
                 if ((self.code >> 11u8) & 0x3ff) == 8 {
                     return SimplifiedIns {
                         mnemonic: "mtlr",
-                        modifiers: Modifiers::default(),
                         args: vec![Argument::GPR(GPR(((self.code >> 21u8) & 0x1f) as _))],
                         ins: self,
                     };
@@ -5647,7 +5563,6 @@ impl Ins {
                 if ((self.code >> 11u8) & 0x3ff) == 9 {
                     return SimplifiedIns {
                         mnemonic: "mtctr",
-                        modifiers: Modifiers::default(),
                         args: vec![Argument::GPR(GPR(((self.code >> 21u8) & 0x1f) as _))],
                         ins: self,
                     };
@@ -5655,7 +5570,6 @@ impl Ins {
                 if ((self.code >> 11u8) & 0x3ff) == 18 {
                     return SimplifiedIns {
                         mnemonic: "mtdsisr",
-                        modifiers: Modifiers::default(),
                         args: vec![Argument::GPR(GPR(((self.code >> 21u8) & 0x1f) as _))],
                         ins: self,
                     };
@@ -5663,7 +5577,6 @@ impl Ins {
                 if ((self.code >> 11u8) & 0x3ff) == 397 {
                     return SimplifiedIns {
                         mnemonic: "mtdbatu",
-                        modifiers: Modifiers::default(),
                         args: vec![Argument::GPR(GPR(((self.code >> 21u8) & 0x1f) as _))],
                         ins: self,
                     };
@@ -5671,7 +5584,6 @@ impl Ins {
                 if ((self.code >> 11u8) & 0x3ff) == 571 {
                     return SimplifiedIns {
                         mnemonic: "mttdu",
-                        modifiers: Modifiers::default(),
                         args: vec![Argument::GPR(GPR(((self.code >> 21u8) & 0x1f) as _))],
                         ins: self,
                     };
@@ -5681,7 +5593,6 @@ impl Ins {
                 if ((self.code >> 21u8) & 0x1f) == ((self.code >> 11u8) & 0x1f) {
                     return SimplifiedIns {
                         mnemonic: "mr",
-                        modifiers: Modifiers::default(),
                         args: vec![
                             Argument::GPR(GPR(((self.code >> 16u8) & 0x1f) as _)),
                             Argument::GPR(GPR(((self.code >> 21u8) & 0x1f) as _)),
@@ -5697,7 +5608,6 @@ impl Ins {
                 {
                     return SimplifiedIns {
                         mnemonic: "nop",
-                        modifiers: Modifiers::default(),
                         args: vec![],
                         ins: self,
                     };
@@ -5707,7 +5617,6 @@ impl Ins {
                 if ((self.code >> 11u8) & 0x1f) == 0 && ((self.code >> 1u8) & 0x1f) == 31 {
                     return SimplifiedIns {
                         mnemonic: "clrlwi",
-                        modifiers: Modifiers::default(),
                         args: vec![
                             Argument::GPR(GPR(((self.code >> 16u8) & 0x1f) as _)),
                             Argument::GPR(GPR(((self.code >> 21u8) & 0x1f) as _)),
@@ -5719,7 +5628,6 @@ impl Ins {
                 if ((self.code >> 6u8) & 0x1f) == 0 && ((self.code >> 1u8) & 0x1f) == 31 {
                     return SimplifiedIns {
                         mnemonic: "rotlwi",
-                        modifiers: Modifiers::default(),
                         args: vec![
                             Argument::GPR(GPR(((self.code >> 16u8) & 0x1f) as _)),
                             Argument::GPR(GPR(((self.code >> 21u8) & 0x1f) as _)),
@@ -5733,7 +5641,6 @@ impl Ins {
                 {
                     return SimplifiedIns {
                         mnemonic: "slwi",
-                        modifiers: Modifiers::default(),
                         args: vec![
                             Argument::GPR(GPR(((self.code >> 16u8) & 0x1f) as _)),
                             Argument::GPR(GPR(((self.code >> 21u8) & 0x1f) as _)),
@@ -5747,7 +5654,6 @@ impl Ins {
                 {
                     return SimplifiedIns {
                         mnemonic: "srwi",
-                        modifiers: Modifiers::default(),
                         args: vec![
                             Argument::GPR(GPR(((self.code >> 16u8) & 0x1f) as _)),
                             Argument::GPR(GPR(((self.code >> 21u8) & 0x1f) as _)),
@@ -5761,7 +5667,6 @@ impl Ins {
                 if ((self.code >> 21u8) & 0x1f) == 8 {
                     return SimplifiedIns {
                         mnemonic: "twgti",
-                        modifiers: Modifiers::default(),
                         args: vec![
                             Argument::GPR(GPR(((self.code >> 16u8) & 0x1f) as _)),
                             Argument::Simm(Simm(
@@ -5774,7 +5679,6 @@ impl Ins {
                 if ((self.code >> 21u8) & 0x1f) == 6 {
                     return SimplifiedIns {
                         mnemonic: "twllei",
-                        modifiers: Modifiers::default(),
                         args: vec![
                             Argument::GPR(GPR(((self.code >> 16u8) & 0x1f) as _)),
                             Argument::Simm(Simm(
@@ -5792,109 +5696,160 @@ impl Ins {
 }
 #[allow(clippy::all, non_snake_case)]
 impl Ins {
+    #[inline(always)]
     pub fn field_simm(&self) -> isize {
         (((self.code & 0xffff) ^ 0x8000).wrapping_sub(0x8000)) as _
     }
+    #[inline(always)]
     pub fn field_uimm(&self) -> usize {
         (self.code & 0xffff) as _
     }
+    #[inline(always)]
     pub fn field_offset(&self) -> isize {
         (((self.code & 0xffff) ^ 0x8000).wrapping_sub(0x8000)) as _
     }
+    #[inline(always)]
     pub fn field_BO(&self) -> usize {
         ((self.code >> 21u8) & 0x1f) as _
     }
+    #[inline(always)]
     pub fn field_BI(&self) -> usize {
         ((self.code >> 16u8) & 0x1f) as _
     }
+    #[inline(always)]
     pub fn field_BD(&self) -> isize {
         (((((self.code >> 2u8) & 0x3fff) ^ 0x2000).wrapping_sub(0x2000)) << 2u8) as _
     }
+    #[inline(always)]
     pub fn field_LI(&self) -> isize {
         (((((self.code >> 2u8) & 0xffffff) ^ 0x800000).wrapping_sub(0x800000)) << 2u8) as _
     }
+    #[inline(always)]
     pub fn field_SH(&self) -> usize {
         ((self.code >> 11u8) & 0x1f) as _
     }
+    #[inline(always)]
     pub fn field_MB(&self) -> usize {
         ((self.code >> 6u8) & 0x1f) as _
     }
+    #[inline(always)]
     pub fn field_ME(&self) -> usize {
         ((self.code >> 1u8) & 0x1f) as _
     }
+    #[inline(always)]
     pub fn field_rS(&self) -> usize {
         ((self.code >> 21u8) & 0x1f) as _
     }
+    #[inline(always)]
     pub fn field_rD(&self) -> usize {
         ((self.code >> 21u8) & 0x1f) as _
     }
+    #[inline(always)]
     pub fn field_rA(&self) -> usize {
         ((self.code >> 16u8) & 0x1f) as _
     }
+    #[inline(always)]
     pub fn field_rB(&self) -> usize {
         ((self.code >> 11u8) & 0x1f) as _
     }
+    #[inline(always)]
     pub fn field_rC(&self) -> usize {
         ((self.code >> 6u8) & 0x1f) as _
     }
+    #[inline(always)]
     pub fn field_sr(&self) -> usize {
         ((self.code >> 16u8) & 0xf) as _
     }
+    #[inline(always)]
     pub fn field_spr(&self) -> usize {
         ((self.code >> 11u8) & 0x3ff) as _
     }
+    #[inline(always)]
     pub fn field_frS(&self) -> usize {
         ((self.code >> 21u8) & 0x1f) as _
     }
+    #[inline(always)]
     pub fn field_frD(&self) -> usize {
         ((self.code >> 21u8) & 0x1f) as _
     }
+    #[inline(always)]
     pub fn field_frA(&self) -> usize {
         ((self.code >> 16u8) & 0x1f) as _
     }
+    #[inline(always)]
     pub fn field_frB(&self) -> usize {
         ((self.code >> 11u8) & 0x1f) as _
     }
+    #[inline(always)]
     pub fn field_frC(&self) -> usize {
         ((self.code >> 6u8) & 0x1f) as _
     }
+    #[inline(always)]
     pub fn field_crbD(&self) -> usize {
         ((self.code >> 21u8) & 0x1f) as _
     }
+    #[inline(always)]
     pub fn field_crbA(&self) -> usize {
         ((self.code >> 16u8) & 0x1f) as _
     }
+    #[inline(always)]
     pub fn field_crbB(&self) -> usize {
         ((self.code >> 11u8) & 0x1f) as _
     }
+    #[inline(always)]
     pub fn field_crfD(&self) -> usize {
         ((self.code >> 23u8) & 0x7) as _
     }
+    #[inline(always)]
     pub fn field_crfS(&self) -> usize {
         ((self.code >> 18u8) & 0x7) as _
     }
+    #[inline(always)]
     pub fn field_crm(&self) -> usize {
         ((self.code >> 12u8) & 0xff) as _
     }
+    #[inline(always)]
     pub fn field_ps_l(&self) -> usize {
         ((self.code >> 12u8) & 0x7) as _
     }
+    #[inline(always)]
     pub fn field_ps_W(&self) -> usize {
         ((self.code >> 16u8) & 0x0) as _
     }
+    #[inline(always)]
     pub fn field_NB(&self) -> usize {
         ((self.code >> 11u8) & 0x1f) as _
     }
+    #[inline(always)]
     pub fn field_tbr(&self) -> usize {
         ((self.code >> 11u8) & 0x3ff) as _
     }
+    #[inline(always)]
     pub fn field_mtfsf_FM(&self) -> usize {
         ((self.code >> 17u8) & 0xff) as _
     }
+    #[inline(always)]
     pub fn field_mtfsf_IMM(&self) -> usize {
         ((self.code >> 12u8) & 0xf) as _
     }
+    #[inline(always)]
     pub fn field_TO(&self) -> usize {
         ((self.code >> 21u8) & 0x1f) as _
+    }
+    #[inline(always)]
+    pub fn field_OE(&self) -> bool {
+        self.bit(21usize)
+    }
+    #[inline(always)]
+    pub fn field_Rc(&self) -> bool {
+        self.bit(31usize)
+    }
+    #[inline(always)]
+    pub fn field_LK(&self) -> bool {
+        self.bit(31usize)
+    }
+    #[inline(always)]
+    pub fn field_AA(&self) -> bool {
+        self.bit(30usize)
     }
 }

@@ -7,7 +7,7 @@ pub struct FormattedIns(pub Ins);
 impl Display for FormattedIns {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         let simple = self.0.clone().simplified();
-        write!(f, "{}{}", simple.mnemonic, simple.modifiers)?;
+        write!(f, "{}{}", simple.mnemonic, simple.ins.suffix())?;
         let mut writing_offset = false;
         for (i, arg) in simple.args.iter().enumerate() {
             if i == 0 {
