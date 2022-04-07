@@ -1,6 +1,7 @@
 [workspace]
 members = [
     "disasm",
+    "disasm-py",
     "dol",
     "fuzz",
     "genisa",
