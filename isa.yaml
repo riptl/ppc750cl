@@ -22,9 +22,11 @@ fields:
     arg: BranchDest
     bits: 16..30
     shift_left: 2
+    signed: true
   - name: LI
     arg: BranchDest
     bits: 6..30
+    signed: true
     shift_left: 2
   # Shift/rotate type fields
   - name: SH

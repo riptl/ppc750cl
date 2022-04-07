@@ -97,24 +97,49 @@ pub(crate) struct Field {
     signed: bool,
     split: bool,
     arg: Option<String>,
+    shift_left: u8,
 }
 
 impl Field {
     fn variant_identifier(&self) -> Option<TokenTree> {
+        self.identifier("")
+    }
+
+    fn identifier(&self, prefix: &str) -> Option<TokenTree> {
         if self.name.strip_suffix(".nz").is_none() {
-            Some(to_rust_ident(&self.name))
+            Some(to_rust_ident(prefix, &self.name))
         } else {
             None
         }
     }
 
     fn express_value(&self, code: TokenStream) -> TokenStream {
+        let mut val = quote!(#code);
+
         let shift = 32 - self.bits.0.end;
-        let mask = (1u32 << self.bits.0.len()) - 1;
-        let mask = LitInt::new(&format!("0x{:x}", mask), Span::call_site());
-        quote! {
-            ((#code >> #shift) & #mask)
+        if shift > 0 {
+            val = quote!((#val >> #shift));
         }
+
+        let mask = (1u32 << self.bits.0.len()) - 1;
+        if mask != 0xFFFF_FFFF {
+            let mask = LitInt::new(&format!("0x{:x}", mask), Span::call_site());
+            val = quote!((#val & #mask));
+        }
+
+        // https://graphics.stanford.edu/~seander/bithacks.html#VariableSignExtend
+        if self.signed {
+            let mask2 = 1u32 << (self.bits.0.len() - 1);
+            let mask2 = LitInt::new(&format!("0x{:x}", mask2), Span::call_site());
+            val = quote!(((#val ^ #mask2).wrapping_sub(#mask2)))
+        }
+
+        let val_shift = self.shift_left;
+        if val_shift > 0 {
+            val = quote!((#val << #val_shift));
+        }
+
+        val
     }
 
     fn express_value_self(&self) -> TokenStream {
@@ -152,6 +177,27 @@ impl Field {
 
     fn construct_variant_self(&self) -> TokenStream {
         self.construct_variant(quote!(self.code))
+    }
+
+    fn construct_accessor(&self) -> TokenStream {
+        let field_variant = match self.identifier("field_") {
+            Some(v) => v,
+            None => return TokenStream::new(),
+        };
+        if self.arg.is_none() {
+            return TokenStream::new();
+        }
+        let value = self.express_value_self();
+        let ret_type = if self.signed {
+            quote!(isize)
+        } else {
+            quote!(usize)
+        };
+        quote! {
+            pub fn #field_variant(&self) -> #ret_type {
+                #value as _
+            }
+        }
     }
 }
 
@@ -475,9 +521,15 @@ impl Isa {
         let use_match_arms = token_stream!(use_match_arms);
         let modifier_match_arms = token_stream!(modifier_match_arms);
         let simplified_ins_match_arms = token_stream!(simplified_ins_match_arms);
+        let field_accessors = self
+            .fields
+            .iter()
+            .map(|field| field.construct_accessor())
+            .collect::<Vec<_>>();
+        let field_accessors = token_stream!(field_accessors);
         // Generate final fields function.
         let ins_impl = quote! {
-            #[allow(clippy::all)]
+            #[allow(clippy::all, unused_mut)]
             impl Ins {
                 pub(crate) fn _fields(&self) -> Vec<Field> {
                     match self.op {
@@ -486,7 +538,6 @@ impl Isa {
                     }
                 }
 
-                #[allow(unused_mut)]
                 pub(crate) fn _defs(&self) -> Vec<Field> {
                     match self.op {
                         Opcode::Illegal => vec![],
@@ -494,7 +545,6 @@ impl Isa {
                     }
                 }
 
-                #[allow(unused_mut)]
                 pub(crate) fn _uses(&self) -> Vec<Field> {
                     match self.op {
                         Opcode::Illegal => vec![],
@@ -502,7 +552,6 @@ impl Isa {
                     }
                 }
 
-                #[allow(unused_mut)]
                 pub(crate) fn _modifiers(&self) -> Modifiers {
                     match self.op {
                         Opcode::Illegal => Modifiers::default(),
@@ -518,14 +567,21 @@ impl Isa {
                     SimplifiedIns::basic_form(self)
                 }
             }
+            #[allow(clippy::all, non_snake_case)]
+            impl Ins {
+                #field_accessors
+            }
         };
         Ok(ins_impl)
     }
 }
 
 /// Converts the given key into an identifier.
-fn to_rust_ident(key: &str) -> TokenTree {
-    TokenTree::Ident(Ident::new(&key.replace('.', "_"), Span::call_site()))
+fn to_rust_ident(prefix: &str, key: &str) -> TokenTree {
+    TokenTree::Ident(Ident::new(
+        &(prefix.to_owned() + &key.replace('.', "_")),
+        Span::call_site(),
+    ))
 }
 
 /// Converts the given key into an enum variant key.

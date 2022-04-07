@@ -313,6 +313,26 @@ impl Ins {
     pub fn bits(&self, range: Range<usize>) -> u32 {
         bits(self.code, range)
     }
+
+    /*
+    pub fn branch_offset(&self) -> Option<i32> {
+        match self.op {
+            Opcode::B => Some(self.li()),
+            Opcode::Bc | Opcode::Bcctr | Opcode::Bclr => Some(self.field_BD() as i32),
+            _ => None,
+        }
+    }
+
+    pub fn branch_dest(&self) -> Option<u32> {
+        self.branch_offset().and_then(|offset| {
+            if offset < 0 {
+                self.addr.checked_sub((-offset) as u32)
+            } else {
+                self.addr.checked_add(offset as u32)
+            }
+        })
+    }
+     */
 }
 
 /// A simplified PowerPC 750CL instruction.

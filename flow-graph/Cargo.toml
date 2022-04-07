@@ -8,9 +8,9 @@ description = "Control flow graph analysis for PowerPC 750CL"
 repository = "https://github.com/terorie/ppc750cl"
 
 [dependencies]
-clap = "2.33"
+clap = "3"
 dol = { version = "0.1.0", path = "../dol" }
 itertools = "0.10"
-parse_int = "0.5"
+parse_int = "0.6"
 petgraph = "0.6"
 ppc750cl = { version = "0.1.1", path = "../disasm" }

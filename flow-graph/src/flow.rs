@@ -55,14 +55,17 @@ impl<'a> BasicBlock<'a> {
                 Opcode::Addis => {
                     if ins.a() == 0 {
                         // lis
-                        defs.insert(ins.d(), ins.uimm());
+                        defs.insert(ins.d(), ins.field_uimm() as u16);
                     } else {
                         defs.remove(&ins.d());
                     }
                 }
                 Opcode::Addi => {
                     if let Some(hi) = defs.get(&ins.a()) {
-                        data_refs.insert(ins.addr / 4, ((*hi as u32) << 16) + (ins.uimm() as u32));
+                        data_refs.insert(
+                            ins.addr / 4,
+                            ((*hi as u32) << 16) + (ins.field_uimm() as u32),
+                        );
                     }
                     defs.remove(&ins.d());
                 }

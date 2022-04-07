@@ -85,7 +85,7 @@ fn test_ins_andi_() {
 fn test_ins_andis_() {
     assert_asm!(0x77c802ff, "andis. r8, r30, 0x2ff");
 }
-/*
+
 #[test]
 fn test_ins_b() {
     assert_asm!(0x48000000, "b 0x0");
@@ -96,6 +96,7 @@ fn test_ins_b() {
     assert_asm!(0x4BDC1A59, "bl -0x23e5a8");
 }
 
+/*
 #[test]
 fn test_ins_bc() {
     assert_asm!(0x40800008, "bge 0x8");

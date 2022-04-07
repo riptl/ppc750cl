@@ -33,7 +33,7 @@ impl BasicSlices {
                 continue;
             }
             // We encountered some kind of control flow instruction.
-            if ins.code != Opcode::BLR {
+            if ins.field_BO() == 20 && ins.field_BI() == 0 {
                 // There's a possibility that branch can be taken.
                 // Branch destinations are always the first instruction of a block.
                 // Thus, we also found the end of another block.
@@ -58,5 +58,5 @@ fn is_conditional_branch(ins: &Ins) -> bool {
         _ => return false,
     };
     // Check whether bits "branch always".
-    ins.bo() & 0b10100 != 0b10100
+    ins.field_BO() & 0b10100 != 0b10100
 }
