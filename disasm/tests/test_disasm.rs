@@ -172,12 +172,10 @@ fn test_ins_cntlzw() {
     assert_asm!(0x7C030034, "cntlzw r3, r0");
 }
 
-/*
 #[test]
 fn test_ins_cror() {
-    assert_asm!(0x4C411382, "cror cr2, cr1, cr2");
+    assert_asm!(0x4C411382, "cror 2, 1, 2");
 }
- */
 
 #[test]
 fn test_ins_dcbf() {
@@ -487,12 +485,10 @@ fn test_ins_mfcr() {
     assert_asm!(0x7C000026, "mfcr cr0");
 }
 
-/*
 #[test]
 fn test_ins_mffs() {
     assert_asm!(0xFC00048E, "mffs f0");
 }
- */
 
 #[test]
 fn test_ins_mfmsr() {
@@ -522,12 +518,12 @@ fn test_ins_mtcrf() {
 /*
 #[test]
 fn test_ins_mtfsb0() {}
+ */
 
 #[test]
 fn test_ins_mtfsb1() {
-    assert_asm!(0xFFA0004C, "mtfsb1 0x1d");
+    assert_asm!(0xFFA0004C, "mtfsb1 29");
 }
-*/
 
 #[test]
 fn test_ins_mtfsf() {
@@ -611,12 +607,10 @@ fn test_ins_psq_l() {
     assert_asm!(0xE02500AC, "psq_l f1, 0xac(r5), 0, qr0");
 }
 
-/*
 #[test]
 fn test_ins_psq_lu() {
     assert_asm!(0xE5435010, "psq_lu f10, 0x10(r3), 0, qr5");
 }
- */
 
 #[test]
 fn test_ins_psq_lx() {
@@ -856,12 +850,10 @@ fn test_ins_stfdu() {
     assert_asm!(0xDC24FFC0, "stfdu f1, -0x40(r4)");
 }
 
-/*
 #[test]
 fn test_ins_stfdx() {
     assert_asm!(0x7C4405AE, "stfdx f2, r4, r0");
 }
- */
 
 #[test]
 fn test_ins_stfs() {

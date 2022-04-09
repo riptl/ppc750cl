@@ -106,9 +106,9 @@ field_arg!(SR, u8);
 // Special-purpose register.
 field_arg!(SPR, u16);
 // Condition register field.
-field_arg!(CRField, u8, "crb{}");
+field_arg!(CRField, u8, "cr{}");
 // Condition register bit (index + condition case).
-field_arg!(CRBit, u8, "cr{}");
+field_arg!(CRBit, u8, "{}");
 // Paired-single graphics quantization register
 field_arg!(GQR, u8, "qr{}");
 // Unsigned immediate.
@@ -192,11 +192,11 @@ impl Field {
             Field::frA(x) => Some(Argument::FPR(*x)),
             Field::frB(x) => Some(Argument::FPR(*x)),
             Field::frC(x) => Some(Argument::FPR(*x)),
-            Field::crbD(x) => Some(Argument::CRField(*x)),
-            Field::crbA(x) => Some(Argument::CRField(*x)),
-            Field::crbB(x) => Some(Argument::CRField(*x)),
-            Field::crfD(x) => Some(Argument::CRBit(*x)),
-            Field::crfS(x) => Some(Argument::CRBit(*x)),
+            Field::crbD(x) => Some(Argument::CRBit(*x)),
+            Field::crbA(x) => Some(Argument::CRBit(*x)),
+            Field::crbB(x) => Some(Argument::CRBit(*x)),
+            Field::crfD(x) => Some(Argument::CRField(*x)),
+            Field::crfS(x) => Some(Argument::CRField(*x)),
             Field::crm(x) => Some(Argument::OpaqueU(*x)),
             Field::ps_l(x) => Some(Argument::GQR(*x)),
             Field::ps_W(x) => Some(Argument::OpaqueU(*x)),

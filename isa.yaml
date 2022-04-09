@@ -87,23 +87,22 @@ fields:
   - name: frC
     arg: FPR
     bits: 21..26
-  # Condition registers
-  # TODO This looks swapped the wrong way around
+  # Condition register bits
   - name: crbD
-    arg: CRField
+    arg: CRBit
     bits: 6..11
   - name: crbA
-    arg: CRField
+    arg: CRBit
     bits: 11..16
   - name: crbB
-    arg: CRField
+    arg: CRBit
     bits: 16..21
   # Condition register fields
   - name: crfD
-    arg: CRBit
+    arg: CRField
     bits: 6..9
   - name: crfS
-    arg: CRBit
+    arg: CRField
     bits: 11..14
   # Condition register misc
   - name: crm
@@ -475,7 +474,7 @@ opcodes:
 
   - name: eciwx
     desc: External Control In Word Indexed
-    bitmask: 0xfc0003ff
+    bitmask: 0xfc0007ff
     pattern: 0x7c00026c
     args: [ rD, rA, rB ]
     defs: [ rD ]
@@ -483,7 +482,7 @@ opcodes:
 
   - name: ecowx
     desc: External Control Out Word Indexed
-    bitmask: 0xfc0003ff
+    bitmask: 0xfc0007ff
     pattern: 0x7c00036c
     args: [ rS, rA, rB ]
     uses: [ rS, rA.nz, rB ]
@@ -1059,8 +1058,8 @@ opcodes:
     bitmask: 0xfc1ffffe
     pattern: 0xfc00048e
     modifiers: [ Rc ]
-    args: [ crfD ]
-    defs: [ crfD ]
+    args: [ frD ]
+    defs: [ frD ]
 
   - name: mfmsr
     desc: Move from Machine State Register
@@ -1671,7 +1670,7 @@ opcodes:
 
   - name: stbux
     desc: Store Byte with Update Indexed
-    bitmask: 0xfc0003ff
+    bitmask: 0xfc0007ff
     pattern: 0x7c0001ee
     args: [ rS, rA, rB ]
     defs: [ rA ]
@@ -1679,7 +1678,7 @@ opcodes:
 
   - name: stbx
     desc: Store Byte Indexed
-    bitmask: 0xfc0003ff
+    bitmask: 0xfc0007ff
     pattern: 0x7c0001ae
     args: [ rS, rA, rB ]
     uses: [ rS, rA.nz, rB ]
@@ -2028,6 +2027,24 @@ mnemonics:
     opcode: cmpli
     args: [ crfD, rA, uimm ]
     condition: crfD == 0
+
+  # Condition Register Logical
+  - name: crset
+    opcode: creqv
+    args: [ crbD ]
+    condition: crbD == crbA && crbD == crbB
+  - name: crclr
+    opcode: crxor
+    args: [ crbD ]
+    condition: crbD == crbA && crbD == crbB
+  - name: crmove
+    opcode: cror
+    args: [ crbD, crbA, crbB ]
+    condition: crbA == crbB
+  - name: crnot
+    opcode: crnor
+    args: [ crbD, crbA, crbB ]
+    condition: crbA == crbB
 
   # Misc
   - name: twgti

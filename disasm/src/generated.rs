@@ -572,10 +572,10 @@ impl Opcode {
         if code & 0xfc0003fe == 0x7c000396 {
             return Opcode::Divwu;
         }
-        if code & 0xfc0003ff == 0x7c00026c {
+        if code & 0xfc0007ff == 0x7c00026c {
             return Opcode::Eciwx;
         }
-        if code & 0xfc0003ff == 0x7c00036c {
+        if code & 0xfc0007ff == 0x7c00036c {
             return Opcode::Ecowx;
         }
         if code & 0xffffffff == 0x7c0006ac {
@@ -1004,10 +1004,10 @@ impl Opcode {
         if code & 0xfc000000 == 0x9c000000 {
             return Opcode::Stbu;
         }
-        if code & 0xfc0003ff == 0x7c0001ee {
+        if code & 0xfc0007ff == 0x7c0001ee {
             return Opcode::Stbux;
         }
-        if code & 0xfc0003ff == 0x7c0001ae {
+        if code & 0xfc0007ff == 0x7c0001ae {
             return Opcode::Stbx;
         }
         if code & 0xfc000000 == 0xd8000000 {
@@ -1150,11 +1150,11 @@ pub enum Field {
     frA(FPR),
     frB(FPR),
     frC(FPR),
-    crbD(CRField),
-    crbA(CRField),
-    crbB(CRField),
-    crfD(CRBit),
-    crfS(CRBit),
+    crbD(CRBit),
+    crbA(CRBit),
+    crbB(CRBit),
+    crfD(CRField),
+    crfS(CRField),
     crm(OpaqueU),
     ps_l(GQR),
     ps_W(OpaqueU),
@@ -1260,24 +1260,24 @@ impl Ins {
                 Field::BI(OpaqueU(((self.code >> 16u8) & 0x1f) as _)),
             ],
             Opcode::Cmp => vec![
-                Field::crfD(CRBit(((self.code >> 23u8) & 0x7) as _)),
+                Field::crfD(CRField(((self.code >> 23u8) & 0x7) as _)),
                 Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
                 Field::rB(GPR(((self.code >> 11u8) & 0x1f) as _)),
             ],
             Opcode::Cmpi => vec![
-                Field::crfD(CRBit(((self.code >> 23u8) & 0x7) as _)),
+                Field::crfD(CRField(((self.code >> 23u8) & 0x7) as _)),
                 Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
                 Field::simm(Simm(
                     (((self.code & 0xffff) ^ 0x8000).wrapping_sub(0x8000)) as _,
                 )),
             ],
             Opcode::Cmpl => vec![
-                Field::crfD(CRBit(((self.code >> 23u8) & 0x7) as _)),
+                Field::crfD(CRField(((self.code >> 23u8) & 0x7) as _)),
                 Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
                 Field::rB(GPR(((self.code >> 11u8) & 0x1f) as _)),
             ],
             Opcode::Cmpli => vec![
-                Field::crfD(CRBit(((self.code >> 23u8) & 0x7) as _)),
+                Field::crfD(CRField(((self.code >> 23u8) & 0x7) as _)),
                 Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
                 Field::uimm(Uimm((self.code & 0xffff) as _)),
             ],
@@ -1286,44 +1286,44 @@ impl Ins {
                 Field::rS(GPR(((self.code >> 21u8) & 0x1f) as _)),
             ],
             Opcode::Crand => vec![
-                Field::crbD(CRField(((self.code >> 21u8) & 0x1f) as _)),
-                Field::crbA(CRField(((self.code >> 16u8) & 0x1f) as _)),
-                Field::crbB(CRField(((self.code >> 11u8) & 0x1f) as _)),
+                Field::crbD(CRBit(((self.code >> 21u8) & 0x1f) as _)),
+                Field::crbA(CRBit(((self.code >> 16u8) & 0x1f) as _)),
+                Field::crbB(CRBit(((self.code >> 11u8) & 0x1f) as _)),
             ],
             Opcode::Crandc => vec![
-                Field::crbD(CRField(((self.code >> 21u8) & 0x1f) as _)),
-                Field::crbA(CRField(((self.code >> 16u8) & 0x1f) as _)),
-                Field::crbB(CRField(((self.code >> 11u8) & 0x1f) as _)),
+                Field::crbD(CRBit(((self.code >> 21u8) & 0x1f) as _)),
+                Field::crbA(CRBit(((self.code >> 16u8) & 0x1f) as _)),
+                Field::crbB(CRBit(((self.code >> 11u8) & 0x1f) as _)),
             ],
             Opcode::Creqv => vec![
-                Field::crbD(CRField(((self.code >> 21u8) & 0x1f) as _)),
-                Field::crbA(CRField(((self.code >> 16u8) & 0x1f) as _)),
-                Field::crbB(CRField(((self.code >> 11u8) & 0x1f) as _)),
+                Field::crbD(CRBit(((self.code >> 21u8) & 0x1f) as _)),
+                Field::crbA(CRBit(((self.code >> 16u8) & 0x1f) as _)),
+                Field::crbB(CRBit(((self.code >> 11u8) & 0x1f) as _)),
             ],
             Opcode::Crnand => vec![
-                Field::crbD(CRField(((self.code >> 21u8) & 0x1f) as _)),
-                Field::crbA(CRField(((self.code >> 16u8) & 0x1f) as _)),
-                Field::crbB(CRField(((self.code >> 11u8) & 0x1f) as _)),
+                Field::crbD(CRBit(((self.code >> 21u8) & 0x1f) as _)),
+                Field::crbA(CRBit(((self.code >> 16u8) & 0x1f) as _)),
+                Field::crbB(CRBit(((self.code >> 11u8) & 0x1f) as _)),
             ],
             Opcode::Crnor => vec![
-                Field::crbD(CRField(((self.code >> 21u8) & 0x1f) as _)),
-                Field::crbA(CRField(((self.code >> 16u8) & 0x1f) as _)),
-                Field::crbB(CRField(((self.code >> 11u8) & 0x1f) as _)),
+                Field::crbD(CRBit(((self.code >> 21u8) & 0x1f) as _)),
+                Field::crbA(CRBit(((self.code >> 16u8) & 0x1f) as _)),
+                Field::crbB(CRBit(((self.code >> 11u8) & 0x1f) as _)),
             ],
             Opcode::Cror => vec![
-                Field::crbD(CRField(((self.code >> 21u8) & 0x1f) as _)),
-                Field::crbA(CRField(((self.code >> 16u8) & 0x1f) as _)),
-                Field::crbB(CRField(((self.code >> 11u8) & 0x1f) as _)),
+                Field::crbD(CRBit(((self.code >> 21u8) & 0x1f) as _)),
+                Field::crbA(CRBit(((self.code >> 16u8) & 0x1f) as _)),
+                Field::crbB(CRBit(((self.code >> 11u8) & 0x1f) as _)),
             ],
             Opcode::Crorc => vec![
-                Field::crbD(CRField(((self.code >> 21u8) & 0x1f) as _)),
-                Field::crbA(CRField(((self.code >> 16u8) & 0x1f) as _)),
-                Field::crbB(CRField(((self.code >> 11u8) & 0x1f) as _)),
+                Field::crbD(CRBit(((self.code >> 21u8) & 0x1f) as _)),
+                Field::crbA(CRBit(((self.code >> 16u8) & 0x1f) as _)),
+                Field::crbB(CRBit(((self.code >> 11u8) & 0x1f) as _)),
             ],
             Opcode::Crxor => vec![
-                Field::crbD(CRField(((self.code >> 21u8) & 0x1f) as _)),
-                Field::crbA(CRField(((self.code >> 16u8) & 0x1f) as _)),
-                Field::crbB(CRField(((self.code >> 11u8) & 0x1f) as _)),
+                Field::crbD(CRBit(((self.code >> 21u8) & 0x1f) as _)),
+                Field::crbA(CRBit(((self.code >> 16u8) & 0x1f) as _)),
+                Field::crbB(CRBit(((self.code >> 11u8) & 0x1f) as _)),
             ],
             Opcode::Dcbf => vec![
                 Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
@@ -1402,12 +1402,12 @@ impl Ins {
                 Field::frB(FPR(((self.code >> 11u8) & 0x1f) as _)),
             ],
             Opcode::Fcmpo => vec![
-                Field::crfD(CRBit(((self.code >> 23u8) & 0x7) as _)),
+                Field::crfD(CRField(((self.code >> 23u8) & 0x7) as _)),
                 Field::frA(FPR(((self.code >> 16u8) & 0x1f) as _)),
                 Field::frB(FPR(((self.code >> 11u8) & 0x1f) as _)),
             ],
             Opcode::Fcmpu => vec![
-                Field::crfD(CRBit(((self.code >> 23u8) & 0x7) as _)),
+                Field::crfD(CRField(((self.code >> 23u8) & 0x7) as _)),
                 Field::frA(FPR(((self.code >> 16u8) & 0x1f) as _)),
                 Field::frB(FPR(((self.code >> 11u8) & 0x1f) as _)),
             ],
@@ -1709,16 +1709,16 @@ impl Ins {
                 Field::rB(GPR(((self.code >> 11u8) & 0x1f) as _)),
             ],
             Opcode::Mcrf => vec![
-                Field::crfD(CRBit(((self.code >> 23u8) & 0x7) as _)),
-                Field::crfS(CRBit(((self.code >> 18u8) & 0x7) as _)),
+                Field::crfD(CRField(((self.code >> 23u8) & 0x7) as _)),
+                Field::crfS(CRField(((self.code >> 18u8) & 0x7) as _)),
             ],
             Opcode::Mcrfs => vec![
-                Field::crfD(CRBit(((self.code >> 23u8) & 0x7) as _)),
-                Field::crfS(CRBit(((self.code >> 18u8) & 0x7) as _)),
+                Field::crfD(CRField(((self.code >> 23u8) & 0x7) as _)),
+                Field::crfS(CRField(((self.code >> 18u8) & 0x7) as _)),
             ],
-            Opcode::Mcrxr => vec![Field::crfD(CRBit(((self.code >> 23u8) & 0x7) as _))],
-            Opcode::Mfcr => vec![Field::crfD(CRBit(((self.code >> 23u8) & 0x7) as _))],
-            Opcode::Mffs => vec![Field::crfD(CRBit(((self.code >> 23u8) & 0x7) as _))],
+            Opcode::Mcrxr => vec![Field::crfD(CRField(((self.code >> 23u8) & 0x7) as _))],
+            Opcode::Mfcr => vec![Field::crfD(CRField(((self.code >> 23u8) & 0x7) as _))],
+            Opcode::Mffs => vec![Field::frD(FPR(((self.code >> 21u8) & 0x1f) as _))],
             Opcode::Mfmsr => vec![Field::rD(GPR(((self.code >> 21u8) & 0x1f) as _))],
             Opcode::Mfspr => vec![
                 Field::rD(GPR(((self.code >> 21u8) & 0x1f) as _)),
@@ -1740,14 +1740,14 @@ impl Ins {
                 Field::crm(OpaqueU(((self.code >> 12u8) & 0xff) as _)),
                 Field::rS(GPR(((self.code >> 21u8) & 0x1f) as _)),
             ],
-            Opcode::Mtfsb0 => vec![Field::crbD(CRField(((self.code >> 21u8) & 0x1f) as _))],
-            Opcode::Mtfsb1 => vec![Field::crbD(CRField(((self.code >> 21u8) & 0x1f) as _))],
+            Opcode::Mtfsb0 => vec![Field::crbD(CRBit(((self.code >> 21u8) & 0x1f) as _))],
+            Opcode::Mtfsb1 => vec![Field::crbD(CRBit(((self.code >> 21u8) & 0x1f) as _))],
             Opcode::Mtfsf => vec![
                 Field::mtfsf_FM(OpaqueU(((self.code >> 17u8) & 0xff) as _)),
                 Field::frB(FPR(((self.code >> 11u8) & 0x1f) as _)),
             ],
             Opcode::Mtfsfi => vec![
-                Field::crfD(CRBit(((self.code >> 23u8) & 0x7) as _)),
+                Field::crfD(CRField(((self.code >> 23u8) & 0x7) as _)),
                 Field::mtfsf_IMM(OpaqueU(((self.code >> 12u8) & 0xf) as _)),
             ],
             Opcode::Mtmsr => vec![Field::rS(GPR(((self.code >> 21u8) & 0x1f) as _))],
@@ -1893,22 +1893,22 @@ impl Ins {
                 Field::frB(FPR(((self.code >> 11u8) & 0x1f) as _)),
             ],
             Opcode::PsCmpo0 => vec![
-                Field::crfD(CRBit(((self.code >> 23u8) & 0x7) as _)),
+                Field::crfD(CRField(((self.code >> 23u8) & 0x7) as _)),
                 Field::frA(FPR(((self.code >> 16u8) & 0x1f) as _)),
                 Field::frB(FPR(((self.code >> 11u8) & 0x1f) as _)),
             ],
             Opcode::PsCmpo1 => vec![
-                Field::crfD(CRBit(((self.code >> 23u8) & 0x7) as _)),
+                Field::crfD(CRField(((self.code >> 23u8) & 0x7) as _)),
                 Field::frA(FPR(((self.code >> 16u8) & 0x1f) as _)),
                 Field::frB(FPR(((self.code >> 11u8) & 0x1f) as _)),
             ],
             Opcode::PsCmpu0 => vec![
-                Field::crfD(CRBit(((self.code >> 23u8) & 0x7) as _)),
+                Field::crfD(CRField(((self.code >> 23u8) & 0x7) as _)),
                 Field::frA(FPR(((self.code >> 16u8) & 0x1f) as _)),
                 Field::frB(FPR(((self.code >> 11u8) & 0x1f) as _)),
             ],
             Opcode::PsCmpu1 => vec![
-                Field::crfD(CRBit(((self.code >> 23u8) & 0x7) as _)),
+                Field::crfD(CRField(((self.code >> 23u8) & 0x7) as _)),
                 Field::frA(FPR(((self.code >> 16u8) & 0x1f) as _)),
                 Field::frB(FPR(((self.code >> 11u8) & 0x1f) as _)),
             ],
@@ -2314,19 +2314,19 @@ impl Ins {
             Opcode::Bc => vec![],
             Opcode::Bcctr => vec![],
             Opcode::Bclr => vec![],
-            Opcode::Cmp => vec![Field::crfD(CRBit(((self.code >> 23u8) & 0x7) as _))],
-            Opcode::Cmpi => vec![Field::crfD(CRBit(((self.code >> 23u8) & 0x7) as _))],
-            Opcode::Cmpl => vec![Field::crfD(CRBit(((self.code >> 23u8) & 0x7) as _))],
-            Opcode::Cmpli => vec![Field::crfD(CRBit(((self.code >> 23u8) & 0x7) as _))],
+            Opcode::Cmp => vec![Field::crfD(CRField(((self.code >> 23u8) & 0x7) as _))],
+            Opcode::Cmpi => vec![Field::crfD(CRField(((self.code >> 23u8) & 0x7) as _))],
+            Opcode::Cmpl => vec![Field::crfD(CRField(((self.code >> 23u8) & 0x7) as _))],
+            Opcode::Cmpli => vec![Field::crfD(CRField(((self.code >> 23u8) & 0x7) as _))],
             Opcode::Cntlzw => vec![Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _))],
-            Opcode::Crand => vec![Field::crbD(CRField(((self.code >> 21u8) & 0x1f) as _))],
-            Opcode::Crandc => vec![Field::crbD(CRField(((self.code >> 21u8) & 0x1f) as _))],
-            Opcode::Creqv => vec![Field::crbD(CRField(((self.code >> 21u8) & 0x1f) as _))],
-            Opcode::Crnand => vec![Field::crbD(CRField(((self.code >> 21u8) & 0x1f) as _))],
-            Opcode::Crnor => vec![Field::crbD(CRField(((self.code >> 21u8) & 0x1f) as _))],
-            Opcode::Cror => vec![Field::crbD(CRField(((self.code >> 21u8) & 0x1f) as _))],
-            Opcode::Crorc => vec![Field::crbD(CRField(((self.code >> 21u8) & 0x1f) as _))],
-            Opcode::Crxor => vec![Field::crbD(CRField(((self.code >> 21u8) & 0x1f) as _))],
+            Opcode::Crand => vec![Field::crbD(CRBit(((self.code >> 21u8) & 0x1f) as _))],
+            Opcode::Crandc => vec![Field::crbD(CRBit(((self.code >> 21u8) & 0x1f) as _))],
+            Opcode::Creqv => vec![Field::crbD(CRBit(((self.code >> 21u8) & 0x1f) as _))],
+            Opcode::Crnand => vec![Field::crbD(CRBit(((self.code >> 21u8) & 0x1f) as _))],
+            Opcode::Crnor => vec![Field::crbD(CRBit(((self.code >> 21u8) & 0x1f) as _))],
+            Opcode::Cror => vec![Field::crbD(CRBit(((self.code >> 21u8) & 0x1f) as _))],
+            Opcode::Crorc => vec![Field::crbD(CRBit(((self.code >> 21u8) & 0x1f) as _))],
+            Opcode::Crxor => vec![Field::crbD(CRBit(((self.code >> 21u8) & 0x1f) as _))],
             Opcode::Dcbf => vec![],
             Opcode::Dcbi => vec![],
             Opcode::Dcbst => vec![],
@@ -2345,8 +2345,8 @@ impl Ins {
             Opcode::Fabs => vec![Field::frD(FPR(((self.code >> 21u8) & 0x1f) as _))],
             Opcode::Fadd => vec![Field::frD(FPR(((self.code >> 21u8) & 0x1f) as _))],
             Opcode::Fadds => vec![Field::frD(FPR(((self.code >> 21u8) & 0x1f) as _))],
-            Opcode::Fcmpo => vec![Field::crfD(CRBit(((self.code >> 23u8) & 0x7) as _))],
-            Opcode::Fcmpu => vec![Field::crfD(CRBit(((self.code >> 23u8) & 0x7) as _))],
+            Opcode::Fcmpo => vec![Field::crfD(CRField(((self.code >> 23u8) & 0x7) as _))],
+            Opcode::Fcmpu => vec![Field::crfD(CRField(((self.code >> 23u8) & 0x7) as _))],
             Opcode::Fctiw => vec![Field::frD(FPR(((self.code >> 21u8) & 0x1f) as _))],
             Opcode::Fctiwz => vec![Field::frD(FPR(((self.code >> 21u8) & 0x1f) as _))],
             Opcode::Fdiv => vec![Field::frD(FPR(((self.code >> 21u8) & 0x1f) as _))],
@@ -2438,24 +2438,24 @@ impl Ins {
                 Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
             ],
             Opcode::Lwzx => vec![Field::rD(GPR(((self.code >> 21u8) & 0x1f) as _))],
-            Opcode::Mcrf => vec![Field::crfD(CRBit(((self.code >> 23u8) & 0x7) as _))],
-            Opcode::Mcrfs => vec![Field::crfD(CRBit(((self.code >> 23u8) & 0x7) as _))],
+            Opcode::Mcrf => vec![Field::crfD(CRField(((self.code >> 23u8) & 0x7) as _))],
+            Opcode::Mcrfs => vec![Field::crfD(CRField(((self.code >> 23u8) & 0x7) as _))],
             Opcode::Mcrxr => vec![
-                Field::crfD(CRBit(((self.code >> 23u8) & 0x7) as _)),
+                Field::crfD(CRField(((self.code >> 23u8) & 0x7) as _)),
                 Field::xer,
             ],
-            Opcode::Mfcr => vec![Field::crfD(CRBit(((self.code >> 23u8) & 0x7) as _))],
-            Opcode::Mffs => vec![Field::crfD(CRBit(((self.code >> 23u8) & 0x7) as _))],
+            Opcode::Mfcr => vec![Field::crfD(CRField(((self.code >> 23u8) & 0x7) as _))],
+            Opcode::Mffs => vec![Field::frD(FPR(((self.code >> 21u8) & 0x1f) as _))],
             Opcode::Mfmsr => vec![Field::rD(GPR(((self.code >> 21u8) & 0x1f) as _))],
             Opcode::Mfspr => vec![Field::rD(GPR(((self.code >> 21u8) & 0x1f) as _))],
             Opcode::Mfsr => vec![Field::rD(GPR(((self.code >> 21u8) & 0x1f) as _))],
             Opcode::Mfsrin => vec![Field::rD(GPR(((self.code >> 21u8) & 0x1f) as _))],
             Opcode::Mftb => vec![Field::rD(GPR(((self.code >> 21u8) & 0x1f) as _))],
             Opcode::Mtcrf => vec![],
-            Opcode::Mtfsb0 => vec![Field::crbD(CRField(((self.code >> 21u8) & 0x1f) as _))],
-            Opcode::Mtfsb1 => vec![Field::crbD(CRField(((self.code >> 21u8) & 0x1f) as _))],
+            Opcode::Mtfsb0 => vec![Field::crbD(CRBit(((self.code >> 21u8) & 0x1f) as _))],
+            Opcode::Mtfsb1 => vec![Field::crbD(CRBit(((self.code >> 21u8) & 0x1f) as _))],
             Opcode::Mtfsf => vec![],
-            Opcode::Mtfsfi => vec![Field::crfD(CRBit(((self.code >> 23u8) & 0x7) as _))],
+            Opcode::Mtfsfi => vec![Field::crfD(CRField(((self.code >> 23u8) & 0x7) as _))],
             Opcode::Mtmsr => vec![],
             Opcode::Mtspr => vec![],
             Opcode::Mtsr => vec![],
@@ -2487,10 +2487,10 @@ impl Ins {
             Opcode::PsqStx => vec![],
             Opcode::PsAbs => vec![Field::frD(FPR(((self.code >> 21u8) & 0x1f) as _))],
             Opcode::PsAdd => vec![Field::frD(FPR(((self.code >> 21u8) & 0x1f) as _))],
-            Opcode::PsCmpo0 => vec![Field::crfD(CRBit(((self.code >> 23u8) & 0x7) as _))],
-            Opcode::PsCmpo1 => vec![Field::crfD(CRBit(((self.code >> 23u8) & 0x7) as _))],
-            Opcode::PsCmpu0 => vec![Field::crfD(CRBit(((self.code >> 23u8) & 0x7) as _))],
-            Opcode::PsCmpu1 => vec![Field::crfD(CRBit(((self.code >> 23u8) & 0x7) as _))],
+            Opcode::PsCmpo0 => vec![Field::crfD(CRField(((self.code >> 23u8) & 0x7) as _))],
+            Opcode::PsCmpo1 => vec![Field::crfD(CRField(((self.code >> 23u8) & 0x7) as _))],
+            Opcode::PsCmpu0 => vec![Field::crfD(CRField(((self.code >> 23u8) & 0x7) as _))],
+            Opcode::PsCmpu1 => vec![Field::crfD(CRField(((self.code >> 23u8) & 0x7) as _))],
             Opcode::PsDiv => vec![Field::frD(FPR(((self.code >> 21u8) & 0x1f) as _))],
             Opcode::PsMadd => vec![Field::frD(FPR(((self.code >> 21u8) & 0x1f) as _))],
             Opcode::PsMadds0 => vec![Field::frD(FPR(((self.code >> 21u8) & 0x1f) as _))],
@@ -2686,57 +2686,57 @@ impl Ins {
             }
             Opcode::Crand => {
                 let mut uses = vec![
-                    Field::crbA(CRField(((self.code >> 16u8) & 0x1f) as _)),
-                    Field::crbB(CRField(((self.code >> 11u8) & 0x1f) as _)),
+                    Field::crbA(CRBit(((self.code >> 16u8) & 0x1f) as _)),
+                    Field::crbB(CRBit(((self.code >> 11u8) & 0x1f) as _)),
                 ];
                 uses
             }
             Opcode::Crandc => {
                 let mut uses = vec![
-                    Field::crbA(CRField(((self.code >> 16u8) & 0x1f) as _)),
-                    Field::crbB(CRField(((self.code >> 11u8) & 0x1f) as _)),
+                    Field::crbA(CRBit(((self.code >> 16u8) & 0x1f) as _)),
+                    Field::crbB(CRBit(((self.code >> 11u8) & 0x1f) as _)),
                 ];
                 uses
             }
             Opcode::Creqv => {
                 let mut uses = vec![
-                    Field::crbA(CRField(((self.code >> 16u8) & 0x1f) as _)),
-                    Field::crbB(CRField(((self.code >> 11u8) & 0x1f) as _)),
+                    Field::crbA(CRBit(((self.code >> 16u8) & 0x1f) as _)),
+                    Field::crbB(CRBit(((self.code >> 11u8) & 0x1f) as _)),
                 ];
                 uses
             }
             Opcode::Crnand => {
                 let mut uses = vec![
-                    Field::crbA(CRField(((self.code >> 16u8) & 0x1f) as _)),
-                    Field::crbB(CRField(((self.code >> 11u8) & 0x1f) as _)),
+                    Field::crbA(CRBit(((self.code >> 16u8) & 0x1f) as _)),
+                    Field::crbB(CRBit(((self.code >> 11u8) & 0x1f) as _)),
                 ];
                 uses
             }
             Opcode::Crnor => {
                 let mut uses = vec![
-                    Field::crbA(CRField(((self.code >> 16u8) & 0x1f) as _)),
-                    Field::crbB(CRField(((self.code >> 11u8) & 0x1f) as _)),
+                    Field::crbA(CRBit(((self.code >> 16u8) & 0x1f) as _)),
+                    Field::crbB(CRBit(((self.code >> 11u8) & 0x1f) as _)),
                 ];
                 uses
             }
             Opcode::Cror => {
                 let mut uses = vec![
-                    Field::crbA(CRField(((self.code >> 16u8) & 0x1f) as _)),
-                    Field::crbB(CRField(((self.code >> 11u8) & 0x1f) as _)),
+                    Field::crbA(CRBit(((self.code >> 16u8) & 0x1f) as _)),
+                    Field::crbB(CRBit(((self.code >> 11u8) & 0x1f) as _)),
                 ];
                 uses
             }
             Opcode::Crorc => {
                 let mut uses = vec![
-                    Field::crbA(CRField(((self.code >> 16u8) & 0x1f) as _)),
-                    Field::crbB(CRField(((self.code >> 11u8) & 0x1f) as _)),
+                    Field::crbA(CRBit(((self.code >> 16u8) & 0x1f) as _)),
+                    Field::crbB(CRBit(((self.code >> 11u8) & 0x1f) as _)),
                 ];
                 uses
             }
             Opcode::Crxor => {
                 let mut uses = vec![
-                    Field::crbA(CRField(((self.code >> 16u8) & 0x1f) as _)),
-                    Field::crbB(CRField(((self.code >> 11u8) & 0x1f) as _)),
+                    Field::crbA(CRBit(((self.code >> 16u8) & 0x1f) as _)),
+                    Field::crbB(CRBit(((self.code >> 11u8) & 0x1f) as _)),
                 ];
                 uses
             }
@@ -3265,11 +3265,11 @@ impl Ins {
                 uses
             }
             Opcode::Mcrf => {
-                let mut uses = vec![Field::crfS(CRBit(((self.code >> 18u8) & 0x7) as _))];
+                let mut uses = vec![Field::crfS(CRField(((self.code >> 18u8) & 0x7) as _))];
                 uses
             }
             Opcode::Mcrfs => {
-                let mut uses = vec![Field::crfS(CRBit(((self.code >> 18u8) & 0x7) as _))];
+                let mut uses = vec![Field::crfS(CRField(((self.code >> 18u8) & 0x7) as _))];
                 uses
             }
             Opcode::Mcrxr => {
@@ -4903,7 +4903,7 @@ impl Ins {
                     return SimplifiedIns {
                         mnemonic: "blt",
                         args: vec![
-                            Argument::CRBit(CRBit(((self.code >> 18u8) & 0x7) as _)),
+                            Argument::CRField(CRField(((self.code >> 18u8) & 0x7) as _)),
                             Argument::BranchDest(BranchDest(
                                 (((((self.code >> 2u8) & 0x3fff) ^ 0x2000).wrapping_sub(0x2000))
                                     << 2u8) as _,
@@ -4930,7 +4930,7 @@ impl Ins {
                     return SimplifiedIns {
                         mnemonic: "ble",
                         args: vec![
-                            Argument::CRBit(CRBit(((self.code >> 18u8) & 0x7) as _)),
+                            Argument::CRField(CRField(((self.code >> 18u8) & 0x7) as _)),
                             Argument::BranchDest(BranchDest(
                                 (((((self.code >> 2u8) & 0x3fff) ^ 0x2000).wrapping_sub(0x2000))
                                     << 2u8) as _,
@@ -4957,7 +4957,7 @@ impl Ins {
                     return SimplifiedIns {
                         mnemonic: "beq",
                         args: vec![
-                            Argument::CRBit(CRBit(((self.code >> 18u8) & 0x7) as _)),
+                            Argument::CRField(CRField(((self.code >> 18u8) & 0x7) as _)),
                             Argument::BranchDest(BranchDest(
                                 (((((self.code >> 2u8) & 0x3fff) ^ 0x2000).wrapping_sub(0x2000))
                                     << 2u8) as _,
@@ -4984,7 +4984,7 @@ impl Ins {
                     return SimplifiedIns {
                         mnemonic: "bge",
                         args: vec![
-                            Argument::CRBit(CRBit(((self.code >> 18u8) & 0x7) as _)),
+                            Argument::CRField(CRField(((self.code >> 18u8) & 0x7) as _)),
                             Argument::BranchDest(BranchDest(
                                 (((((self.code >> 2u8) & 0x3fff) ^ 0x2000).wrapping_sub(0x2000))
                                     << 2u8) as _,
@@ -5011,7 +5011,7 @@ impl Ins {
                     return SimplifiedIns {
                         mnemonic: "bgt",
                         args: vec![
-                            Argument::CRBit(CRBit(((self.code >> 18u8) & 0x7) as _)),
+                            Argument::CRField(CRField(((self.code >> 18u8) & 0x7) as _)),
                             Argument::BranchDest(BranchDest(
                                 (((((self.code >> 2u8) & 0x3fff) ^ 0x2000).wrapping_sub(0x2000))
                                     << 2u8) as _,
@@ -5038,7 +5038,7 @@ impl Ins {
                     return SimplifiedIns {
                         mnemonic: "bne",
                         args: vec![
-                            Argument::CRBit(CRBit(((self.code >> 18u8) & 0x7) as _)),
+                            Argument::CRField(CRField(((self.code >> 18u8) & 0x7) as _)),
                             Argument::BranchDest(BranchDest(
                                 (((((self.code >> 2u8) & 0x3fff) ^ 0x2000).wrapping_sub(0x2000))
                                     << 2u8) as _,
@@ -5065,7 +5065,7 @@ impl Ins {
                     return SimplifiedIns {
                         mnemonic: "bso",
                         args: vec![
-                            Argument::CRBit(CRBit(((self.code >> 18u8) & 0x7) as _)),
+                            Argument::CRField(CRField(((self.code >> 18u8) & 0x7) as _)),
                             Argument::BranchDest(BranchDest(
                                 (((((self.code >> 2u8) & 0x3fff) ^ 0x2000).wrapping_sub(0x2000))
                                     << 2u8) as _,
@@ -5092,7 +5092,7 @@ impl Ins {
                     return SimplifiedIns {
                         mnemonic: "bns",
                         args: vec![
-                            Argument::CRBit(CRBit(((self.code >> 18u8) & 0x7) as _)),
+                            Argument::CRField(CRField(((self.code >> 18u8) & 0x7) as _)),
                             Argument::BranchDest(BranchDest(
                                 (((((self.code >> 2u8) & 0x3fff) ^ 0x2000).wrapping_sub(0x2000))
                                     << 2u8) as _,
@@ -5144,7 +5144,7 @@ impl Ins {
                 {
                     return SimplifiedIns {
                         mnemonic: "bltctr",
-                        args: vec![Argument::CRBit(CRBit(((self.code >> 18u8) & 0x7) as _))],
+                        args: vec![Argument::CRField(CRField(((self.code >> 18u8) & 0x7) as _))],
                         ins: self,
                     };
                 }
@@ -5162,7 +5162,7 @@ impl Ins {
                 {
                     return SimplifiedIns {
                         mnemonic: "blectr",
-                        args: vec![Argument::CRBit(CRBit(((self.code >> 18u8) & 0x7) as _))],
+                        args: vec![Argument::CRField(CRField(((self.code >> 18u8) & 0x7) as _))],
                         ins: self,
                     };
                 }
@@ -5180,7 +5180,7 @@ impl Ins {
                 {
                     return SimplifiedIns {
                         mnemonic: "beqctr",
-                        args: vec![Argument::CRBit(CRBit(((self.code >> 18u8) & 0x7) as _))],
+                        args: vec![Argument::CRField(CRField(((self.code >> 18u8) & 0x7) as _))],
                         ins: self,
                     };
                 }
@@ -5198,7 +5198,7 @@ impl Ins {
                 {
                     return SimplifiedIns {
                         mnemonic: "bgectr",
-                        args: vec![Argument::CRBit(CRBit(((self.code >> 18u8) & 0x7) as _))],
+                        args: vec![Argument::CRField(CRField(((self.code >> 18u8) & 0x7) as _))],
                         ins: self,
                     };
                 }
@@ -5216,7 +5216,7 @@ impl Ins {
                 {
                     return SimplifiedIns {
                         mnemonic: "bgtctr",
-                        args: vec![Argument::CRBit(CRBit(((self.code >> 18u8) & 0x7) as _))],
+                        args: vec![Argument::CRField(CRField(((self.code >> 18u8) & 0x7) as _))],
                         ins: self,
                     };
                 }
@@ -5234,7 +5234,7 @@ impl Ins {
                 {
                     return SimplifiedIns {
                         mnemonic: "bnectr",
-                        args: vec![Argument::CRBit(CRBit(((self.code >> 18u8) & 0x7) as _))],
+                        args: vec![Argument::CRField(CRField(((self.code >> 18u8) & 0x7) as _))],
                         ins: self,
                     };
                 }
@@ -5252,7 +5252,7 @@ impl Ins {
                 {
                     return SimplifiedIns {
                         mnemonic: "bsoctr",
-                        args: vec![Argument::CRBit(CRBit(((self.code >> 18u8) & 0x7) as _))],
+                        args: vec![Argument::CRField(CRField(((self.code >> 18u8) & 0x7) as _))],
                         ins: self,
                     };
                 }
@@ -5270,7 +5270,7 @@ impl Ins {
                 {
                     return SimplifiedIns {
                         mnemonic: "bnsctr",
-                        args: vec![Argument::CRBit(CRBit(((self.code >> 18u8) & 0x7) as _))],
+                        args: vec![Argument::CRField(CRField(((self.code >> 18u8) & 0x7) as _))],
                         ins: self,
                     };
                 }
@@ -5297,7 +5297,7 @@ impl Ins {
                 {
                     return SimplifiedIns {
                         mnemonic: "bltlr",
-                        args: vec![Argument::CRBit(CRBit(((self.code >> 18u8) & 0x7) as _))],
+                        args: vec![Argument::CRField(CRField(((self.code >> 18u8) & 0x7) as _))],
                         ins: self,
                     };
                 }
@@ -5315,7 +5315,7 @@ impl Ins {
                 {
                     return SimplifiedIns {
                         mnemonic: "blelr",
-                        args: vec![Argument::CRBit(CRBit(((self.code >> 18u8) & 0x7) as _))],
+                        args: vec![Argument::CRField(CRField(((self.code >> 18u8) & 0x7) as _))],
                         ins: self,
                     };
                 }
@@ -5333,7 +5333,7 @@ impl Ins {
                 {
                     return SimplifiedIns {
                         mnemonic: "beqlr",
-                        args: vec![Argument::CRBit(CRBit(((self.code >> 18u8) & 0x7) as _))],
+                        args: vec![Argument::CRField(CRField(((self.code >> 18u8) & 0x7) as _))],
                         ins: self,
                     };
                 }
@@ -5351,7 +5351,7 @@ impl Ins {
                 {
                     return SimplifiedIns {
                         mnemonic: "bgelr",
-                        args: vec![Argument::CRBit(CRBit(((self.code >> 18u8) & 0x7) as _))],
+                        args: vec![Argument::CRField(CRField(((self.code >> 18u8) & 0x7) as _))],
                         ins: self,
                     };
                 }
@@ -5369,7 +5369,7 @@ impl Ins {
                 {
                     return SimplifiedIns {
                         mnemonic: "bgtlr",
-                        args: vec![Argument::CRBit(CRBit(((self.code >> 18u8) & 0x7) as _))],
+                        args: vec![Argument::CRField(CRField(((self.code >> 18u8) & 0x7) as _))],
                         ins: self,
                     };
                 }
@@ -5387,7 +5387,7 @@ impl Ins {
                 {
                     return SimplifiedIns {
                         mnemonic: "bnelr",
-                        args: vec![Argument::CRBit(CRBit(((self.code >> 18u8) & 0x7) as _))],
+                        args: vec![Argument::CRField(CRField(((self.code >> 18u8) & 0x7) as _))],
                         ins: self,
                     };
                 }
@@ -5405,7 +5405,7 @@ impl Ins {
                 {
                     return SimplifiedIns {
                         mnemonic: "bsolr",
-                        args: vec![Argument::CRBit(CRBit(((self.code >> 18u8) & 0x7) as _))],
+                        args: vec![Argument::CRField(CRField(((self.code >> 18u8) & 0x7) as _))],
                         ins: self,
                     };
                 }
@@ -5423,7 +5423,7 @@ impl Ins {
                 {
                     return SimplifiedIns {
                         mnemonic: "bnslr",
-                        args: vec![Argument::CRBit(CRBit(((self.code >> 18u8) & 0x7) as _))],
+                        args: vec![Argument::CRField(CRField(((self.code >> 18u8) & 0x7) as _))],
                         ins: self,
                     };
                 }
@@ -5457,7 +5457,7 @@ impl Ins {
                     return SimplifiedIns {
                         mnemonic: "cmpwi",
                         args: vec![
-                            Argument::CRBit(CRBit(((self.code >> 23u8) & 0x7) as _)),
+                            Argument::CRField(CRField(((self.code >> 23u8) & 0x7) as _)),
                             Argument::GPR(GPR(((self.code >> 16u8) & 0x1f) as _)),
                             Argument::Simm(Simm(
                                 (((self.code & 0xffff) ^ 0x8000).wrapping_sub(0x8000)) as _,
@@ -5494,10 +5494,58 @@ impl Ins {
                     return SimplifiedIns {
                         mnemonic: "cmplwi",
                         args: vec![
-                            Argument::CRBit(CRBit(((self.code >> 23u8) & 0x7) as _)),
+                            Argument::CRField(CRField(((self.code >> 23u8) & 0x7) as _)),
                             Argument::GPR(GPR(((self.code >> 16u8) & 0x1f) as _)),
                             Argument::Uimm(Uimm((self.code & 0xffff) as _)),
                         ],
+                        ins: self,
+                    };
+                }
+            }
+            Opcode::Creqv => {
+                if ((self.code >> 21u8) & 0x1f) == ((self.code >> 16u8) & 0x1f)
+                    && ((self.code >> 21u8) & 0x1f) == ((self.code >> 11u8) & 0x1f)
+                {
+                    return SimplifiedIns {
+                        mnemonic: "crset",
+                        args: vec![Argument::CRBit(CRBit(((self.code >> 21u8) & 0x1f) as _))],
+                        ins: self,
+                    };
+                }
+            }
+            Opcode::Crnor => {
+                if ((self.code >> 16u8) & 0x1f) == ((self.code >> 11u8) & 0x1f) {
+                    return SimplifiedIns {
+                        mnemonic: "crnot",
+                        args: vec![
+                            Argument::CRBit(CRBit(((self.code >> 21u8) & 0x1f) as _)),
+                            Argument::CRBit(CRBit(((self.code >> 16u8) & 0x1f) as _)),
+                            Argument::CRBit(CRBit(((self.code >> 11u8) & 0x1f) as _)),
+                        ],
+                        ins: self,
+                    };
+                }
+            }
+            Opcode::Cror => {
+                if ((self.code >> 16u8) & 0x1f) == ((self.code >> 11u8) & 0x1f) {
+                    return SimplifiedIns {
+                        mnemonic: "crmove",
+                        args: vec![
+                            Argument::CRBit(CRBit(((self.code >> 21u8) & 0x1f) as _)),
+                            Argument::CRBit(CRBit(((self.code >> 16u8) & 0x1f) as _)),
+                            Argument::CRBit(CRBit(((self.code >> 11u8) & 0x1f) as _)),
+                        ],
+                        ins: self,
+                    };
+                }
+            }
+            Opcode::Crxor => {
+                if ((self.code >> 21u8) & 0x1f) == ((self.code >> 16u8) & 0x1f)
+                    && ((self.code >> 21u8) & 0x1f) == ((self.code >> 11u8) & 0x1f)
+                {
+                    return SimplifiedIns {
+                        mnemonic: "crclr",
+                        args: vec![Argument::CRBit(CRBit(((self.code >> 21u8) & 0x1f) as _))],
                         ins: self,
                     };
                 }
