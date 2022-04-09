@@ -28,6 +28,8 @@ python
 >>> ins = ppc750cl.Ins(addr=0x80006969, code=0x10400420)
 >>> str(ins)
 'ps_merge00 f2, f0, f0'
+>>> ins.fields()
+[('frD', 2), ('frA', 0), ('frB', 0)]
 >>> ins.frD
 2
 ```
