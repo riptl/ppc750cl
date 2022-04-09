@@ -172,6 +172,7 @@ impl Field {
             Field::simm(x) => Some(Argument::Simm(*x)),
             Field::uimm(x) => Some(Argument::Uimm(*x)),
             Field::offset(x) => Some(Argument::Offset(*x)),
+            Field::ps_offset(x) => Some(Argument::Offset(*x)),
             Field::BO(x) => Some(Argument::OpaqueU(*x)),
             Field::BI(x) => Some(Argument::OpaqueU(*x)),
             Field::BD(x) => Some(Argument::BranchDest(*x)),

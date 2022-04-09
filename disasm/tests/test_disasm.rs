@@ -638,13 +638,11 @@ fn test_ins_psq_lx() {
     assert_asm!(0x1000000C, "psq_lx f0, r0, r0, 0, qr0");
 }
 
-/*
 #[test]
 fn test_ins_psq_st() {
     assert_asm!(0xF1230210, "psq_st f9, 0x210(r3), 0, qr0");
-    assert_asm!(0xF1238008, "psq_st f9, 8(r3), 1, qr0");
+    assert_asm!(0xF1238008, "psq_st f9, 0x8(r3), 1, qr0");
 }
- */
 
 #[test]
 fn test_ins_psq_stu() {

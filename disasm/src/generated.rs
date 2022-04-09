@@ -1130,6 +1130,7 @@ pub enum Field {
     simm(Simm),
     uimm(Uimm),
     offset(Offset),
+    ps_offset(Offset),
     BO(OpaqueU),
     BI(OpaqueU),
     BD(BranchDest),
@@ -1820,66 +1821,66 @@ impl Ins {
             ],
             Opcode::PsqL => vec![
                 Field::frD(FPR(((self.code >> 21u8) & 0x1f) as _)),
-                Field::offset(Offset(
-                    (((self.code & 0xffff) ^ 0x8000).wrapping_sub(0x8000)) as _,
+                Field::ps_offset(Offset(
+                    (((self.code & 0xfff) ^ 0x800).wrapping_sub(0x800)) as _,
                 )),
                 Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
-                Field::ps_W(OpaqueU(((self.code >> 16u8) & 0x0) as _)),
+                Field::ps_W(OpaqueU(((self.code >> 15u8) & 0x1) as _)),
                 Field::ps_l(GQR(((self.code >> 12u8) & 0x7) as _)),
             ],
             Opcode::PsqLu => vec![
                 Field::frD(FPR(((self.code >> 21u8) & 0x1f) as _)),
-                Field::offset(Offset(
-                    (((self.code & 0xffff) ^ 0x8000).wrapping_sub(0x8000)) as _,
+                Field::ps_offset(Offset(
+                    (((self.code & 0xfff) ^ 0x800).wrapping_sub(0x800)) as _,
                 )),
                 Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
-                Field::ps_W(OpaqueU(((self.code >> 16u8) & 0x0) as _)),
+                Field::ps_W(OpaqueU(((self.code >> 15u8) & 0x1) as _)),
                 Field::ps_l(GQR(((self.code >> 12u8) & 0x7) as _)),
             ],
             Opcode::PsqLux => vec![
                 Field::frD(FPR(((self.code >> 21u8) & 0x1f) as _)),
                 Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
                 Field::rB(GPR(((self.code >> 11u8) & 0x1f) as _)),
-                Field::ps_W(OpaqueU(((self.code >> 16u8) & 0x0) as _)),
+                Field::ps_W(OpaqueU(((self.code >> 15u8) & 0x1) as _)),
                 Field::ps_l(GQR(((self.code >> 12u8) & 0x7) as _)),
             ],
             Opcode::PsqLx => vec![
                 Field::frD(FPR(((self.code >> 21u8) & 0x1f) as _)),
                 Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
                 Field::rB(GPR(((self.code >> 11u8) & 0x1f) as _)),
-                Field::ps_W(OpaqueU(((self.code >> 16u8) & 0x0) as _)),
+                Field::ps_W(OpaqueU(((self.code >> 15u8) & 0x1) as _)),
                 Field::ps_l(GQR(((self.code >> 12u8) & 0x7) as _)),
             ],
             Opcode::PsqSt => vec![
                 Field::frS(FPR(((self.code >> 21u8) & 0x1f) as _)),
-                Field::offset(Offset(
-                    (((self.code & 0xffff) ^ 0x8000).wrapping_sub(0x8000)) as _,
+                Field::ps_offset(Offset(
+                    (((self.code & 0xfff) ^ 0x800).wrapping_sub(0x800)) as _,
                 )),
                 Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
-                Field::ps_W(OpaqueU(((self.code >> 16u8) & 0x0) as _)),
+                Field::ps_W(OpaqueU(((self.code >> 15u8) & 0x1) as _)),
                 Field::ps_l(GQR(((self.code >> 12u8) & 0x7) as _)),
             ],
             Opcode::PsqStu => vec![
                 Field::frS(FPR(((self.code >> 21u8) & 0x1f) as _)),
-                Field::offset(Offset(
-                    (((self.code & 0xffff) ^ 0x8000).wrapping_sub(0x8000)) as _,
+                Field::ps_offset(Offset(
+                    (((self.code & 0xfff) ^ 0x800).wrapping_sub(0x800)) as _,
                 )),
                 Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
-                Field::ps_W(OpaqueU(((self.code >> 16u8) & 0x0) as _)),
+                Field::ps_W(OpaqueU(((self.code >> 15u8) & 0x1) as _)),
                 Field::ps_l(GQR(((self.code >> 12u8) & 0x7) as _)),
             ],
             Opcode::PsqStux => vec![
                 Field::frS(FPR(((self.code >> 21u8) & 0x1f) as _)),
                 Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
                 Field::rB(GPR(((self.code >> 11u8) & 0x1f) as _)),
-                Field::ps_W(OpaqueU(((self.code >> 16u8) & 0x0) as _)),
+                Field::ps_W(OpaqueU(((self.code >> 15u8) & 0x1) as _)),
                 Field::ps_l(GQR(((self.code >> 12u8) & 0x7) as _)),
             ],
             Opcode::PsqStx => vec![
                 Field::frS(FPR(((self.code >> 21u8) & 0x1f) as _)),
                 Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
                 Field::rB(GPR(((self.code >> 11u8) & 0x1f) as _)),
-                Field::ps_W(OpaqueU(((self.code >> 16u8) & 0x0) as _)),
+                Field::ps_W(OpaqueU(((self.code >> 15u8) & 0x1) as _)),
                 Field::ps_l(GQR(((self.code >> 12u8) & 0x7) as _)),
             ],
             Opcode::PsAbs => vec![
@@ -5709,6 +5710,10 @@ impl Ins {
         (((self.code & 0xffff) ^ 0x8000).wrapping_sub(0x8000)) as _
     }
     #[inline(always)]
+    pub fn field_ps_offset(&self) -> isize {
+        (((self.code & 0xfff) ^ 0x800).wrapping_sub(0x800)) as _
+    }
+    #[inline(always)]
     pub fn field_BO(&self) -> usize {
         ((self.code >> 21u8) & 0x1f) as _
     }
@@ -5814,7 +5819,7 @@ impl Ins {
     }
     #[inline(always)]
     pub fn field_ps_W(&self) -> usize {
-        ((self.code >> 16u8) & 0x0) as _
+        ((self.code >> 15u8) & 0x1) as _
     }
     #[inline(always)]
     pub fn field_NB(&self) -> usize {

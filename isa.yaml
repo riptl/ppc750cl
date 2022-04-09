@@ -11,6 +11,10 @@ fields:
     arg: Offset
     bits: 16..32
     signed: true
+  - name: ps_offset
+    arg: Offset
+    bits: 20..32
+    signed: true
   # Branch fields
   - name: BO
     arg: OpaqueU
@@ -111,7 +115,7 @@ fields:
     bits: 17..20
   - name: ps_W
     arg: OpaqueU
-    bits: 16
+    bits: 16..17
   # Misc
   - name: NB
     arg: OpaqueU
@@ -1262,7 +1266,7 @@ opcodes:
     desc: Paired Single Quantized Load
     bitmask: 0xfc000000
     pattern: 0xe0000000
-    args: [ frD, offset, rA, ps_W, ps_l ]
+    args: [ frD, ps_offset, rA, ps_W, ps_l ]
     defs: [ frD ]
     uses: [ rA.nz ]
 
@@ -1270,7 +1274,7 @@ opcodes:
     desc: Paired Single Quantized Load with Update
     bitmask: 0xfc000000
     pattern: 0xe4000000
-    args: [ frD, offset, rA, ps_W, ps_l ]
+    args: [ frD, ps_offset, rA, ps_W, ps_l ]
     defs: [ frD, rA ]
     uses: [ rA ]
 
@@ -1294,14 +1298,14 @@ opcodes:
     desc: Paired Single Quantized Store
     bitmask: 0xfc000000
     pattern: 0xf0000000
-    args: [ frS, offset, rA, ps_W, ps_l ]
+    args: [ frS, ps_offset, rA, ps_W, ps_l ]
     uses: [ frS, rA.nz ]
 
   - name: psq_stu
     desc: Paired Single Quantized Store with Update
     bitmask: 0xfc000000
     pattern: 0xf4000000
-    args: [ frS, offset, rA, ps_W, ps_l ]
+    args: [ frS, ps_offset, rA, ps_W, ps_l ]
     defs: [ rA ]
     uses: [ frS, rA ]
 
