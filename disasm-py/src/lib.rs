@@ -33,6 +33,155 @@ impl Ins {
     }
 }
 
+#[allow(non_snake_case)]
+#[pymethods]
+impl Ins {
+    #[getter]
+    fn simm(&self) -> i64 {
+        self.0.field_simm() as i64
+    }
+    #[getter]
+    fn uimm(&self) -> i64 {
+        self.0.field_uimm() as i64
+    }
+    #[getter]
+    fn offset(&self) -> i64 {
+        self.0.field_offset() as i64
+    }
+    #[getter]
+    fn ps_offset(&self) -> i64 {
+        self.0.field_ps_offset() as i64
+    }
+    #[getter]
+    fn BO(&self) -> i64 {
+        self.0.field_BO() as i64
+    }
+    #[getter]
+    fn BI(&self) -> i64 {
+        self.0.field_BI() as i64
+    }
+    #[getter]
+    fn BD(&self) -> i64 {
+        self.0.field_BD() as i64
+    }
+    #[getter]
+    fn LI(&self) -> i64 {
+        self.0.field_LI() as i64
+    }
+    #[getter]
+    fn SH(&self) -> i64 {
+        self.0.field_SH() as i64
+    }
+    #[getter]
+    fn MB(&self) -> i64 {
+        self.0.field_SH() as i64
+    }
+    #[getter]
+    fn ME(&self) -> i64 {
+        self.0.field_SH() as i64
+    }
+    #[getter]
+    fn rS(&self) -> i64 {
+        self.0.field_rS() as i64
+    }
+    #[getter]
+    fn rD(&self) -> i64 {
+        self.0.field_rD() as i64
+    }
+    #[getter]
+    fn rA(&self) -> i64 {
+        self.0.field_rA() as i64
+    }
+    #[getter]
+    fn rB(&self) -> i64 {
+        self.0.field_rB() as i64
+    }
+    #[getter]
+    fn rC(&self) -> i64 {
+        self.0.field_rC() as i64
+    }
+    #[getter]
+    fn sr(&self) -> i64 {
+        self.0.field_sr() as i64
+    }
+    #[getter]
+    fn spr(&self) -> i64 {
+        self.0.field_spr() as i64
+    }
+    #[getter]
+    fn frS(&self) -> i64 {
+        self.0.field_frS() as i64
+    }
+    #[getter]
+    fn frD(&self) -> i64 {
+        self.0.field_frD() as i64
+    }
+    #[getter]
+    fn frA(&self) -> i64 {
+        self.0.field_frA() as i64
+    }
+    #[getter]
+    fn frB(&self) -> i64 {
+        self.0.field_frB() as i64
+    }
+    #[getter]
+    fn frC(&self) -> i64 {
+        self.0.field_frC() as i64
+    }
+    #[getter]
+    fn crbD(&self) -> i64 {
+        self.0.field_crbD() as i64
+    }
+    #[getter]
+    fn crbA(&self) -> i64 {
+        self.0.field_crbA() as i64
+    }
+    #[getter]
+    fn crbB(&self) -> i64 {
+        self.0.field_crbB() as i64
+    }
+    #[getter]
+    fn crfD(&self) -> i64 {
+        self.0.field_crfD() as i64
+    }
+    #[getter]
+    fn crfS(&self) -> i64 {
+        self.0.field_crfS() as i64
+    }
+    #[getter]
+    fn crm(&self) -> i64 {
+        self.0.field_crm() as i64
+    }
+    #[getter]
+    fn ps_l(&self) -> i64 {
+        self.0.field_ps_l() as i64
+    }
+    #[getter]
+    fn ps_W(&self) -> i64 {
+        self.0.field_ps_W() as i64
+    }
+    #[getter]
+    fn ps_NB(&self) -> i64 {
+        self.0.field_NB() as i64
+    }
+    #[getter]
+    fn tbr(&self) -> i64 {
+        self.0.field_tbr() as i64
+    }
+    #[getter]
+    fn mtfsf_FM(&self) -> i64 {
+        self.0.field_mtfsf_FM() as i64
+    }
+    #[getter]
+    fn mtfsf_IMM(&self) -> i64 {
+        self.0.field_mtfsf_IMM() as i64
+    }
+    #[getter]
+    fn TO(&self) -> i64 {
+        self.0.field_TO() as i64
+    }
+}
+
 impl From<ppc750cl::Ins> for Ins {
     fn from(ins: ppc750cl::Ins) -> Self {
         Self(ins)

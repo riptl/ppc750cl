@@ -25,8 +25,11 @@ Install module in dev env
 maturin develop -m ./disasm-py/Cargo.toml
 python
 >>> import ppc750cl
->>> str(ppc750cl.Ins(addr=0x80006969, code=0x10400420))
+>>> ins = ppc750cl.Ins(addr=0x80006969, code=0x10400420)
+>>> str(ins)
 'ps_merge00 f2, f0, f0'
+>>> ins.frD
+2
 ```
 
 ### Instruction Set
