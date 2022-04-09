@@ -31,6 +31,14 @@ impl Ins {
     fn __str__(&self) -> String {
         FormattedIns(self.0.clone()).to_string()
     }
+
+    fn fields(&self) -> Vec<(&'static str, i64)> {
+        self.0
+            .fields()
+            .iter()
+            .flat_map(|field| field.argument().map(|arg| (field.name(), arg.into())))
+            .collect()
+    }
 }
 
 #[allow(non_snake_case)]

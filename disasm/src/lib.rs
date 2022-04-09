@@ -166,47 +166,30 @@ impl Display for Argument {
     }
 }
 
-impl Field {
-    pub fn argument(&self) -> Option<Argument> {
+impl Into<i64> for Argument {
+    fn into(self) -> i64 {
         match self {
-            Field::simm(x) => Some(Argument::Simm(*x)),
-            Field::uimm(x) => Some(Argument::Uimm(*x)),
-            Field::offset(x) => Some(Argument::Offset(*x)),
-            Field::ps_offset(x) => Some(Argument::Offset(*x)),
-            Field::BO(x) => Some(Argument::OpaqueU(*x)),
-            Field::BI(x) => Some(Argument::OpaqueU(*x)),
-            Field::BD(x) => Some(Argument::BranchDest(*x)),
-            Field::LI(x) => Some(Argument::BranchDest(*x)),
-            Field::SH(x) => Some(Argument::OpaqueU(*x)),
-            Field::MB(x) => Some(Argument::OpaqueU(*x)),
-            Field::ME(x) => Some(Argument::OpaqueU(*x)),
-            Field::rS(x) => Some(Argument::GPR(*x)),
-            Field::rD(x) => Some(Argument::GPR(*x)),
-            Field::rA(x) => Some(Argument::GPR(*x)),
-            Field::rB(x) => Some(Argument::GPR(*x)),
-            Field::rC(x) => Some(Argument::GPR(*x)),
-            Field::sr(x) => Some(Argument::SR(*x)),
-            Field::spr(x) => Some(Argument::SPR(*x)),
-            Field::frS(x) => Some(Argument::FPR(*x)),
-            Field::frD(x) => Some(Argument::FPR(*x)),
-            Field::frA(x) => Some(Argument::FPR(*x)),
-            Field::frB(x) => Some(Argument::FPR(*x)),
-            Field::frC(x) => Some(Argument::FPR(*x)),
-            Field::crbD(x) => Some(Argument::CRBit(*x)),
-            Field::crbA(x) => Some(Argument::CRBit(*x)),
-            Field::crbB(x) => Some(Argument::CRBit(*x)),
-            Field::crfD(x) => Some(Argument::CRField(*x)),
-            Field::crfS(x) => Some(Argument::CRField(*x)),
-            Field::crm(x) => Some(Argument::OpaqueU(*x)),
-            Field::ps_l(x) => Some(Argument::GQR(*x)),
-            Field::ps_W(x) => Some(Argument::OpaqueU(*x)),
-            Field::NB(x) => Some(Argument::OpaqueU(*x)),
-            Field::tbr(x) => Some(Argument::OpaqueU(*x)),
-            Field::mtfsf_FM(x) => Some(Argument::OpaqueU(*x)),
-            Field::mtfsf_IMM(x) => Some(Argument::OpaqueU(*x)),
-            Field::TO(x) => Some(Argument::OpaqueU(*x)),
-            _ => None,
+            Argument::GPR(x) => x.0 as i64,
+            Argument::FPR(x) => x.0 as i64,
+            Argument::SR(x) => x.0 as i64,
+            Argument::SPR(x) => x.0 as i64,
+            Argument::CRField(x) => x.0 as i64,
+            Argument::CRBit(x) => x.0 as i64,
+            Argument::GQR(x) => x.0 as i64,
+            Argument::Uimm(x) => x.0 as i64,
+            Argument::Simm(x) => x.0 as i64,
+            Argument::Offset(x) => x.0 as i64,
+            Argument::BranchDest(x) => x.0 as i64,
+            Argument::Bit(x) => x.0 as i64,
+            Argument::OpaqueU(x) => x.0 as i64,
         }
+    }
+}
+
+impl TryInto<Argument> for &Field {
+    type Error = ();
+    fn try_into(self) -> Result<Argument, Self::Error> {
+        self.argument().ok_or(())
     }
 }
 

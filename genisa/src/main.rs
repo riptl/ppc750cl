@@ -40,6 +40,7 @@ fn _main() -> Result<()> {
     )?;
     writeln!(&mut unformatted_code, "{}", isa.gen_opcode_enum()?)?;
     writeln!(&mut unformatted_code, "{}", isa.gen_field_enum()?)?;
+    writeln!(&mut unformatted_code, "{}", isa.gen_field_impl()?)?;
     writeln!(&mut unformatted_code, "{}", isa.gen_ins_impl()?)?;
 
     let formatted_code = rustfmt(unformatted_code);
@@ -160,7 +161,7 @@ impl Field {
         })
     }
 
-    fn construct_variant(&self, code: TokenStream) -> TokenStream {
+    pub(crate) fn construct_variant(&self, code: TokenStream) -> TokenStream {
         let field_variant = self.variant_identifier();
         if let Some(arg) = &self.arg {
             let field_arg = TokenTree::Ident(Ident::new(arg, Span::call_site()));
@@ -334,7 +335,7 @@ impl Isa {
         Ok(mnemonic_fn)
     }
 
-    pub(crate) fn gen_opcode_detect(&self) -> Result<TokenStream> {
+    fn gen_opcode_detect(&self) -> Result<TokenStream> {
         // Generate if chain.
         let if_chain = self
             .opcodes
@@ -363,7 +364,7 @@ impl Isa {
         Ok(func)
     }
 
-    pub(crate) fn gen_field_enum(&self) -> Result<TokenStream> {
+    fn gen_field_enum(&self) -> Result<TokenStream> {
         // Create enum variants.
         let mut enum_variants = Vec::new();
         for field in &self.fields {
@@ -384,7 +385,58 @@ impl Isa {
         Ok(field_enum)
     }
 
-    pub(crate) fn gen_ins_impl(&self) -> Result<TokenStream> {
+    fn gen_field_argument(&self) -> Result<TokenStream> {
+        let mut match_arms = Vec::new();
+        for field in &self.fields {
+            if let Some(variant) = field.variant_identifier() {
+                if let Some(arg_str) = field.arg.as_ref() {
+                    let arg = Ident::new(arg_str, Span::call_site());
+                    match_arms.push(quote! { Field::#variant(x) => Some(Argument::#arg(*x)), });
+                }
+            }
+        }
+        let match_arms = token_stream!(match_arms);
+        Ok(quote! {
+            pub fn argument(&self) -> Option<Argument> {
+                match self {
+                    #match_arms
+                    _ => None,
+                }
+            }
+        })
+    }
+
+    fn gen_field_name(&self) -> Result<TokenStream> {
+        let mut match_arms = Vec::new();
+        for field in &self.fields {
+            if let Some(variant) = field.variant_identifier() {
+                let name = LitStr::new(&variant.to_string(), Span::call_site());
+                let arg = field.arg.as_ref().map(|_| quote!((_)));
+                match_arms.push(quote! { Field::#variant #arg => #name, });
+            }
+        }
+        let match_arms = token_stream!(match_arms);
+        Ok(quote! {
+            pub fn name(&self) -> &'static str {
+                match self {
+                    #match_arms
+                }
+            }
+        })
+    }
+
+    fn gen_field_impl(&self) -> Result<TokenStream> {
+        let field_argument = self.gen_field_argument()?;
+        let field_name = self.gen_field_name()?;
+        Ok(quote! {
+            impl Field {
+                #field_argument
+                #field_name
+            }
+        })
+    }
+
+    fn gen_ins_impl(&self) -> Result<TokenStream> {
         // Map fields by name.
         let mut field_by_name = HashMap::<String, &Field>::new();
         for field in &self.fields {
