@@ -128,6 +128,10 @@ impl Field {
             val = quote!((#val & #mask));
         }
 
+        if self.split {
+            val = quote!((((#val & 0b11111_00000u32) >> 5u32) | ((#val & 0b00000_11111u32) << 5u32)) as u32);
+        }
+
         // https://graphics.stanford.edu/~seander/bithacks.html#VariableSignExtend
         if self.signed {
             let mask2 = 1u32 << (self.bits.0.len() - 1);

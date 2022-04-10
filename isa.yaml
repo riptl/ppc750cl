@@ -2112,6 +2112,11 @@ mnemonics:
     condition: spr == 571
 
   # Branch Conditional
+  # bc branch always
+  - name: b
+    opcode: bc
+    modifiers: [ AA, LK ]
+    condition: BO == 20 && BI == 0
   # bc branch if negative
   - name: blt
     opcode: bc

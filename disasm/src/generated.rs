@@ -1808,7 +1808,11 @@ impl Ins {
             Opcode::Mfmsr => vec![Field::rD(GPR(((self.code >> 21u8) & 0x1f) as _))],
             Opcode::Mfspr => vec![
                 Field::rD(GPR(((self.code >> 21u8) & 0x1f) as _)),
-                Field::spr(SPR(((self.code >> 11u8) & 0x3ff) as _)),
+                Field::spr(SPR(
+                    (((((self.code >> 11u8) & 0x3ff) & 0b11111_00000u32) >> 5u32)
+                        | ((((self.code >> 11u8) & 0x3ff) & 0b00000_11111u32) << 5u32))
+                        as u32 as _,
+                )),
             ],
             Opcode::Mfsr => vec![
                 Field::rD(GPR(((self.code >> 21u8) & 0x1f) as _)),
@@ -1820,7 +1824,11 @@ impl Ins {
             ],
             Opcode::Mftb => vec![
                 Field::rD(GPR(((self.code >> 21u8) & 0x1f) as _)),
-                Field::tbr(OpaqueU(((self.code >> 11u8) & 0x3ff) as _)),
+                Field::tbr(OpaqueU(
+                    (((((self.code >> 11u8) & 0x3ff) & 0b11111_00000u32) >> 5u32)
+                        | ((((self.code >> 11u8) & 0x3ff) & 0b00000_11111u32) << 5u32))
+                        as u32 as _,
+                )),
             ],
             Opcode::Mtcrf => vec![
                 Field::crm(OpaqueU(((self.code >> 12u8) & 0xff) as _)),
@@ -1838,7 +1846,11 @@ impl Ins {
             ],
             Opcode::Mtmsr => vec![Field::rS(GPR(((self.code >> 21u8) & 0x1f) as _))],
             Opcode::Mtspr => vec![
-                Field::spr(SPR(((self.code >> 11u8) & 0x3ff) as _)),
+                Field::spr(SPR(
+                    (((((self.code >> 11u8) & 0x3ff) & 0b11111_00000u32) >> 5u32)
+                        | ((((self.code >> 11u8) & 0x3ff) & 0b00000_11111u32) << 5u32))
+                        as u32 as _,
+                )),
                 Field::rS(GPR(((self.code >> 21u8) & 0x1f) as _)),
             ],
             Opcode::Mtsr => vec![
@@ -4971,6 +4983,13 @@ impl Ins {
                 }
             }
             Opcode::Bc => {
+                if ((self.code >> 21u8) & 0x1f) == 20 && ((self.code >> 16u8) & 0x1f) == 0 {
+                    return SimplifiedIns {
+                        mnemonic: "b",
+                        args: vec![],
+                        ins: self,
+                    };
+                }
                 if ((self.code >> 21u8) & 0x1f) == 12
                     && ((self.code >> 16u8) & 0x1f) & 0b11 == 0b00
                     && ((self.code >> 18u8) & 0x7) == 0
@@ -5637,42 +5656,66 @@ impl Ins {
                 }
             }
             Opcode::Mfspr => {
-                if ((self.code >> 11u8) & 0x3ff) == 1 {
+                if (((((self.code >> 11u8) & 0x3ff) & 0b11111_00000u32) >> 5u32)
+                    | ((((self.code >> 11u8) & 0x3ff) & 0b00000_11111u32) << 5u32))
+                    as u32
+                    == 1
+                {
                     return SimplifiedIns {
                         mnemonic: "mfxer",
                         args: vec![Argument::GPR(GPR(((self.code >> 21u8) & 0x1f) as _))],
                         ins: self,
                     };
                 }
-                if ((self.code >> 11u8) & 0x3ff) == 8 {
+                if (((((self.code >> 11u8) & 0x3ff) & 0b11111_00000u32) >> 5u32)
+                    | ((((self.code >> 11u8) & 0x3ff) & 0b00000_11111u32) << 5u32))
+                    as u32
+                    == 8
+                {
                     return SimplifiedIns {
                         mnemonic: "mflr",
                         args: vec![Argument::GPR(GPR(((self.code >> 21u8) & 0x1f) as _))],
                         ins: self,
                     };
                 }
-                if ((self.code >> 11u8) & 0x3ff) == 9 {
+                if (((((self.code >> 11u8) & 0x3ff) & 0b11111_00000u32) >> 5u32)
+                    | ((((self.code >> 11u8) & 0x3ff) & 0b00000_11111u32) << 5u32))
+                    as u32
+                    == 9
+                {
                     return SimplifiedIns {
                         mnemonic: "mfctr",
                         args: vec![Argument::GPR(GPR(((self.code >> 21u8) & 0x1f) as _))],
                         ins: self,
                     };
                 }
-                if ((self.code >> 11u8) & 0x3ff) == 18 {
+                if (((((self.code >> 11u8) & 0x3ff) & 0b11111_00000u32) >> 5u32)
+                    | ((((self.code >> 11u8) & 0x3ff) & 0b00000_11111u32) << 5u32))
+                    as u32
+                    == 18
+                {
                     return SimplifiedIns {
                         mnemonic: "mfdsisr",
                         args: vec![Argument::GPR(GPR(((self.code >> 21u8) & 0x1f) as _))],
                         ins: self,
                     };
                 }
-                if ((self.code >> 11u8) & 0x3ff) == 397 {
+                if (((((self.code >> 11u8) & 0x3ff) & 0b11111_00000u32) >> 5u32)
+                    | ((((self.code >> 11u8) & 0x3ff) & 0b00000_11111u32) << 5u32))
+                    as u32
+                    == 397
+                {
                     return SimplifiedIns {
                         mnemonic: "mfdbatu",
                         args: vec![Argument::GPR(GPR(((self.code >> 21u8) & 0x1f) as _))],
                         ins: self,
                     };
                 }
-                if ((self.code >> 11u8) & 0x3ff) == 571 {
+                if (((((self.code >> 11u8) & 0x3ff) & 0b11111_00000u32) >> 5u32)
+                    | ((((self.code >> 11u8) & 0x3ff) & 0b00000_11111u32) << 5u32))
+                    as u32
+                    == 571
+                {
                     return SimplifiedIns {
                         mnemonic: "mftdu",
                         args: vec![Argument::GPR(GPR(((self.code >> 21u8) & 0x1f) as _))],
@@ -5681,42 +5724,66 @@ impl Ins {
                 }
             }
             Opcode::Mtspr => {
-                if ((self.code >> 11u8) & 0x3ff) == 1 {
+                if (((((self.code >> 11u8) & 0x3ff) & 0b11111_00000u32) >> 5u32)
+                    | ((((self.code >> 11u8) & 0x3ff) & 0b00000_11111u32) << 5u32))
+                    as u32
+                    == 1
+                {
                     return SimplifiedIns {
                         mnemonic: "mtxer",
                         args: vec![Argument::GPR(GPR(((self.code >> 21u8) & 0x1f) as _))],
                         ins: self,
                     };
                 }
-                if ((self.code >> 11u8) & 0x3ff) == 8 {
+                if (((((self.code >> 11u8) & 0x3ff) & 0b11111_00000u32) >> 5u32)
+                    | ((((self.code >> 11u8) & 0x3ff) & 0b00000_11111u32) << 5u32))
+                    as u32
+                    == 8
+                {
                     return SimplifiedIns {
                         mnemonic: "mtlr",
                         args: vec![Argument::GPR(GPR(((self.code >> 21u8) & 0x1f) as _))],
                         ins: self,
                     };
                 }
-                if ((self.code >> 11u8) & 0x3ff) == 9 {
+                if (((((self.code >> 11u8) & 0x3ff) & 0b11111_00000u32) >> 5u32)
+                    | ((((self.code >> 11u8) & 0x3ff) & 0b00000_11111u32) << 5u32))
+                    as u32
+                    == 9
+                {
                     return SimplifiedIns {
                         mnemonic: "mtctr",
                         args: vec![Argument::GPR(GPR(((self.code >> 21u8) & 0x1f) as _))],
                         ins: self,
                     };
                 }
-                if ((self.code >> 11u8) & 0x3ff) == 18 {
+                if (((((self.code >> 11u8) & 0x3ff) & 0b11111_00000u32) >> 5u32)
+                    | ((((self.code >> 11u8) & 0x3ff) & 0b00000_11111u32) << 5u32))
+                    as u32
+                    == 18
+                {
                     return SimplifiedIns {
                         mnemonic: "mtdsisr",
                         args: vec![Argument::GPR(GPR(((self.code >> 21u8) & 0x1f) as _))],
                         ins: self,
                     };
                 }
-                if ((self.code >> 11u8) & 0x3ff) == 397 {
+                if (((((self.code >> 11u8) & 0x3ff) & 0b11111_00000u32) >> 5u32)
+                    | ((((self.code >> 11u8) & 0x3ff) & 0b00000_11111u32) << 5u32))
+                    as u32
+                    == 397
+                {
                     return SimplifiedIns {
                         mnemonic: "mtdbatu",
                         args: vec![Argument::GPR(GPR(((self.code >> 21u8) & 0x1f) as _))],
                         ins: self,
                     };
                 }
-                if ((self.code >> 11u8) & 0x3ff) == 571 {
+                if (((((self.code >> 11u8) & 0x3ff) & 0b11111_00000u32) >> 5u32)
+                    | ((((self.code >> 11u8) & 0x3ff) & 0b00000_11111u32) << 5u32))
+                    as u32
+                    == 571
+                {
                     return SimplifiedIns {
                         mnemonic: "mttdu",
                         args: vec![Argument::GPR(GPR(((self.code >> 21u8) & 0x1f) as _))],
@@ -5901,7 +5968,8 @@ impl Ins {
     }
     #[inline(always)]
     pub fn field_spr(&self) -> usize {
-        ((self.code >> 11u8) & 0x3ff) as _
+        (((((self.code >> 11u8) & 0x3ff) & 0b11111_00000u32) >> 5u32)
+            | ((((self.code >> 11u8) & 0x3ff) & 0b00000_11111u32) << 5u32)) as u32 as _
     }
     #[inline(always)]
     pub fn field_frS(&self) -> usize {
@@ -5961,7 +6029,8 @@ impl Ins {
     }
     #[inline(always)]
     pub fn field_tbr(&self) -> usize {
-        ((self.code >> 11u8) & 0x3ff) as _
+        (((((self.code >> 11u8) & 0x3ff) & 0b11111_00000u32) >> 5u32)
+            | ((((self.code >> 11u8) & 0x3ff) & 0b00000_11111u32) << 5u32)) as u32 as _
     }
     #[inline(always)]
     pub fn field_mtfsf_FM(&self) -> usize {

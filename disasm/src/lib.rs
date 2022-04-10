@@ -129,6 +129,8 @@ impl Display for Bit {
 // Unsigned opaque argument.
 field_arg!(OpaqueU, u32);
 
+const SPR_LR: usize = 16;
+
 #[derive(Debug, Clone)]
 pub enum Argument {
     GPR(GPR),
@@ -166,9 +168,9 @@ impl Display for Argument {
     }
 }
 
-impl Into<i64> for Argument {
-    fn into(self) -> i64 {
-        match self {
+impl From<Argument> for i64 {
+    fn from(arg: Argument) -> Self {
+        match arg {
             Argument::GPR(x) => x.0 as i64,
             Argument::FPR(x) => x.0 as i64,
             Argument::SR(x) => x.0 as i64,
@@ -287,6 +289,32 @@ impl Ins {
                 self.addr.checked_add(offset as u32)
             }
         })
+    }
+
+    pub fn is_branch(&self) -> bool {
+        match self.op {
+            Opcode::B | Opcode::Bc | Opcode::Bcctr | Opcode::Bclr => true,
+            _ => false,
+        }
+    }
+
+    pub fn is_unconditional_branch(&self) -> bool {
+        match self.op {
+            Opcode::B => true,
+            Opcode::Bc | Opcode::Bcctr | Opcode::Bclr => {
+                self.field_BO() == 20 && self.field_BI() == 0
+            }
+            _ => false,
+        }
+    }
+
+    pub fn is_conditional_branch(&self) -> bool {
+        self.is_branch() && !self.is_unconditional_branch()
+    }
+
+    pub fn is_blr(&self) -> bool {
+        // self.op == Opcode::Bclr && self.is_unconditional_branch() && !self.field_LK()
+        self.code == 0x4e800020
     }
 }
 
