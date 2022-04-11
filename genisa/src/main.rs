@@ -136,7 +136,7 @@ impl Field {
         if self.signed {
             let mask2 = 1u32 << (self.bits.0.len() - 1);
             let mask2 = LitInt::new(&format!("0x{:x}", mask2), Span::call_site());
-            val = quote!(((#val ^ #mask2).wrapping_sub(#mask2)))
+            val = quote!((((#val ^ #mask2).wrapping_sub(#mask2)) as i32))
         }
 
         let val_shift = self.shift_left;

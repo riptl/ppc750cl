@@ -155,9 +155,7 @@ impl<'a> FlowGraph<'a> {
             // Get last instruction of left block.
             // Unless it's an unconditional branch, we can connect the blocks.
             let last_ins = &src_block.code.last().unwrap();
-            if last_ins.code == 0x4E800020
-                || (last_ins.op == Opcode::B && last_ins.field_BO() == 0b10100)
-            {
+            if last_ins.is_blr() || (last_ins.op == Opcode::B && last_ins.field_BO() == 0b10100) {
                 continue;
             }
             // Execution can continue past the last instruction of a block,

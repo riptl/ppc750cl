@@ -107,11 +107,22 @@ impl Dol {
         })
     }
 
-    /// Reads bytes into a destination buffer given a virtual address.
-    pub fn virtual_read(&self, dest: &mut [u8], virtual_addr: u32) {
+    pub fn section_data(&self, section: &DolSection) -> &[u8] {
+        self.virtual_data_at(section.target, section.size as usize)
+    }
+
+    /// Returns a slice of DOL data. Does not support bss.
+    // TODO Gracefully handle errors.
+    pub fn virtual_data_at(&self, virtual_addr: u32, read_len: usize) -> &[u8] {
         let offset = (virtual_addr - self.memory_offset) as usize;
-        // TODO Gracefully handle errors.
-        dest.copy_from_slice(&self.memory[offset..offset + dest.len()])
+        &self.memory[offset..offset + read_len]
+    }
+
+    /// Reads bytes into a destination buffer given a virtual address.
+    // TODO Gracefully handle errors.
+    pub fn virtual_read(&self, data: &mut [u8], virtual_addr: u32) {
+        let offset = (virtual_addr - self.memory_offset) as usize;
+        data.copy_from_slice(&self.memory[offset..offset + data.len()])
     }
 }
 
@@ -132,6 +143,7 @@ pub struct DolSection {
 
 pub struct DolHeader {
     pub sections: Vec<DolSection>,
+    pub entry_point: u32,
 }
 
 impl From<&DolHeaderData> for DolHeader {
@@ -159,7 +171,21 @@ impl From<&DolHeaderData> for DolHeader {
         }
         // Sort sections by target address to prepare them for mapping.
         sections.sort_by_key(|s| s.target);
-        Self { sections }
+        Self {
+            sections,
+            entry_point: header.entry_point,
+        }
+    }
+}
+
+impl DolHeader {
+    pub fn section_at(&self, addr: u32) -> Option<&DolSection> {
+        for section in &self.sections {
+            if (section.target..(section.target + section.size)).contains(&addr) {
+                return Some(section);
+            }
+        }
+        None
     }
 }
 

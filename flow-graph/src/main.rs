@@ -2,12 +2,9 @@ use petgraph::dot::{Config as DotConfig, Dot};
 
 use ppc750cl::{disasm_iter, Ins};
 
-pub mod flow;
-pub mod slices;
-
-use crate::flow::FlowGraph;
-use crate::slices::BasicSlices;
 use dol::Dol;
+use ppc750cl_analysis::flow::FlowGraph;
+use ppc750cl_analysis::slices::BasicSlices;
 
 fn main() {
     let matches = clap::Command::new("ppc750cl-flow-graph")

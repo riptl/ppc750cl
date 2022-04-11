@@ -1,13 +1,11 @@
 [package]
-name = "dol"
+name = "ppc750cl-vm"
 version = "0.2.0"
 edition = "2021"
 authors = ["Richard Patel <me@terorie.dev>"]
 license = "GPL-3.0-or-later"
-description = "Deserializer for the DOL executable format"
+description = "Very broken VM for PowerPC 750CL code"
 repository = "https://github.com/terorie/ppc750cl"
 
 [dependencies]
-bincode = "1.3"
-serde = { version = "1.0", features = ["derive"] }
-thiserror = "1.0"
+ppc750cl = { version = "0.2.0", path = "../disasm" }

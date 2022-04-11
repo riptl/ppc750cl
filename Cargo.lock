@@ -67,11 +67,22 @@ dependencies = [
 
 [[package]]
 name = "dol"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "bincode",
  "serde",
  "thiserror",
+]
+
+[[package]]
+name = "dol-analysis"
+version = "0.2.0"
+dependencies = [
+ "clap",
+ "dol",
+ "ppc750cl",
+ "ppc750cl-analysis",
+ "twoway",
 ]
 
 [[package]]
@@ -285,6 +296,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "ppc750cl-analysis"
+version = "0.2.0"
+dependencies = [
+ "itertools",
+ "petgraph",
+ "ppc750cl",
+]
+
+[[package]]
 name = "ppc750cl-flow-graph"
 version = "0.2.0"
 dependencies = [
@@ -294,6 +314,7 @@ dependencies = [
  "parse_int",
  "petgraph",
  "ppc750cl",
+ "ppc750cl-analysis",
 ]
 
 [[package]]
@@ -332,6 +353,13 @@ dependencies = [
  "ppc750cl",
  "rand_core",
  "sfmt",
+]
+
+[[package]]
+name = "ppc750cl-vm"
+version = "0.2.0"
+dependencies = [
+ "ppc750cl",
 ]
 
 [[package]]
@@ -574,6 +602,22 @@ dependencies = [
  "quote",
  "syn",
 ]
+
+[[package]]
+name = "twoway"
+version = "0.2.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "c57ffb460d7c24cd6eda43694110189030a3d1dfe418416d9468fd1c1d290b47"
+dependencies = [
+ "memchr",
+ "unchecked-index",
+]
+
+[[package]]
+name = "unchecked-index"
+version = "0.2.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "eeba86d422ce181a719445e51872fa30f1f7413b62becb52e95ec91aa262d85c"
 
 [[package]]
 name = "unicode-xid"

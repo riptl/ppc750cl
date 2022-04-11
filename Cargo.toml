@@ -1,10 +1,13 @@
 [workspace]
 members = [
+    "analysis",
     "disasm",
     "disasm-py",
     "dol",
+    "dol-analysis",
     "fuzz",
     "genisa",
     "flow-graph",
     "rand",
+    "vm",
 ]
