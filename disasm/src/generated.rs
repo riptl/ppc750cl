@@ -1277,21 +1277,21 @@ impl Ins {
                 Field::rD(GPR(((self.code >> 21u8) & 0x1f) as _)),
                 Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
                 Field::simm(Simm(
-                    (((self.code & 0xffff) ^ 0x8000).wrapping_sub(0x8000)) as _,
+                    ((((self.code & 0xffff) ^ 0x8000).wrapping_sub(0x8000)) as i32) as _,
                 )),
             ],
             Opcode::Addic => vec![
                 Field::rD(GPR(((self.code >> 21u8) & 0x1f) as _)),
                 Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
                 Field::simm(Simm(
-                    (((self.code & 0xffff) ^ 0x8000).wrapping_sub(0x8000)) as _,
+                    ((((self.code & 0xffff) ^ 0x8000).wrapping_sub(0x8000)) as i32) as _,
                 )),
             ],
             Opcode::Addic_ => vec![
                 Field::rD(GPR(((self.code >> 21u8) & 0x1f) as _)),
                 Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
                 Field::simm(Simm(
-                    (((self.code & 0xffff) ^ 0x8000).wrapping_sub(0x8000)) as _,
+                    ((((self.code & 0xffff) ^ 0x8000).wrapping_sub(0x8000)) as i32) as _,
                 )),
             ],
             Opcode::Addis => vec![
@@ -1328,13 +1328,15 @@ impl Ins {
                 Field::uimm(Uimm((self.code & 0xffff) as _)),
             ],
             Opcode::B => vec![Field::LI(BranchDest(
-                (((((self.code >> 2u8) & 0xffffff) ^ 0x800000).wrapping_sub(0x800000)) << 2u8) as _,
+                ((((((self.code >> 2u8) & 0xffffff) ^ 0x800000).wrapping_sub(0x800000)) as i32)
+                    << 2u8) as _,
             ))],
             Opcode::Bc => vec![
                 Field::BO(OpaqueU(((self.code >> 21u8) & 0x1f) as _)),
                 Field::BI(OpaqueU(((self.code >> 16u8) & 0x1f) as _)),
                 Field::BD(BranchDest(
-                    (((((self.code >> 2u8) & 0x3fff) ^ 0x2000).wrapping_sub(0x2000)) << 2u8) as _,
+                    ((((((self.code >> 2u8) & 0x3fff) ^ 0x2000).wrapping_sub(0x2000)) as i32)
+                        << 2u8) as _,
                 )),
             ],
             Opcode::Bcctr => vec![
@@ -1354,7 +1356,7 @@ impl Ins {
                 Field::crfD(CRField(((self.code >> 23u8) & 0x7) as _)),
                 Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
                 Field::simm(Simm(
-                    (((self.code & 0xffff) ^ 0x8000).wrapping_sub(0x8000)) as _,
+                    ((((self.code & 0xffff) ^ 0x8000).wrapping_sub(0x8000)) as i32) as _,
                 )),
             ],
             Opcode::Cmpl => vec![
@@ -1621,14 +1623,14 @@ impl Ins {
             Opcode::Lbz => vec![
                 Field::rD(GPR(((self.code >> 21u8) & 0x1f) as _)),
                 Field::offset(Offset(
-                    (((self.code & 0xffff) ^ 0x8000).wrapping_sub(0x8000)) as _,
+                    ((((self.code & 0xffff) ^ 0x8000).wrapping_sub(0x8000)) as i32) as _,
                 )),
                 Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
             ],
             Opcode::Lbzu => vec![
                 Field::rD(GPR(((self.code >> 21u8) & 0x1f) as _)),
                 Field::offset(Offset(
-                    (((self.code & 0xffff) ^ 0x8000).wrapping_sub(0x8000)) as _,
+                    ((((self.code & 0xffff) ^ 0x8000).wrapping_sub(0x8000)) as i32) as _,
                 )),
                 Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
             ],
@@ -1645,14 +1647,14 @@ impl Ins {
             Opcode::Lfd => vec![
                 Field::frD(FPR(((self.code >> 21u8) & 0x1f) as _)),
                 Field::offset(Offset(
-                    (((self.code & 0xffff) ^ 0x8000).wrapping_sub(0x8000)) as _,
+                    ((((self.code & 0xffff) ^ 0x8000).wrapping_sub(0x8000)) as i32) as _,
                 )),
                 Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
             ],
             Opcode::Lfdu => vec![
                 Field::frD(FPR(((self.code >> 21u8) & 0x1f) as _)),
                 Field::offset(Offset(
-                    (((self.code & 0xffff) ^ 0x8000).wrapping_sub(0x8000)) as _,
+                    ((((self.code & 0xffff) ^ 0x8000).wrapping_sub(0x8000)) as i32) as _,
                 )),
                 Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
             ],
@@ -1669,14 +1671,14 @@ impl Ins {
             Opcode::Lfs => vec![
                 Field::frD(FPR(((self.code >> 21u8) & 0x1f) as _)),
                 Field::offset(Offset(
-                    (((self.code & 0xffff) ^ 0x8000).wrapping_sub(0x8000)) as _,
+                    ((((self.code & 0xffff) ^ 0x8000).wrapping_sub(0x8000)) as i32) as _,
                 )),
                 Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
             ],
             Opcode::Lfsu => vec![
                 Field::frD(FPR(((self.code >> 21u8) & 0x1f) as _)),
                 Field::offset(Offset(
-                    (((self.code & 0xffff) ^ 0x8000).wrapping_sub(0x8000)) as _,
+                    ((((self.code & 0xffff) ^ 0x8000).wrapping_sub(0x8000)) as i32) as _,
                 )),
                 Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
             ],
@@ -1693,14 +1695,14 @@ impl Ins {
             Opcode::Lha => vec![
                 Field::rD(GPR(((self.code >> 21u8) & 0x1f) as _)),
                 Field::offset(Offset(
-                    (((self.code & 0xffff) ^ 0x8000).wrapping_sub(0x8000)) as _,
+                    ((((self.code & 0xffff) ^ 0x8000).wrapping_sub(0x8000)) as i32) as _,
                 )),
                 Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
             ],
             Opcode::Lhau => vec![
                 Field::rD(GPR(((self.code >> 21u8) & 0x1f) as _)),
                 Field::offset(Offset(
-                    (((self.code & 0xffff) ^ 0x8000).wrapping_sub(0x8000)) as _,
+                    ((((self.code & 0xffff) ^ 0x8000).wrapping_sub(0x8000)) as i32) as _,
                 )),
                 Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
             ],
@@ -1722,14 +1724,14 @@ impl Ins {
             Opcode::Lhz => vec![
                 Field::rD(GPR(((self.code >> 21u8) & 0x1f) as _)),
                 Field::offset(Offset(
-                    (((self.code & 0xffff) ^ 0x8000).wrapping_sub(0x8000)) as _,
+                    ((((self.code & 0xffff) ^ 0x8000).wrapping_sub(0x8000)) as i32) as _,
                 )),
                 Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
             ],
             Opcode::Lhzu => vec![
                 Field::rD(GPR(((self.code >> 21u8) & 0x1f) as _)),
                 Field::offset(Offset(
-                    (((self.code & 0xffff) ^ 0x8000).wrapping_sub(0x8000)) as _,
+                    ((((self.code & 0xffff) ^ 0x8000).wrapping_sub(0x8000)) as i32) as _,
                 )),
                 Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
             ],
@@ -1746,7 +1748,7 @@ impl Ins {
             Opcode::Lmw => vec![
                 Field::rD(GPR(((self.code >> 21u8) & 0x1f) as _)),
                 Field::offset(Offset(
-                    (((self.code & 0xffff) ^ 0x8000).wrapping_sub(0x8000)) as _,
+                    ((((self.code & 0xffff) ^ 0x8000).wrapping_sub(0x8000)) as i32) as _,
                 )),
                 Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
             ],
@@ -1773,14 +1775,14 @@ impl Ins {
             Opcode::Lwz => vec![
                 Field::rD(GPR(((self.code >> 21u8) & 0x1f) as _)),
                 Field::offset(Offset(
-                    (((self.code & 0xffff) ^ 0x8000).wrapping_sub(0x8000)) as _,
+                    ((((self.code & 0xffff) ^ 0x8000).wrapping_sub(0x8000)) as i32) as _,
                 )),
                 Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
             ],
             Opcode::Lwzu => vec![
                 Field::rD(GPR(((self.code >> 21u8) & 0x1f) as _)),
                 Field::offset(Offset(
-                    (((self.code & 0xffff) ^ 0x8000).wrapping_sub(0x8000)) as _,
+                    ((((self.code & 0xffff) ^ 0x8000).wrapping_sub(0x8000)) as i32) as _,
                 )),
                 Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
             ],
@@ -1875,7 +1877,7 @@ impl Ins {
                 Field::rD(GPR(((self.code >> 21u8) & 0x1f) as _)),
                 Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
                 Field::simm(Simm(
-                    (((self.code & 0xffff) ^ 0x8000).wrapping_sub(0x8000)) as _,
+                    ((((self.code & 0xffff) ^ 0x8000).wrapping_sub(0x8000)) as i32) as _,
                 )),
             ],
             Opcode::Mullw => vec![
@@ -1920,7 +1922,7 @@ impl Ins {
             Opcode::PsqL => vec![
                 Field::frD(FPR(((self.code >> 21u8) & 0x1f) as _)),
                 Field::ps_offset(Offset(
-                    (((self.code & 0xfff) ^ 0x800).wrapping_sub(0x800)) as _,
+                    ((((self.code & 0xfff) ^ 0x800).wrapping_sub(0x800)) as i32) as _,
                 )),
                 Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
                 Field::ps_W(OpaqueU(((self.code >> 15u8) & 0x1) as _)),
@@ -1929,7 +1931,7 @@ impl Ins {
             Opcode::PsqLu => vec![
                 Field::frD(FPR(((self.code >> 21u8) & 0x1f) as _)),
                 Field::ps_offset(Offset(
-                    (((self.code & 0xfff) ^ 0x800).wrapping_sub(0x800)) as _,
+                    ((((self.code & 0xfff) ^ 0x800).wrapping_sub(0x800)) as i32) as _,
                 )),
                 Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
                 Field::ps_W(OpaqueU(((self.code >> 15u8) & 0x1) as _)),
@@ -1952,7 +1954,7 @@ impl Ins {
             Opcode::PsqSt => vec![
                 Field::frS(FPR(((self.code >> 21u8) & 0x1f) as _)),
                 Field::ps_offset(Offset(
-                    (((self.code & 0xfff) ^ 0x800).wrapping_sub(0x800)) as _,
+                    ((((self.code & 0xfff) ^ 0x800).wrapping_sub(0x800)) as i32) as _,
                 )),
                 Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
                 Field::ps_W(OpaqueU(((self.code >> 15u8) & 0x1) as _)),
@@ -1961,7 +1963,7 @@ impl Ins {
             Opcode::PsqStu => vec![
                 Field::frS(FPR(((self.code >> 21u8) & 0x1f) as _)),
                 Field::ps_offset(Offset(
-                    (((self.code & 0xfff) ^ 0x800).wrapping_sub(0x800)) as _,
+                    ((((self.code & 0xfff) ^ 0x800).wrapping_sub(0x800)) as i32) as _,
                 )),
                 Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
                 Field::ps_W(OpaqueU(((self.code >> 15u8) & 0x1) as _)),
@@ -2176,14 +2178,14 @@ impl Ins {
             Opcode::Stb => vec![
                 Field::rS(GPR(((self.code >> 21u8) & 0x1f) as _)),
                 Field::offset(Offset(
-                    (((self.code & 0xffff) ^ 0x8000).wrapping_sub(0x8000)) as _,
+                    ((((self.code & 0xffff) ^ 0x8000).wrapping_sub(0x8000)) as i32) as _,
                 )),
                 Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
             ],
             Opcode::Stbu => vec![
                 Field::rS(GPR(((self.code >> 21u8) & 0x1f) as _)),
                 Field::offset(Offset(
-                    (((self.code & 0xffff) ^ 0x8000).wrapping_sub(0x8000)) as _,
+                    ((((self.code & 0xffff) ^ 0x8000).wrapping_sub(0x8000)) as i32) as _,
                 )),
                 Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
             ],
@@ -2200,14 +2202,14 @@ impl Ins {
             Opcode::Stfd => vec![
                 Field::frS(FPR(((self.code >> 21u8) & 0x1f) as _)),
                 Field::offset(Offset(
-                    (((self.code & 0xffff) ^ 0x8000).wrapping_sub(0x8000)) as _,
+                    ((((self.code & 0xffff) ^ 0x8000).wrapping_sub(0x8000)) as i32) as _,
                 )),
                 Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
             ],
             Opcode::Stfdu => vec![
                 Field::frS(FPR(((self.code >> 21u8) & 0x1f) as _)),
                 Field::offset(Offset(
-                    (((self.code & 0xffff) ^ 0x8000).wrapping_sub(0x8000)) as _,
+                    ((((self.code & 0xffff) ^ 0x8000).wrapping_sub(0x8000)) as i32) as _,
                 )),
                 Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
             ],
@@ -2229,14 +2231,14 @@ impl Ins {
             Opcode::Stfs => vec![
                 Field::frS(FPR(((self.code >> 21u8) & 0x1f) as _)),
                 Field::offset(Offset(
-                    (((self.code & 0xffff) ^ 0x8000).wrapping_sub(0x8000)) as _,
+                    ((((self.code & 0xffff) ^ 0x8000).wrapping_sub(0x8000)) as i32) as _,
                 )),
                 Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
             ],
             Opcode::Stfsu => vec![
                 Field::frS(FPR(((self.code >> 21u8) & 0x1f) as _)),
                 Field::offset(Offset(
-                    (((self.code & 0xffff) ^ 0x8000).wrapping_sub(0x8000)) as _,
+                    ((((self.code & 0xffff) ^ 0x8000).wrapping_sub(0x8000)) as i32) as _,
                 )),
                 Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
             ],
@@ -2253,7 +2255,7 @@ impl Ins {
             Opcode::Sth => vec![
                 Field::rS(GPR(((self.code >> 21u8) & 0x1f) as _)),
                 Field::offset(Offset(
-                    (((self.code & 0xffff) ^ 0x8000).wrapping_sub(0x8000)) as _,
+                    ((((self.code & 0xffff) ^ 0x8000).wrapping_sub(0x8000)) as i32) as _,
                 )),
                 Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
             ],
@@ -2265,7 +2267,7 @@ impl Ins {
             Opcode::Sthu => vec![
                 Field::rS(GPR(((self.code >> 21u8) & 0x1f) as _)),
                 Field::offset(Offset(
-                    (((self.code & 0xffff) ^ 0x8000).wrapping_sub(0x8000)) as _,
+                    ((((self.code & 0xffff) ^ 0x8000).wrapping_sub(0x8000)) as i32) as _,
                 )),
                 Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
             ],
@@ -2282,7 +2284,7 @@ impl Ins {
             Opcode::Stmw => vec![
                 Field::rS(GPR(((self.code >> 21u8) & 0x1f) as _)),
                 Field::offset(Offset(
-                    (((self.code & 0xffff) ^ 0x8000).wrapping_sub(0x8000)) as _,
+                    ((((self.code & 0xffff) ^ 0x8000).wrapping_sub(0x8000)) as i32) as _,
                 )),
                 Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
             ],
@@ -2299,7 +2301,7 @@ impl Ins {
             Opcode::Stw => vec![
                 Field::rS(GPR(((self.code >> 21u8) & 0x1f) as _)),
                 Field::offset(Offset(
-                    (((self.code & 0xffff) ^ 0x8000).wrapping_sub(0x8000)) as _,
+                    ((((self.code & 0xffff) ^ 0x8000).wrapping_sub(0x8000)) as i32) as _,
                 )),
                 Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
             ],
@@ -2316,7 +2318,7 @@ impl Ins {
             Opcode::Stwu => vec![
                 Field::rS(GPR(((self.code >> 21u8) & 0x1f) as _)),
                 Field::offset(Offset(
-                    (((self.code & 0xffff) ^ 0x8000).wrapping_sub(0x8000)) as _,
+                    ((((self.code & 0xffff) ^ 0x8000).wrapping_sub(0x8000)) as i32) as _,
                 )),
                 Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
             ],
@@ -2349,7 +2351,7 @@ impl Ins {
                 Field::rD(GPR(((self.code >> 21u8) & 0x1f) as _)),
                 Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
                 Field::simm(Simm(
-                    (((self.code & 0xffff) ^ 0x8000).wrapping_sub(0x8000)) as _,
+                    ((((self.code & 0xffff) ^ 0x8000).wrapping_sub(0x8000)) as i32) as _,
                 )),
             ],
             Opcode::Subfme => vec![
@@ -2372,7 +2374,7 @@ impl Ins {
                 Field::TO(OpaqueU(((self.code >> 21u8) & 0x1f) as _)),
                 Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
                 Field::simm(Simm(
-                    (((self.code & 0xffff) ^ 0x8000).wrapping_sub(0x8000)) as _,
+                    ((((self.code & 0xffff) ^ 0x8000).wrapping_sub(0x8000)) as i32) as _,
                 )),
             ],
             Opcode::Xor => vec![
@@ -3128,7 +3130,7 @@ impl Ins {
             }
             Opcode::Lbz => {
                 let mut uses = vec![Field::offset(Offset(
-                    (((self.code & 0xffff) ^ 0x8000).wrapping_sub(0x8000)) as _,
+                    ((((self.code & 0xffff) ^ 0x8000).wrapping_sub(0x8000)) as i32) as _,
                 ))];
                 if ((self.code >> 16u8) & 0x1f) != 0 {
                     uses.push(Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)));
@@ -3138,7 +3140,7 @@ impl Ins {
             Opcode::Lbzu => {
                 let mut uses = vec![
                     Field::offset(Offset(
-                        (((self.code & 0xffff) ^ 0x8000).wrapping_sub(0x8000)) as _,
+                        ((((self.code & 0xffff) ^ 0x8000).wrapping_sub(0x8000)) as i32) as _,
                     )),
                     Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
                 ];
@@ -3160,7 +3162,7 @@ impl Ins {
             }
             Opcode::Lfd => {
                 let mut uses = vec![Field::offset(Offset(
-                    (((self.code & 0xffff) ^ 0x8000).wrapping_sub(0x8000)) as _,
+                    ((((self.code & 0xffff) ^ 0x8000).wrapping_sub(0x8000)) as i32) as _,
                 ))];
                 if ((self.code >> 16u8) & 0x1f) != 0 {
                     uses.push(Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)));
@@ -3170,7 +3172,7 @@ impl Ins {
             Opcode::Lfdu => {
                 let mut uses = vec![
                     Field::offset(Offset(
-                        (((self.code & 0xffff) ^ 0x8000).wrapping_sub(0x8000)) as _,
+                        ((((self.code & 0xffff) ^ 0x8000).wrapping_sub(0x8000)) as i32) as _,
                     )),
                     Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
                 ];
@@ -3192,7 +3194,7 @@ impl Ins {
             }
             Opcode::Lfs => {
                 let mut uses = vec![Field::offset(Offset(
-                    (((self.code & 0xffff) ^ 0x8000).wrapping_sub(0x8000)) as _,
+                    ((((self.code & 0xffff) ^ 0x8000).wrapping_sub(0x8000)) as i32) as _,
                 ))];
                 if ((self.code >> 16u8) & 0x1f) != 0 {
                     uses.push(Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)));
@@ -3202,7 +3204,7 @@ impl Ins {
             Opcode::Lfsu => {
                 let mut uses = vec![
                     Field::offset(Offset(
-                        (((self.code & 0xffff) ^ 0x8000).wrapping_sub(0x8000)) as _,
+                        ((((self.code & 0xffff) ^ 0x8000).wrapping_sub(0x8000)) as i32) as _,
                     )),
                     Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
                 ];
@@ -3224,7 +3226,7 @@ impl Ins {
             }
             Opcode::Lha => {
                 let mut uses = vec![Field::offset(Offset(
-                    (((self.code & 0xffff) ^ 0x8000).wrapping_sub(0x8000)) as _,
+                    ((((self.code & 0xffff) ^ 0x8000).wrapping_sub(0x8000)) as i32) as _,
                 ))];
                 if ((self.code >> 16u8) & 0x1f) != 0 {
                     uses.push(Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)));
@@ -3234,7 +3236,7 @@ impl Ins {
             Opcode::Lhau => {
                 let mut uses = vec![
                     Field::offset(Offset(
-                        (((self.code & 0xffff) ^ 0x8000).wrapping_sub(0x8000)) as _,
+                        ((((self.code & 0xffff) ^ 0x8000).wrapping_sub(0x8000)) as i32) as _,
                     )),
                     Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
                 ];
@@ -3263,7 +3265,7 @@ impl Ins {
             }
             Opcode::Lhz => {
                 let mut uses = vec![Field::offset(Offset(
-                    (((self.code & 0xffff) ^ 0x8000).wrapping_sub(0x8000)) as _,
+                    ((((self.code & 0xffff) ^ 0x8000).wrapping_sub(0x8000)) as i32) as _,
                 ))];
                 if ((self.code >> 16u8) & 0x1f) != 0 {
                     uses.push(Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)));
@@ -3273,7 +3275,7 @@ impl Ins {
             Opcode::Lhzu => {
                 let mut uses = vec![
                     Field::offset(Offset(
-                        (((self.code & 0xffff) ^ 0x8000).wrapping_sub(0x8000)) as _,
+                        ((((self.code & 0xffff) ^ 0x8000).wrapping_sub(0x8000)) as i32) as _,
                     )),
                     Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
                 ];
@@ -3295,7 +3297,7 @@ impl Ins {
             }
             Opcode::Lmw => {
                 let mut uses = vec![Field::offset(Offset(
-                    (((self.code & 0xffff) ^ 0x8000).wrapping_sub(0x8000)) as _,
+                    ((((self.code & 0xffff) ^ 0x8000).wrapping_sub(0x8000)) as i32) as _,
                 ))];
                 if ((self.code >> 16u8) & 0x1f) != 0 {
                     uses.push(Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)));
@@ -3332,7 +3334,7 @@ impl Ins {
             }
             Opcode::Lwz => {
                 let mut uses = vec![Field::offset(Offset(
-                    (((self.code & 0xffff) ^ 0x8000).wrapping_sub(0x8000)) as _,
+                    ((((self.code & 0xffff) ^ 0x8000).wrapping_sub(0x8000)) as i32) as _,
                 ))];
                 if ((self.code >> 16u8) & 0x1f) != 0 {
                     uses.push(Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)));
@@ -3342,7 +3344,7 @@ impl Ins {
             Opcode::Lwzu => {
                 let mut uses = vec![
                     Field::offset(Offset(
-                        (((self.code & 0xffff) ^ 0x8000).wrapping_sub(0x8000)) as _,
+                        ((((self.code & 0xffff) ^ 0x8000).wrapping_sub(0x8000)) as i32) as _,
                     )),
                     Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
                 ];
@@ -4963,7 +4965,8 @@ impl Ins {
                         args: vec![
                             Argument::GPR(GPR(((self.code >> 21u8) & 0x1f) as _)),
                             Argument::Simm(Simm(
-                                (((self.code & 0xffff) ^ 0x8000).wrapping_sub(0x8000)) as _,
+                                ((((self.code & 0xffff) ^ 0x8000).wrapping_sub(0x8000)) as i32)
+                                    as _,
                             )),
                         ],
                         ins: self,
@@ -4997,8 +5000,9 @@ impl Ins {
                     return SimplifiedIns {
                         mnemonic: "blt",
                         args: vec![Argument::BranchDest(BranchDest(
-                            (((((self.code >> 2u8) & 0x3fff) ^ 0x2000).wrapping_sub(0x2000)) << 2u8)
-                                as _,
+                            ((((((self.code >> 2u8) & 0x3fff) ^ 0x2000).wrapping_sub(0x2000))
+                                as i32)
+                                << 2u8) as _,
                         ))],
                         ins: self,
                     };
@@ -5010,7 +5014,8 @@ impl Ins {
                         args: vec![
                             Argument::CRField(CRField(((self.code >> 18u8) & 0x7) as _)),
                             Argument::BranchDest(BranchDest(
-                                (((((self.code >> 2u8) & 0x3fff) ^ 0x2000).wrapping_sub(0x2000))
+                                ((((((self.code >> 2u8) & 0x3fff) ^ 0x2000).wrapping_sub(0x2000))
+                                    as i32)
                                     << 2u8) as _,
                             )),
                         ],
@@ -5024,8 +5029,9 @@ impl Ins {
                     return SimplifiedIns {
                         mnemonic: "ble",
                         args: vec![Argument::BranchDest(BranchDest(
-                            (((((self.code >> 2u8) & 0x3fff) ^ 0x2000).wrapping_sub(0x2000)) << 2u8)
-                                as _,
+                            ((((((self.code >> 2u8) & 0x3fff) ^ 0x2000).wrapping_sub(0x2000))
+                                as i32)
+                                << 2u8) as _,
                         ))],
                         ins: self,
                     };
@@ -5037,7 +5043,8 @@ impl Ins {
                         args: vec![
                             Argument::CRField(CRField(((self.code >> 18u8) & 0x7) as _)),
                             Argument::BranchDest(BranchDest(
-                                (((((self.code >> 2u8) & 0x3fff) ^ 0x2000).wrapping_sub(0x2000))
+                                ((((((self.code >> 2u8) & 0x3fff) ^ 0x2000).wrapping_sub(0x2000))
+                                    as i32)
                                     << 2u8) as _,
                             )),
                         ],
@@ -5051,8 +5058,9 @@ impl Ins {
                     return SimplifiedIns {
                         mnemonic: "beq",
                         args: vec![Argument::BranchDest(BranchDest(
-                            (((((self.code >> 2u8) & 0x3fff) ^ 0x2000).wrapping_sub(0x2000)) << 2u8)
-                                as _,
+                            ((((((self.code >> 2u8) & 0x3fff) ^ 0x2000).wrapping_sub(0x2000))
+                                as i32)
+                                << 2u8) as _,
                         ))],
                         ins: self,
                     };
@@ -5064,7 +5072,8 @@ impl Ins {
                         args: vec![
                             Argument::CRField(CRField(((self.code >> 18u8) & 0x7) as _)),
                             Argument::BranchDest(BranchDest(
-                                (((((self.code >> 2u8) & 0x3fff) ^ 0x2000).wrapping_sub(0x2000))
+                                ((((((self.code >> 2u8) & 0x3fff) ^ 0x2000).wrapping_sub(0x2000))
+                                    as i32)
                                     << 2u8) as _,
                             )),
                         ],
@@ -5078,8 +5087,9 @@ impl Ins {
                     return SimplifiedIns {
                         mnemonic: "bge",
                         args: vec![Argument::BranchDest(BranchDest(
-                            (((((self.code >> 2u8) & 0x3fff) ^ 0x2000).wrapping_sub(0x2000)) << 2u8)
-                                as _,
+                            ((((((self.code >> 2u8) & 0x3fff) ^ 0x2000).wrapping_sub(0x2000))
+                                as i32)
+                                << 2u8) as _,
                         ))],
                         ins: self,
                     };
@@ -5091,7 +5101,8 @@ impl Ins {
                         args: vec![
                             Argument::CRField(CRField(((self.code >> 18u8) & 0x7) as _)),
                             Argument::BranchDest(BranchDest(
-                                (((((self.code >> 2u8) & 0x3fff) ^ 0x2000).wrapping_sub(0x2000))
+                                ((((((self.code >> 2u8) & 0x3fff) ^ 0x2000).wrapping_sub(0x2000))
+                                    as i32)
                                     << 2u8) as _,
                             )),
                         ],
@@ -5105,8 +5116,9 @@ impl Ins {
                     return SimplifiedIns {
                         mnemonic: "bgt",
                         args: vec![Argument::BranchDest(BranchDest(
-                            (((((self.code >> 2u8) & 0x3fff) ^ 0x2000).wrapping_sub(0x2000)) << 2u8)
-                                as _,
+                            ((((((self.code >> 2u8) & 0x3fff) ^ 0x2000).wrapping_sub(0x2000))
+                                as i32)
+                                << 2u8) as _,
                         ))],
                         ins: self,
                     };
@@ -5118,7 +5130,8 @@ impl Ins {
                         args: vec![
                             Argument::CRField(CRField(((self.code >> 18u8) & 0x7) as _)),
                             Argument::BranchDest(BranchDest(
-                                (((((self.code >> 2u8) & 0x3fff) ^ 0x2000).wrapping_sub(0x2000))
+                                ((((((self.code >> 2u8) & 0x3fff) ^ 0x2000).wrapping_sub(0x2000))
+                                    as i32)
                                     << 2u8) as _,
                             )),
                         ],
@@ -5132,8 +5145,9 @@ impl Ins {
                     return SimplifiedIns {
                         mnemonic: "bne",
                         args: vec![Argument::BranchDest(BranchDest(
-                            (((((self.code >> 2u8) & 0x3fff) ^ 0x2000).wrapping_sub(0x2000)) << 2u8)
-                                as _,
+                            ((((((self.code >> 2u8) & 0x3fff) ^ 0x2000).wrapping_sub(0x2000))
+                                as i32)
+                                << 2u8) as _,
                         ))],
                         ins: self,
                     };
@@ -5145,7 +5159,8 @@ impl Ins {
                         args: vec![
                             Argument::CRField(CRField(((self.code >> 18u8) & 0x7) as _)),
                             Argument::BranchDest(BranchDest(
-                                (((((self.code >> 2u8) & 0x3fff) ^ 0x2000).wrapping_sub(0x2000))
+                                ((((((self.code >> 2u8) & 0x3fff) ^ 0x2000).wrapping_sub(0x2000))
+                                    as i32)
                                     << 2u8) as _,
                             )),
                         ],
@@ -5159,8 +5174,9 @@ impl Ins {
                     return SimplifiedIns {
                         mnemonic: "bso",
                         args: vec![Argument::BranchDest(BranchDest(
-                            (((((self.code >> 2u8) & 0x3fff) ^ 0x2000).wrapping_sub(0x2000)) << 2u8)
-                                as _,
+                            ((((((self.code >> 2u8) & 0x3fff) ^ 0x2000).wrapping_sub(0x2000))
+                                as i32)
+                                << 2u8) as _,
                         ))],
                         ins: self,
                     };
@@ -5172,7 +5188,8 @@ impl Ins {
                         args: vec![
                             Argument::CRField(CRField(((self.code >> 18u8) & 0x7) as _)),
                             Argument::BranchDest(BranchDest(
-                                (((((self.code >> 2u8) & 0x3fff) ^ 0x2000).wrapping_sub(0x2000))
+                                ((((((self.code >> 2u8) & 0x3fff) ^ 0x2000).wrapping_sub(0x2000))
+                                    as i32)
                                     << 2u8) as _,
                             )),
                         ],
@@ -5186,8 +5203,9 @@ impl Ins {
                     return SimplifiedIns {
                         mnemonic: "bns",
                         args: vec![Argument::BranchDest(BranchDest(
-                            (((((self.code >> 2u8) & 0x3fff) ^ 0x2000).wrapping_sub(0x2000)) << 2u8)
-                                as _,
+                            ((((((self.code >> 2u8) & 0x3fff) ^ 0x2000).wrapping_sub(0x2000))
+                                as i32)
+                                << 2u8) as _,
                         ))],
                         ins: self,
                     };
@@ -5199,7 +5217,8 @@ impl Ins {
                         args: vec![
                             Argument::CRField(CRField(((self.code >> 18u8) & 0x7) as _)),
                             Argument::BranchDest(BranchDest(
-                                (((((self.code >> 2u8) & 0x3fff) ^ 0x2000).wrapping_sub(0x2000))
+                                ((((((self.code >> 2u8) & 0x3fff) ^ 0x2000).wrapping_sub(0x2000))
+                                    as i32)
                                     << 2u8) as _,
                             )),
                         ],
@@ -5210,8 +5229,9 @@ impl Ins {
                     return SimplifiedIns {
                         mnemonic: "bdnz",
                         args: vec![Argument::BranchDest(BranchDest(
-                            (((((self.code >> 2u8) & 0x3fff) ^ 0x2000).wrapping_sub(0x2000)) << 2u8)
-                                as _,
+                            ((((((self.code >> 2u8) & 0x3fff) ^ 0x2000).wrapping_sub(0x2000))
+                                as i32)
+                                << 2u8) as _,
                         ))],
                         ins: self,
                     };
@@ -5220,8 +5240,9 @@ impl Ins {
                     return SimplifiedIns {
                         mnemonic: "bdz",
                         args: vec![Argument::BranchDest(BranchDest(
-                            (((((self.code >> 2u8) & 0x3fff) ^ 0x2000).wrapping_sub(0x2000)) << 2u8)
-                                as _,
+                            ((((((self.code >> 2u8) & 0x3fff) ^ 0x2000).wrapping_sub(0x2000))
+                                as i32)
+                                << 2u8) as _,
                         ))],
                         ins: self,
                     };
@@ -5552,7 +5573,8 @@ impl Ins {
                         args: vec![
                             Argument::GPR(GPR(((self.code >> 16u8) & 0x1f) as _)),
                             Argument::Simm(Simm(
-                                (((self.code & 0xffff) ^ 0x8000).wrapping_sub(0x8000)) as _,
+                                ((((self.code & 0xffff) ^ 0x8000).wrapping_sub(0x8000)) as i32)
+                                    as _,
                             )),
                         ],
                         ins: self,
@@ -5565,7 +5587,8 @@ impl Ins {
                             Argument::CRField(CRField(((self.code >> 23u8) & 0x7) as _)),
                             Argument::GPR(GPR(((self.code >> 16u8) & 0x1f) as _)),
                             Argument::Simm(Simm(
-                                (((self.code & 0xffff) ^ 0x8000).wrapping_sub(0x8000)) as _,
+                                ((((self.code & 0xffff) ^ 0x8000).wrapping_sub(0x8000)) as i32)
+                                    as _,
                             )),
                         ],
                         ins: self,
@@ -5872,7 +5895,8 @@ impl Ins {
                         args: vec![
                             Argument::GPR(GPR(((self.code >> 16u8) & 0x1f) as _)),
                             Argument::Simm(Simm(
-                                (((self.code & 0xffff) ^ 0x8000).wrapping_sub(0x8000)) as _,
+                                ((((self.code & 0xffff) ^ 0x8000).wrapping_sub(0x8000)) as i32)
+                                    as _,
                             )),
                         ],
                         ins: self,
@@ -5884,7 +5908,8 @@ impl Ins {
                         args: vec![
                             Argument::GPR(GPR(((self.code >> 16u8) & 0x1f) as _)),
                             Argument::Simm(Simm(
-                                (((self.code & 0xffff) ^ 0x8000).wrapping_sub(0x8000)) as _,
+                                ((((self.code & 0xffff) ^ 0x8000).wrapping_sub(0x8000)) as i32)
+                                    as _,
                             )),
                         ],
                         ins: self,
@@ -5900,7 +5925,7 @@ impl Ins {
 impl Ins {
     #[inline(always)]
     pub fn field_simm(&self) -> isize {
-        (((self.code & 0xffff) ^ 0x8000).wrapping_sub(0x8000)) as _
+        ((((self.code & 0xffff) ^ 0x8000).wrapping_sub(0x8000)) as i32) as _
     }
     #[inline(always)]
     pub fn field_uimm(&self) -> usize {
@@ -5908,11 +5933,11 @@ impl Ins {
     }
     #[inline(always)]
     pub fn field_offset(&self) -> isize {
-        (((self.code & 0xffff) ^ 0x8000).wrapping_sub(0x8000)) as _
+        ((((self.code & 0xffff) ^ 0x8000).wrapping_sub(0x8000)) as i32) as _
     }
     #[inline(always)]
     pub fn field_ps_offset(&self) -> isize {
-        (((self.code & 0xfff) ^ 0x800).wrapping_sub(0x800)) as _
+        ((((self.code & 0xfff) ^ 0x800).wrapping_sub(0x800)) as i32) as _
     }
     #[inline(always)]
     pub fn field_BO(&self) -> usize {
@@ -5924,11 +5949,11 @@ impl Ins {
     }
     #[inline(always)]
     pub fn field_BD(&self) -> isize {
-        (((((self.code >> 2u8) & 0x3fff) ^ 0x2000).wrapping_sub(0x2000)) << 2u8) as _
+        ((((((self.code >> 2u8) & 0x3fff) ^ 0x2000).wrapping_sub(0x2000)) as i32) << 2u8) as _
     }
     #[inline(always)]
     pub fn field_LI(&self) -> isize {
-        (((((self.code >> 2u8) & 0xffffff) ^ 0x800000).wrapping_sub(0x800000)) << 2u8) as _
+        ((((((self.code >> 2u8) & 0xffffff) ^ 0x800000).wrapping_sub(0x800000)) as i32) << 2u8) as _
     }
     #[inline(always)]
     pub fn field_SH(&self) -> usize {

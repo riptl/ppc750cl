@@ -1,17 +1,15 @@
 [package]
-name = "ppc750cl-flow-graph"
+name = "dol-analysis"
 version = "0.2.0"
 edition = "2021"
-authors = ["riidefi <riidefi@rii.dev>", "Richard Patel <me@terorie.dev>"]
+authors = ["Richard Patel <me@terorie.dev>"]
 license = "GPL-3.0-or-later"
-description = "Control flow graph analysis for PowerPC 750CL"
+description = "main.dol analysis experiment"
 repository = "https://github.com/terorie/ppc750cl"
 
 [dependencies]
-clap = "3"
 dol = { version = "0.2.0", path = "../dol" }
-itertools = "0.10"
-parse_int = "0.6"
-petgraph = "0.6"
+clap = "3"
 ppc750cl = { version = "0.2.0", path = "../disasm" }
 ppc750cl-analysis = { version = "0.2.0", path = "../analysis" }
+twoway = "0.2.2"
