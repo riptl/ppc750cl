@@ -483,7 +483,7 @@ fn test_ins_lwzx() {
 
 #[test]
 fn test_ins_mfcr() {
-    assert_asm!(0x7C000026, "mfcr cr0");
+    assert_asm!(0x7C000026, "mfcr r0");
 }
 
 #[test]

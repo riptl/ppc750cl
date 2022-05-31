@@ -1823,7 +1823,7 @@ impl Ins {
                 Field::crfS(CRField(((self.code >> 18u8) & 0x7) as _)),
             ],
             Opcode::Mcrxr => vec![Field::crfD(CRField(((self.code >> 23u8) & 0x7) as _))],
-            Opcode::Mfcr => vec![Field::crfD(CRField(((self.code >> 23u8) & 0x7) as _))],
+            Opcode::Mfcr => vec![Field::rD(GPR(((self.code >> 21u8) & 0x1f) as _))],
             Opcode::Mffs => vec![Field::frD(FPR(((self.code >> 21u8) & 0x1f) as _))],
             Opcode::Mfmsr => vec![Field::rD(GPR(((self.code >> 21u8) & 0x1f) as _))],
             Opcode::Mfspr => vec![
@@ -2562,7 +2562,7 @@ impl Ins {
                 Field::crfD(CRField(((self.code >> 23u8) & 0x7) as _)),
                 Field::xer,
             ],
-            Opcode::Mfcr => vec![Field::crfD(CRField(((self.code >> 23u8) & 0x7) as _))],
+            Opcode::Mfcr => vec![Field::rD(GPR(((self.code >> 21u8) & 0x1f) as _))],
             Opcode::Mffs => vec![Field::frD(FPR(((self.code >> 21u8) & 0x1f) as _))],
             Opcode::Mfmsr => vec![Field::rD(GPR(((self.code >> 21u8) & 0x1f) as _))],
             Opcode::Mfspr => vec![Field::rD(GPR(((self.code >> 21u8) & 0x1f) as _))],

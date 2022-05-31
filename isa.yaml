@@ -1063,8 +1063,8 @@ opcodes:
     desc: Move from Condition Register
     bitmask: 0xfc1fffff
     pattern: 0x7c000026
-    args: [ crfD ]
-    defs: [ crfD ]
+    args: [ rD ]
+    defs: [ rD ]
 
   - name: mffs
     desc: Move from FPSCR
