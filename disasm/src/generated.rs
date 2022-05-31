@@ -5708,17 +5708,6 @@ impl Ins {
                         ins: self,
                     };
                 }
-                if (((((self.code >> 11u8) & 0x3ff) & 0b11111_00000u32) >> 5u32)
-                    | ((((self.code >> 11u8) & 0x3ff) & 0b00000_11111u32) << 5u32))
-                    as u32
-                    == 571
-                {
-                    return SimplifiedIns {
-                        mnemonic: "mftdu",
-                        args: vec![Argument::GPR(GPR(((self.code >> 21u8) & 0x1f) as _))],
-                        ins: self,
-                    };
-                }
             }
             Opcode::Mtspr => {
                 if (((((self.code >> 11u8) & 0x3ff) & 0b11111_00000u32) >> 5u32)
@@ -5772,17 +5761,6 @@ impl Ins {
                 {
                     return SimplifiedIns {
                         mnemonic: "mtdbatu",
-                        args: vec![Argument::GPR(GPR(((self.code >> 21u8) & 0x1f) as _))],
-                        ins: self,
-                    };
-                }
-                if (((((self.code >> 11u8) & 0x3ff) & 0b11111_00000u32) >> 5u32)
-                    | ((((self.code >> 11u8) & 0x3ff) & 0b00000_11111u32) << 5u32))
-                    as u32
-                    == 571
-                {
-                    return SimplifiedIns {
-                        mnemonic: "mttdu",
                         args: vec![Argument::GPR(GPR(((self.code >> 21u8) & 0x1f) as _))],
                         ins: self,
                     };

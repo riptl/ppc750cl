@@ -2103,10 +2103,6 @@ mnemonics:
     opcode: mtspr
     args: [ rS ]
     condition: spr == 397
-  - name: mttdu
-    opcode: mtspr
-    args: [ rS ]
-    condition: spr == 571
 
   # Move from special-purpose register
   - name: mfxer
@@ -2129,10 +2125,6 @@ mnemonics:
     opcode: mfspr
     args: [ rD ]
     condition: spr == 397
-  - name: mftdu
-    opcode: mfspr
-    args: [ rD ]
-    condition: spr == 571
 
   # Branch Conditional
   # bc branch always
