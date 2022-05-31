@@ -4204,21 +4204,21 @@ impl Ins {
             Opcode::Andis_ => String::new(),
             Opcode::B => {
                 let mut s = String::with_capacity(4);
-                if self.bit(30usize) {
-                    s.push('a');
-                }
                 if self.bit(31usize) {
                     s.push('l');
+                }
+                if self.bit(30usize) {
+                    s.push('a');
                 }
                 s
             }
             Opcode::Bc => {
                 let mut s = String::with_capacity(4);
-                if self.bit(30usize) {
-                    s.push('a');
-                }
                 if self.bit(31usize) {
                     s.push('l');
+                }
+                if self.bit(30usize) {
+                    s.push('a');
                 }
                 s
             }

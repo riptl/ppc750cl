@@ -94,6 +94,7 @@ fn test_ins_b() {
     assert_asm!(0x4823B4D9, "bl 0x23b4d8");
     assert_asm!(0x4BE03C99, "bl -0x1fc368");
     assert_asm!(0x4BDC1A59, "bl -0x23e5a8");
+    assert_asm!(0x48000063, "bla 0x60");
 }
 
 #[test]

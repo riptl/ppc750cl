@@ -287,14 +287,14 @@ opcodes:
     desc: Branch
     bitmask: 0xfc000000
     pattern: 0x48000000
-    modifiers: [ AA, LK ]
+    modifiers: [ LK, AA ]
     args: [ LI ]
 
   - name: bc
     desc: Branch Conditional
     bitmask: 0xfc000000
     pattern: 0x40000000
-    modifiers: [ AA, LK ]
+    modifiers: [ LK, AA ]
     args: [ BO, BI, BD ]
 
   - name: bcctr
@@ -2164,105 +2164,105 @@ mnemonics:
   # bc branch always
   - name: b
     opcode: bc
-    modifiers: [ AA, LK ]
+    modifiers: [ LK, AA ]
     condition: BO == 20 && BI == 0
   # bc branch if negative
   - name: blt
     opcode: bc
-    modifiers: [ AA, LK ]
+    modifiers: [ LK, AA ]
     args: [ BD ]
     condition: BO == 12 && BI & 0b11 == 0b00 && crfS == 0
   - name: blt
     opcode: bc
-    modifiers: [ AA, LK ]
+    modifiers: [ LK, AA ]
     args: [ crfS, BD ]
     condition: BO == 12 && BI & 0b11 == 0b00
   # bc branch if not positive
   - name: ble
     opcode: bc
-    modifiers: [ AA, LK ]
+    modifiers: [ LK, AA ]
     args: [ BD ]
     condition: BO == 4 && BI & 0b11 == 0b01 && crfS == 0
   - name: ble
     opcode: bc
-    modifiers: [ AA, LK ]
+    modifiers: [ LK, AA ]
     args: [ crfS, BD ]
     condition: BO == 4 && BI & 0b11 == 0b01
   # bc branch if zero
   - name: beq
     opcode: bc
-    modifiers: [ AA, LK ]
+    modifiers: [ LK, AA ]
     args: [ BD ]
     condition: BO == 12 && BI & 0b11 == 0b10 && crfS == 0
   - name: beq
     opcode: bc
-    modifiers: [ AA, LK ]
+    modifiers: [ LK, AA ]
     args: [ crfS, BD ]
     condition: BO == 12 && BI & 0b11 == 0b10
   # bc branch if not negative
   - name: bge
     opcode: bc
-    modifiers: [ AA, LK ]
+    modifiers: [ LK, AA ]
     args: [ BD ]
     condition: BO == 4 && BI & 0b11 == 0b00 && crfS == 0
   - name: bge
     opcode: bc
-    modifiers: [ AA, LK ]
+    modifiers: [ LK, AA ]
     args: [ crfS, BD ]
     condition: BO == 4 && BI & 0b11 == 0b00
   # bc branch if positive
   - name: bgt
     opcode: bc
-    modifiers: [ AA, LK ]
+    modifiers: [ LK, AA ]
     args: [ BD ]
     condition: BO == 12 && BI & 0b11 == 0b01 && crfS == 0
   - name: bgt
     opcode: bc
-    modifiers: [ AA, LK ]
+    modifiers: [ LK, AA ]
     args: [ crfS, BD ]
     condition: BO == 12 && BI & 0b11 == 0b01
   # bc branch if not zero
   - name: bne
     opcode: bc
-    modifiers: [ AA, LK ]
+    modifiers: [ LK, AA ]
     args: [ BD ]
     condition: BO == 4 && BI & 0b11 == 0b10 && crfS == 0
   - name: bne
     opcode: bc
-    modifiers: [ AA, LK ]
+    modifiers: [ LK, AA ]
     args: [ crfS, BD ]
     condition: BO == 4 && BI & 0b11 == 0b10
   # bc branch if summary overflow
   - name: bso
     opcode: bc
-    modifiers: [ AA, LK ]
+    modifiers: [ LK, AA ]
     args: [ BD ]
     condition: BO == 12 && BI & 0b11 == 0b11 && crfS == 0
   - name: bso
     opcode: bc
-    modifiers: [ AA, LK ]
+    modifiers: [ LK, AA ]
     args: [ crfS, BD ]
     condition: BO == 12 && BI & 0b11 == 0b11
   # bc branch if not summary overflow
   - name: bns
     opcode: bc
-    modifiers: [ AA, LK ]
+    modifiers: [ LK, AA ]
     args: [ BD ]
     condition: BO == 4 && BI & 0b11 == 0b11 && crfS == 0
   - name: bns
     opcode: bc
-    modifiers: [ AA, LK ]
+    modifiers: [ LK, AA ]
     args: [ crfS, BD ]
     condition: BO == 4 && BI & 0b11 == 0b11
 
   - name: bdnz
     opcode: bc
-    modifiers: [ AA, LK ]
+    modifiers: [ LK, AA ]
     args: [ BD ]
     condition: BO == 16 && BI == 0
   - name: bdz
     opcode: bc
-    modifiers: [ AA, LK ]
+    modifiers: [ LK, AA ]
     args: [ BD ]
     condition: BO == 18 && BI == 0
   # TODO support conditional bd...
