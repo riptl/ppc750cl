@@ -4532,13 +4532,7 @@ impl Ins {
             Opcode::Mcrfs => String::new(),
             Opcode::Mcrxr => String::new(),
             Opcode::Mfcr => String::new(),
-            Opcode::Mffs => {
-                let mut s = String::with_capacity(4);
-                if self.bit(31usize) {
-                    s.push('.');
-                }
-                s
-            }
+            Opcode::Mffs => String::new(),
             Opcode::Mfmsr => String::new(),
             Opcode::Mfspr => String::new(),
             Opcode::Mfsr => String::new(),
@@ -4591,13 +4585,7 @@ impl Ins {
                 }
                 s
             }
-            Opcode::Mulli => {
-                let mut s = String::with_capacity(4);
-                if self.bit(31usize) {
-                    s.push('.');
-                }
-                s
-            }
+            Opcode::Mulli => String::new(),
             Opcode::Mullw => {
                 let mut s = String::with_capacity(4);
                 if self.bit(21usize) {
@@ -4656,185 +4644,35 @@ impl Ins {
             Opcode::PsqStu => String::new(),
             Opcode::PsqStux => String::new(),
             Opcode::PsqStx => String::new(),
-            Opcode::PsAbs => {
-                let mut s = String::with_capacity(4);
-                if self.bit(31usize) {
-                    s.push('.');
-                }
-                s
-            }
-            Opcode::PsAdd => {
-                let mut s = String::with_capacity(4);
-                if self.bit(31usize) {
-                    s.push('.');
-                }
-                s
-            }
+            Opcode::PsAbs => String::new(),
+            Opcode::PsAdd => String::new(),
             Opcode::PsCmpo0 => String::new(),
             Opcode::PsCmpo1 => String::new(),
             Opcode::PsCmpu0 => String::new(),
             Opcode::PsCmpu1 => String::new(),
-            Opcode::PsDiv => {
-                let mut s = String::with_capacity(4);
-                if self.bit(31usize) {
-                    s.push('.');
-                }
-                s
-            }
-            Opcode::PsMadd => {
-                let mut s = String::with_capacity(4);
-                if self.bit(31usize) {
-                    s.push('.');
-                }
-                s
-            }
-            Opcode::PsMadds0 => {
-                let mut s = String::with_capacity(4);
-                if self.bit(31usize) {
-                    s.push('.');
-                }
-                s
-            }
-            Opcode::PsMadds1 => {
-                let mut s = String::with_capacity(4);
-                if self.bit(31usize) {
-                    s.push('.');
-                }
-                s
-            }
-            Opcode::PsMerge00 => {
-                let mut s = String::with_capacity(4);
-                if self.bit(31usize) {
-                    s.push('.');
-                }
-                s
-            }
-            Opcode::PsMerge01 => {
-                let mut s = String::with_capacity(4);
-                if self.bit(31usize) {
-                    s.push('.');
-                }
-                s
-            }
-            Opcode::PsMerge10 => {
-                let mut s = String::with_capacity(4);
-                if self.bit(31usize) {
-                    s.push('.');
-                }
-                s
-            }
-            Opcode::PsMerge11 => {
-                let mut s = String::with_capacity(4);
-                if self.bit(31usize) {
-                    s.push('.');
-                }
-                s
-            }
-            Opcode::PsMr => {
-                let mut s = String::with_capacity(4);
-                if self.bit(31usize) {
-                    s.push('.');
-                }
-                s
-            }
-            Opcode::PsMsub => {
-                let mut s = String::with_capacity(4);
-                if self.bit(31usize) {
-                    s.push('.');
-                }
-                s
-            }
-            Opcode::PsMul => {
-                let mut s = String::with_capacity(4);
-                if self.bit(31usize) {
-                    s.push('.');
-                }
-                s
-            }
-            Opcode::PsMuls0 => {
-                let mut s = String::with_capacity(4);
-                if self.bit(31usize) {
-                    s.push('.');
-                }
-                s
-            }
-            Opcode::PsMuls1 => {
-                let mut s = String::with_capacity(4);
-                if self.bit(31usize) {
-                    s.push('.');
-                }
-                s
-            }
-            Opcode::PsNabs => {
-                let mut s = String::with_capacity(4);
-                if self.bit(31usize) {
-                    s.push('.');
-                }
-                s
-            }
-            Opcode::PsNeg => {
-                let mut s = String::with_capacity(4);
-                if self.bit(31usize) {
-                    s.push('.');
-                }
-                s
-            }
-            Opcode::PsNmadd => {
-                let mut s = String::with_capacity(4);
-                if self.bit(31usize) {
-                    s.push('.');
-                }
-                s
-            }
-            Opcode::PsNmsub => {
-                let mut s = String::with_capacity(4);
-                if self.bit(31usize) {
-                    s.push('.');
-                }
-                s
-            }
-            Opcode::PsRes => {
-                let mut s = String::with_capacity(4);
-                if self.bit(31usize) {
-                    s.push('.');
-                }
-                s
-            }
-            Opcode::PsRsqrte => {
-                let mut s = String::with_capacity(4);
-                if self.bit(31usize) {
-                    s.push('.');
-                }
-                s
-            }
-            Opcode::PsSel => {
-                let mut s = String::with_capacity(4);
-                if self.bit(31usize) {
-                    s.push('.');
-                }
-                s
-            }
-            Opcode::PsSub => {
-                let mut s = String::with_capacity(4);
-                if self.bit(31usize) {
-                    s.push('.');
-                }
-                s
-            }
-            Opcode::PsSum0 => {
-                let mut s = String::with_capacity(4);
-                if self.bit(31usize) {
-                    s.push('.');
-                }
-                s
-            }
-            Opcode::PsSum1 => {
-                let mut s = String::with_capacity(4);
-                if self.bit(31usize) {
-                    s.push('.');
-                }
-                s
-            }
+            Opcode::PsDiv => String::new(),
+            Opcode::PsMadd => String::new(),
+            Opcode::PsMadds0 => String::new(),
+            Opcode::PsMadds1 => String::new(),
+            Opcode::PsMerge00 => String::new(),
+            Opcode::PsMerge01 => String::new(),
+            Opcode::PsMerge10 => String::new(),
+            Opcode::PsMerge11 => String::new(),
+            Opcode::PsMr => String::new(),
+            Opcode::PsMsub => String::new(),
+            Opcode::PsMul => String::new(),
+            Opcode::PsMuls0 => String::new(),
+            Opcode::PsMuls1 => String::new(),
+            Opcode::PsNabs => String::new(),
+            Opcode::PsNeg => String::new(),
+            Opcode::PsNmadd => String::new(),
+            Opcode::PsNmsub => String::new(),
+            Opcode::PsRes => String::new(),
+            Opcode::PsRsqrte => String::new(),
+            Opcode::PsSel => String::new(),
+            Opcode::PsSub => String::new(),
+            Opcode::PsSum0 => String::new(),
+            Opcode::PsSum1 => String::new(),
             Opcode::Rfi => String::new(),
             Opcode::Rlwimi => {
                 let mut s = String::with_capacity(4);

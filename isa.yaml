@@ -1070,7 +1070,6 @@ opcodes:
     desc: Move from FPSCR
     bitmask: 0xfc1ffffe
     pattern: 0xfc00048e
-    modifiers: [ Rc ]
     args: [ frD ]
     defs: [ frD ]
 
@@ -1199,7 +1198,6 @@ opcodes:
     desc: Multiply Low Immediate
     bitmask: 0xfc000000
     pattern: 0x1c000000
-    modifiers: [ Rc ]
     args: [ rD, rA, simm ]
     defs: [ rD ]
     uses: [ rA ]
@@ -1340,7 +1338,6 @@ opcodes:
     desc: Paired Single Absolute Value
     bitmask: 0xfc1f07fe
     pattern: 0x10000210
-    modifiers: [ Rc ]
     args: [ frD, frB ]
     defs: [ frD ]
     uses: [ frB ]
@@ -1349,7 +1346,6 @@ opcodes:
     desc: Paired Single Add
     bitmask: 0xfc0007fe
     pattern: 0x1000002a
-    modifiers: [ Rc ]
     args: [ frD, frA, frB ]
     defs: [ frD ]
     uses: [ frA, frB ]
@@ -1390,7 +1386,6 @@ opcodes:
     desc: Paired Single Divide
     bitmask: 0xfc0007fe
     pattern: 0x10000024
-    modifiers: [ Rc ]
     args: [ frD, frA, frB ]
     defs: [ frD ]
     uses: [ frA, frB ]
@@ -1399,7 +1394,6 @@ opcodes:
     desc: Paired Single Multiply-Add
     bitmask: 0xfc00003e
     pattern: 0x1000003a
-    modifiers: [ Rc ]
     args: [ frD, frA, frC, frB ]
     defs: [ frD ]
     uses: [ frA, frC, frB ]
@@ -1408,7 +1402,6 @@ opcodes:
     desc: Paired Single Multiply-Add Scalar high
     bitmask: 0xfc00003e
     pattern: 0x1000001c
-    modifiers: [ Rc ]
     args: [ frD, frA, frC, frB ]
     defs: [ frD ]
     uses: [ frA, frC, frB ]
@@ -1417,7 +1410,6 @@ opcodes:
     desc: Paired Single Multiply-Add Scalar low
     bitmask: 0xfc00003e
     pattern: 0x1000001e
-    modifiers: [ Rc ]
     args: [ frD, frA, frC, frB ]
     defs: [ frD ]
     uses: [ frA, frC, frB ]
@@ -1426,7 +1418,6 @@ opcodes:
     desc: Paired Single MERGE high
     bitmask: 0xfc0007fe
     pattern: 0x10000420
-    modifiers: [ Rc ]
     args: [ frD, frA, frB ]
     defs: [ frD ]
     uses: [ frA, frB ]
@@ -1435,7 +1426,6 @@ opcodes:
     desc: Paired Single MERGE direct
     bitmask: 0xfc0007fe
     pattern: 0x10000460
-    modifiers: [ Rc ]
     args: [ frD, frA, frB ]
     defs: [ frD ]
     uses: [ frA, frB ]
@@ -1444,7 +1434,6 @@ opcodes:
     desc: Paired Single MERGE swapped
     bitmask: 0xfc0007fe
     pattern: 0x100004a0
-    modifiers: [ Rc ]
     args: [ frD, frA, frB ]
     defs: [ frD ]
     uses: [ frA, frB ]
@@ -1453,7 +1442,6 @@ opcodes:
     desc: Paired Single MERGE low
     bitmask: 0xfc0007fe
     pattern: 0x100004e0
-    modifiers: [ Rc ]
     args: [ frD, frA, frB ]
     defs: [ frD ]
     uses: [ frA, frB ]
@@ -1462,7 +1450,6 @@ opcodes:
     desc: Paired Single Move Register
     bitmask: 0xfc1f07fe
     pattern: 0x10000090
-    modifiers: [ Rc ]
     args: [ frD, frA, frB ]
     defs: [ frD ]
     uses: [ frB ]
@@ -1471,7 +1458,6 @@ opcodes:
     desc: Paired Single Multiply-Subtract
     bitmask: 0xfc00003e
     pattern: 0x10000038
-    modifiers: [ Rc ]
     args: [ frD, frA, frC, frB ]
     defs: [ frD ]
     uses: [ frA, frC, frB ]
@@ -1480,7 +1466,6 @@ opcodes:
     desc: Paired Single Multiply
     bitmask: 0xfc00f83e
     pattern: 0x10000032
-    modifiers: [ Rc ]
     args: [ frD, frA, frC ]
     defs: [ frD ]
     uses: [ frA, frC ]
@@ -1489,7 +1474,6 @@ opcodes:
     desc: Paired Single Multiply Scalar high
     bitmask: 0xfc00f83e
     pattern: 0x10000018
-    modifiers: [ Rc ]
     args: [ frD, frA, frC ]
     defs: [ frD ]
     uses: [ frA, frC ]
@@ -1498,7 +1482,6 @@ opcodes:
     desc: Paired Single Multiply Scalar low
     bitmask: 0xfc00f83e
     pattern: 0x1000001a
-    modifiers: [ Rc ]
     args: [ frD, frA, frC ]
     defs: [ frD ]
     uses: [ frA, frC ]
@@ -1507,7 +1490,6 @@ opcodes:
     desc: Paired Single Negative Absolute Value
     bitmask: 0xfc1f07fe
     pattern: 0x10000110
-    modifiers: [ Rc ]
     args: [ frD, frB ]
     defs: [ frD ]
     uses: [ frB ]
@@ -1516,7 +1498,6 @@ opcodes:
     desc: Paired Single Negate
     bitmask: 0xfc1f07fe
     pattern: 0x10000050
-    modifiers: [ Rc ]
     args: [ frD, frB ]
     defs: [ frD ]
     uses: [ frB ]
@@ -1525,7 +1506,6 @@ opcodes:
     desc: Paired Single Negative Multiply-Add
     bitmask: 0xfc00003e
     pattern: 0x1000003e
-    modifiers: [ Rc ]
     args: [ frD, frA, frC, frB ]
     defs: [ frD ]
     uses: [ frA, frC, frB ]
@@ -1534,7 +1514,6 @@ opcodes:
     desc: Paired Single Negative Multiply-Subtract
     bitmask: 0xfc00003e
     pattern: 0x1000003c
-    modifiers: [ Rc ]
     args: [ frD, frA, frC, frB ]
     defs: [ frD ]
     uses: [ frA, frC, frB ]
@@ -1543,7 +1522,6 @@ opcodes:
     desc: Paired Single Reciprocal Estimate
     bitmask: 0xfc1f07fe
     pattern: 0x10000030
-    modifiers: [ Rc ]
     args: [ frD, frB ]
     defs: [ frD ]
     uses: [ frB ]
@@ -1552,7 +1530,6 @@ opcodes:
     desc: Paired Single Reciprocal Square Root Estimate
     bitmask: 0xfc1f07fe
     pattern: 0x10000034
-    modifiers: [ Rc ]
     args: [ frD, frB ]
     defs: [ frD ]
     uses: [ frB ]
@@ -1561,7 +1538,6 @@ opcodes:
     desc: Paired Single Select
     bitmask: 0xfc00003e
     pattern: 0x1000002e
-    modifiers: [ Rc ]
     args: [ frD, frA, frC, frB ]
     defs: [ frD ]
     uses: [ frA, frC, frB ]
@@ -1570,7 +1546,6 @@ opcodes:
     desc: Paired Single Subtract
     bitmask: 0xfc0007fe
     pattern: 0x10000028
-    modifiers: [ Rc ]
     args: [ frD, frA, frB ]
     defs: [ frD ]
     uses: [ frA, frB ]
@@ -1579,7 +1554,6 @@ opcodes:
     desc: Paired Single vector SUM high
     bitmask: 0xfc00003e
     pattern: 0x10000014
-    modifiers: [ Rc ]
     args: [ frD, frA, frC, frB ]
     defs: [ frD ]
     uses: [ frA, frC, frB ]
@@ -1588,7 +1562,6 @@ opcodes:
     desc: Paired Single vector SUM low
     bitmask: 0xfc00003e
     pattern: 0x10000016
-    modifiers: [ Rc ]
     args: [ frD, frA, frC, frB ]
     defs: [ frD ]
     uses: [ frA, frC, frB ]
