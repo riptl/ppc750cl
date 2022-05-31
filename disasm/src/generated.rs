@@ -2189,8 +2189,8 @@ impl Ins {
                 Field::SH(OpaqueU(((self.code >> 11u8) & 0x1f) as _)),
             ],
             Opcode::Srw => vec![
-                Field::rS(GPR(((self.code >> 21u8) & 0x1f) as _)),
                 Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
+                Field::rS(GPR(((self.code >> 21u8) & 0x1f) as _)),
                 Field::rB(GPR(((self.code >> 11u8) & 0x1f) as _)),
             ],
             Opcode::Stb => vec![

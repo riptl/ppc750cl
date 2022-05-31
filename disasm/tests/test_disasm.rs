@@ -816,6 +816,7 @@ fn test_ins_srawi() {
 #[test]
 fn test_ins_srw() {
     assert_asm!(0x7C001C30, "srw r0, r0, r3");
+    assert_asm!(0x7C600430, "srw r0, r3, r0");
 }
 
 #[test]

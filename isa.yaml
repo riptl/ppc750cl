@@ -1635,7 +1635,7 @@ opcodes:
     bitmask: 0xfc0007fe
     pattern: 0x7c000430
     modifiers: [ Rc ]
-    args: [ rS, rA, rB ]
+    args: [ rA, rS, rB ]
     defs: [ rA ]
     uses: [ rA, rB ]
 
