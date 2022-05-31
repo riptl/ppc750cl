@@ -622,8 +622,8 @@ fn test_ins_psq_lx() {
             frD(FPR(0)),
             rA(GPR(0)),
             rB(GPR(0)),
-            ps_W(OpaqueU(0)),
-            ps_l(GQR(0))
+            ps_WX(OpaqueU(0)),
+            ps_IX(GQR(0))
         ]
     );
     assert_eq!(ins.defs(), vec![frD(FPR(0))]);

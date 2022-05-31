@@ -112,12 +112,18 @@ fields:
     arg: OpaqueU
     bits: 12..20
   # Paired single fields
-  - name: ps_l
+  - name: ps_I
     arg: GQR
     bits: 17..20
+  - name: ps_IX
+    arg: GQR
+    bits: 22..25
   - name: ps_W
     arg: OpaqueU
     bits: 16..17
+  - name: ps_WX
+    arg: OpaqueU
+    bits: 21..22
   # Misc
   - name: NB
     arg: OpaqueU
@@ -1268,7 +1274,7 @@ opcodes:
     desc: Paired Single Quantized Load
     bitmask: 0xfc000000
     pattern: 0xe0000000
-    args: [ frD, ps_offset, rA, ps_W, ps_l ]
+    args: [ frD, ps_offset, rA, ps_W, ps_I ]
     defs: [ frD ]
     uses: [ rA.nz ]
 
@@ -1276,7 +1282,7 @@ opcodes:
     desc: Paired Single Quantized Load with Update
     bitmask: 0xfc000000
     pattern: 0xe4000000
-    args: [ frD, ps_offset, rA, ps_W, ps_l ]
+    args: [ frD, ps_offset, rA, ps_W, ps_I ]
     defs: [ frD, rA ]
     uses: [ rA ]
 
@@ -1284,7 +1290,7 @@ opcodes:
     desc: Paired Single Quantized Load with Update Indexed
     bitmask: 0xfc00007f
     pattern: 0x1000004c
-    args: [ frD, rA, rB, ps_W, ps_l ]
+    args: [ frD, rA, rB, ps_WX, ps_IX ]
     defs: [ frD, rA ]
     uses: [ rA, rB ]
 
@@ -1292,7 +1298,7 @@ opcodes:
     desc: Paired Single Quantized Load Indexed
     bitmask: 0xfc00007f
     pattern: 0x1000000c
-    args: [ frD, rA, rB, ps_W, ps_l ]
+    args: [ frD, rA, rB, ps_WX, ps_IX ]
     defs: [ frD ]
     uses: [ rA.nz, rB ]
 
@@ -1300,14 +1306,14 @@ opcodes:
     desc: Paired Single Quantized Store
     bitmask: 0xfc000000
     pattern: 0xf0000000
-    args: [ frS, ps_offset, rA, ps_W, ps_l ]
+    args: [ frS, ps_offset, rA, ps_W, ps_I ]
     uses: [ frS, rA.nz ]
 
   - name: psq_stu
     desc: Paired Single Quantized Store with Update
     bitmask: 0xfc000000
     pattern: 0xf4000000
-    args: [ frS, ps_offset, rA, ps_W, ps_l ]
+    args: [ frS, ps_offset, rA, ps_W, ps_I ]
     defs: [ rA ]
     uses: [ frS, rA ]
 
@@ -1315,7 +1321,7 @@ opcodes:
     desc: Paired Single Quantized Store with Update Indexed
     bitmask: 0xfc00007f
     pattern: 0x1000004e
-    args: [ frS, rA, rB, ps_W, ps_l ]
+    args: [ frS, rA, rB, ps_WX, ps_IX ]
     defs: [ rA ]
     uses: [ frS, rA, rB ]
 
@@ -1323,7 +1329,7 @@ opcodes:
     desc: Paired Single Quantized Store Indexed
     bitmask: 0xfc00007f
     pattern: 0x1000000e
-    args: [ frS, rA, rB, ps_W, ps_l ]
+    args: [ frS, rA, rB, ps_WX, ps_IX ]
     uses: [ frS, rA.nz, rB ]
 
   - name: ps_abs

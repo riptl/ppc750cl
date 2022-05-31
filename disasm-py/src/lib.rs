@@ -161,12 +161,20 @@ impl Ins {
         self.0.field_crm() as i64
     }
     #[getter]
-    fn ps_l(&self) -> i64 {
-        self.0.field_ps_l() as i64
+    fn ps_I(&self) -> i64 {
+        self.0.field_ps_I() as i64
+    }
+    #[getter]
+    fn ps_IX(&self) -> i64 {
+        self.0.field_ps_IX() as i64
     }
     #[getter]
     fn ps_W(&self) -> i64 {
         self.0.field_ps_W() as i64
+    }
+    #[getter]
+    fn ps_WX(&self) -> i64 {
+        self.0.field_ps_WX() as i64
     }
     #[getter]
     fn ps_NB(&self) -> i64 {
