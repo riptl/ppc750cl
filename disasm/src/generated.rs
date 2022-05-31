@@ -1166,6 +1166,7 @@ pub enum Field {
     mtfsf_FM(OpaqueU),
     mtfsf_IMM(OpaqueU),
     TO(OpaqueU),
+    L(OpaqueU),
     xer,
     ctr,
     lr,
@@ -1212,6 +1213,7 @@ impl Field {
             Field::mtfsf_FM(x) => Some(Argument::OpaqueU(*x)),
             Field::mtfsf_IMM(x) => Some(Argument::OpaqueU(*x)),
             Field::TO(x) => Some(Argument::OpaqueU(*x)),
+            Field::L(x) => Some(Argument::OpaqueU(*x)),
             _ => None,
         }
     }
@@ -1256,6 +1258,7 @@ impl Field {
             Field::mtfsf_FM(_) => "mtfsf_FM",
             Field::mtfsf_IMM(_) => "mtfsf_IMM",
             Field::TO(_) => "TO",
+            Field::L(_) => "L",
             Field::xer => "xer",
             Field::ctr => "ctr",
             Field::lr => "lr",
@@ -1360,11 +1363,13 @@ impl Ins {
             ],
             Opcode::Cmp => vec![
                 Field::crfD(CRField(((self.code >> 23u8) & 0x7) as _)),
+                Field::L(OpaqueU(((self.code >> 21u8) & 0x1) as _)),
                 Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
                 Field::rB(GPR(((self.code >> 11u8) & 0x1f) as _)),
             ],
             Opcode::Cmpi => vec![
                 Field::crfD(CRField(((self.code >> 23u8) & 0x7) as _)),
+                Field::L(OpaqueU(((self.code >> 21u8) & 0x1) as _)),
                 Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
                 Field::simm(Simm(
                     ((((self.code & 0xffff) ^ 0x8000).wrapping_sub(0x8000)) as i32) as _,
@@ -1372,11 +1377,13 @@ impl Ins {
             ],
             Opcode::Cmpl => vec![
                 Field::crfD(CRField(((self.code >> 23u8) & 0x7) as _)),
+                Field::L(OpaqueU(((self.code >> 21u8) & 0x1) as _)),
                 Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
                 Field::rB(GPR(((self.code >> 11u8) & 0x1f) as _)),
             ],
             Opcode::Cmpli => vec![
                 Field::crfD(CRField(((self.code >> 23u8) & 0x7) as _)),
+                Field::L(OpaqueU(((self.code >> 21u8) & 0x1) as _)),
                 Field::rA(GPR(((self.code >> 16u8) & 0x1f) as _)),
                 Field::uimm(Uimm((self.code & 0xffff) as _)),
             ],
@@ -5566,7 +5573,7 @@ impl Ins {
                 }
             }
             Opcode::Cmp => {
-                if ((self.code >> 23u8) & 0x7) == 0 {
+                if ((self.code >> 23u8) & 0x7) == 0 && ((self.code >> 21u8) & 0x1) == 0 {
                     return SimplifiedIns {
                         mnemonic: "cmpw",
                         args: vec![
@@ -5576,9 +5583,41 @@ impl Ins {
                         ins: self,
                     };
                 }
+                if ((self.code >> 21u8) & 0x1) == 0 {
+                    return SimplifiedIns {
+                        mnemonic: "cmpw",
+                        args: vec![
+                            Argument::CRField(CRField(((self.code >> 23u8) & 0x7) as _)),
+                            Argument::GPR(GPR(((self.code >> 16u8) & 0x1f) as _)),
+                            Argument::GPR(GPR(((self.code >> 11u8) & 0x1f) as _)),
+                        ],
+                        ins: self,
+                    };
+                }
+                if ((self.code >> 23u8) & 0x7) == 0 && ((self.code >> 21u8) & 0x1) == 1 {
+                    return SimplifiedIns {
+                        mnemonic: "cmpd",
+                        args: vec![
+                            Argument::GPR(GPR(((self.code >> 16u8) & 0x1f) as _)),
+                            Argument::GPR(GPR(((self.code >> 11u8) & 0x1f) as _)),
+                        ],
+                        ins: self,
+                    };
+                }
+                if ((self.code >> 21u8) & 0x1) == 1 {
+                    return SimplifiedIns {
+                        mnemonic: "cmpd",
+                        args: vec![
+                            Argument::CRField(CRField(((self.code >> 23u8) & 0x7) as _)),
+                            Argument::GPR(GPR(((self.code >> 16u8) & 0x1f) as _)),
+                            Argument::GPR(GPR(((self.code >> 11u8) & 0x1f) as _)),
+                        ],
+                        ins: self,
+                    };
+                }
             }
             Opcode::Cmpi => {
-                if ((self.code >> 23u8) & 0x7) == 0 {
+                if ((self.code >> 23u8) & 0x7) == 0 && ((self.code >> 21u8) & 0x1) == 0 {
                     return SimplifiedIns {
                         mnemonic: "cmpwi",
                         args: vec![
@@ -5591,7 +5630,7 @@ impl Ins {
                         ins: self,
                     };
                 }
-                if ((self.code >> 23u8) & 0x7) == 0 {
+                if ((self.code >> 21u8) & 0x1) == 0 {
                     return SimplifiedIns {
                         mnemonic: "cmpwi",
                         args: vec![
@@ -5605,9 +5644,36 @@ impl Ins {
                         ins: self,
                     };
                 }
+                if ((self.code >> 23u8) & 0x7) == 0 && ((self.code >> 21u8) & 0x1) == 1 {
+                    return SimplifiedIns {
+                        mnemonic: "cmpdi",
+                        args: vec![
+                            Argument::GPR(GPR(((self.code >> 16u8) & 0x1f) as _)),
+                            Argument::Simm(Simm(
+                                ((((self.code & 0xffff) ^ 0x8000).wrapping_sub(0x8000)) as i32)
+                                    as _,
+                            )),
+                        ],
+                        ins: self,
+                    };
+                }
+                if ((self.code >> 21u8) & 0x1) == 1 {
+                    return SimplifiedIns {
+                        mnemonic: "cmpdi",
+                        args: vec![
+                            Argument::CRField(CRField(((self.code >> 23u8) & 0x7) as _)),
+                            Argument::GPR(GPR(((self.code >> 16u8) & 0x1f) as _)),
+                            Argument::Simm(Simm(
+                                ((((self.code & 0xffff) ^ 0x8000).wrapping_sub(0x8000)) as i32)
+                                    as _,
+                            )),
+                        ],
+                        ins: self,
+                    };
+                }
             }
             Opcode::Cmpl => {
-                if ((self.code >> 23u8) & 0x7) == 0 {
+                if ((self.code >> 23u8) & 0x7) == 0 && ((self.code >> 21u8) & 0x1) == 0 {
                     return SimplifiedIns {
                         mnemonic: "cmplw",
                         args: vec![
@@ -5617,9 +5683,41 @@ impl Ins {
                         ins: self,
                     };
                 }
+                if ((self.code >> 21u8) & 0x1) == 0 {
+                    return SimplifiedIns {
+                        mnemonic: "cmplw",
+                        args: vec![
+                            Argument::CRField(CRField(((self.code >> 23u8) & 0x7) as _)),
+                            Argument::GPR(GPR(((self.code >> 16u8) & 0x1f) as _)),
+                            Argument::GPR(GPR(((self.code >> 11u8) & 0x1f) as _)),
+                        ],
+                        ins: self,
+                    };
+                }
+                if ((self.code >> 23u8) & 0x7) == 0 && ((self.code >> 21u8) & 0x1) == 1 {
+                    return SimplifiedIns {
+                        mnemonic: "cmpld",
+                        args: vec![
+                            Argument::GPR(GPR(((self.code >> 16u8) & 0x1f) as _)),
+                            Argument::GPR(GPR(((self.code >> 11u8) & 0x1f) as _)),
+                        ],
+                        ins: self,
+                    };
+                }
+                if ((self.code >> 21u8) & 0x1) == 1 {
+                    return SimplifiedIns {
+                        mnemonic: "cmpld",
+                        args: vec![
+                            Argument::CRField(CRField(((self.code >> 23u8) & 0x7) as _)),
+                            Argument::GPR(GPR(((self.code >> 16u8) & 0x1f) as _)),
+                            Argument::GPR(GPR(((self.code >> 11u8) & 0x1f) as _)),
+                        ],
+                        ins: self,
+                    };
+                }
             }
             Opcode::Cmpli => {
-                if ((self.code >> 23u8) & 0x7) == 0 {
+                if ((self.code >> 23u8) & 0x7) == 0 && ((self.code >> 21u8) & 0x1) == 0 {
                     return SimplifiedIns {
                         mnemonic: "cmplwi",
                         args: vec![
@@ -5629,9 +5727,30 @@ impl Ins {
                         ins: self,
                     };
                 }
-                if ((self.code >> 23u8) & 0x7) == 0 {
+                if ((self.code >> 21u8) & 0x1) == 0 {
                     return SimplifiedIns {
                         mnemonic: "cmplwi",
+                        args: vec![
+                            Argument::CRField(CRField(((self.code >> 23u8) & 0x7) as _)),
+                            Argument::GPR(GPR(((self.code >> 16u8) & 0x1f) as _)),
+                            Argument::Uimm(Uimm((self.code & 0xffff) as _)),
+                        ],
+                        ins: self,
+                    };
+                }
+                if ((self.code >> 23u8) & 0x7) == 0 && ((self.code >> 21u8) & 0x1) == 1 {
+                    return SimplifiedIns {
+                        mnemonic: "cmpldi",
+                        args: vec![
+                            Argument::GPR(GPR(((self.code >> 16u8) & 0x1f) as _)),
+                            Argument::Uimm(Uimm((self.code & 0xffff) as _)),
+                        ],
+                        ins: self,
+                    };
+                }
+                if ((self.code >> 21u8) & 0x1) == 1 {
+                    return SimplifiedIns {
+                        mnemonic: "cmpldi",
                         args: vec![
                             Argument::CRField(CRField(((self.code >> 23u8) & 0x7) as _)),
                             Argument::GPR(GPR(((self.code >> 16u8) & 0x1f) as _)),
@@ -6091,6 +6210,10 @@ impl Ins {
     #[inline(always)]
     pub fn field_TO(&self) -> usize {
         ((self.code >> 21u8) & 0x1f) as _
+    }
+    #[inline(always)]
+    pub fn field_L(&self) -> usize {
+        ((self.code >> 21u8) & 0x1) as _
     }
     #[inline(always)]
     pub fn field_OE(&self) -> bool {

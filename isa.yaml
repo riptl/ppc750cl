@@ -145,6 +145,10 @@ fields:
     arg: OpaqueU
     desc: Bitset for tw and twi
     bits: 6..11
+  - name: L
+    arg: OpaqueU
+    desc: Bitset for cmp, cmpi, cmpl, cmpli
+    bits: 10..11
   - name: xer
   - name: ctr
   - name: lr
@@ -313,7 +317,7 @@ opcodes:
     desc: Compare
     bitmask: 0xfc4007ff
     pattern: 0x7c000000
-    args: [ crfD, rA, rB ]
+    args: [ crfD, L, rA, rB ]
     defs: [ crfD ]
     uses: [ rA, rB ]
 
@@ -321,7 +325,7 @@ opcodes:
     desc: Compare Immediate
     bitmask: 0xfc400000
     pattern: 0x2c000000
-    args: [ crfD, rA, simm ]
+    args: [ crfD, L, rA, simm ]
     defs: [ crfD ]
     uses: [ rA ]
 
@@ -329,7 +333,7 @@ opcodes:
     desc: Compare Logical
     bitmask: 0xfc4007ff
     pattern: 0x7c000040
-    args: [ crfD, rA, rB ]
+    args: [ crfD, L, rA, rB ]
     defs: [ crfD ]
     uses: [ rA, rB ]
 
@@ -337,7 +341,7 @@ opcodes:
     desc: Compare Logical Immediate
     bitmask: 0xfc400000
     pattern: 0x28000000
-    args: [ crfD, rA, uimm ]
+    args: [ crfD, L, rA, uimm ]
     defs: [ crfD ]
     uses: [ rA ]
 
@@ -2005,37 +2009,73 @@ mnemonics:
     args: [ rA, rS, MB ]
     condition: ME == 31 && 32 - MB == SH
 
-  # Compares
-  - name: cmpw
-    opcode: cmp
-    args: [ rA, rB ]
-    condition: crfD == 0
-  - name: cmpw
-    opcode: cmp
-    args: [ crfD, rA, rB ]
-  - name: cmplw
-    opcode: cmpl
-    args: [ rA, rB ]
-    condition: crfD == 0
-  - name: cmplw
-    opcode: cmpl
-    args: [ crfD, rA, rB ]
+  # Compares Word
   - name: cmpwi
     opcode: cmpi
     args: [ rA, simm ]
-    condition: crfD == 0
+    condition: crfD == 0 && L == 0
   - name: cmpwi
     opcode: cmpi
     args: [ crfD, rA, simm ]
-    condition: crfD == 0
+    condition: L == 0
+  - name: cmpw
+    opcode: cmp
+    args: [ rA, rB ]
+    condition: crfD == 0 && L == 0
+  - name: cmpw
+    opcode: cmp
+    args: [ crfD, rA, rB ]
+    condition: L == 0
   - name: cmplwi
     opcode: cmpli
     args: [ rA, uimm ]
-    condition: crfD == 0
+    condition: crfD == 0 && L == 0
   - name: cmplwi
     opcode: cmpli
     args: [ crfD, rA, uimm ]
-    condition: crfD == 0
+    condition: L == 0
+  - name: cmplw
+    opcode: cmpl
+    args: [ rA, rB ]
+    condition: crfD == 0 && L == 0
+  - name: cmplw
+    opcode: cmpl
+    args: [ crfD, rA, rB ]
+    condition: L == 0
+
+  # Compares Doubleword
+  - name: cmpdi
+    opcode: cmpi
+    args: [ rA, simm ]
+    condition: crfD == 0 && L == 1
+  - name: cmpdi
+    opcode: cmpi
+    args: [ crfD, rA, simm ]
+    condition: L == 1
+  - name: cmpd
+    opcode: cmp
+    args: [ rA, rB ]
+    condition: crfD == 0 && L == 1
+  - name: cmpd
+    opcode: cmp
+    args: [ crfD, rA, rB ]
+    condition: L == 1
+  - name: cmpldi
+    opcode: cmpli
+    args: [ rA, uimm ]
+    condition: crfD == 0 && L == 1
+  - name: cmpldi
+    opcode: cmpli
+    args: [ crfD, rA, uimm ]
+    condition: L == 1
+  - name: cmpld
+    opcode: cmpl
+    args: [ rA, rB ]
+    condition: crfD == 0 && L == 1
+  - name: cmpld
+    opcode: cmpl
+    args: [ crfD, rA, rB ]
+    condition: L == 1
 
   # Condition Register Logical
   - name: crset
