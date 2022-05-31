@@ -959,6 +959,7 @@ fn test_ins_sync() {
 #[test]
 fn test_ins_xor() {
     assert_asm!(0x7C052A78, "xor r5, r0, r5");
+    assert_asm!(0x7D275279, "xor. r7, r9, r10");
 }
 
 #[test]

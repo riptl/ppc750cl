@@ -1926,6 +1926,7 @@ opcodes:
     desc: XOR
     bitmask: 0xfc0007fe
     pattern: 0x7c000278
+    modifiers: [ Rc ]
     args: [ rA, rS, rB ]
     defs: [ rA ]
     uses: [ rS, rB ]

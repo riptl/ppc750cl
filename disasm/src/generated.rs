@@ -4807,7 +4807,13 @@ impl Ins {
             Opcode::Tlbsync => String::new(),
             Opcode::Tw => String::new(),
             Opcode::Twi => String::new(),
-            Opcode::Xor => String::new(),
+            Opcode::Xor => {
+                let mut s = String::with_capacity(4);
+                if self.bit(31usize) {
+                    s.push('.');
+                }
+                s
+            }
             Opcode::Xori => String::new(),
             Opcode::Xoris => String::new(),
         }
