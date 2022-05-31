@@ -1133,6 +1133,7 @@ pub enum Field {
     ps_offset(Offset),
     BO(OpaqueU),
     BI(OpaqueU),
+    BH(OpaqueU),
     BD(BranchDest),
     LI(BranchDest),
     SH(OpaqueU),
@@ -1176,6 +1177,7 @@ impl Field {
             Field::ps_offset(x) => Some(Argument::Offset(*x)),
             Field::BO(x) => Some(Argument::OpaqueU(*x)),
             Field::BI(x) => Some(Argument::OpaqueU(*x)),
+            Field::BH(x) => Some(Argument::OpaqueU(*x)),
             Field::BD(x) => Some(Argument::BranchDest(*x)),
             Field::LI(x) => Some(Argument::BranchDest(*x)),
             Field::SH(x) => Some(Argument::OpaqueU(*x)),
@@ -1217,6 +1219,7 @@ impl Field {
             Field::ps_offset(_) => "ps_offset",
             Field::BO(_) => "BO",
             Field::BI(_) => "BI",
+            Field::BH(_) => "BH",
             Field::BD(_) => "BD",
             Field::LI(_) => "LI",
             Field::SH(_) => "SH",
@@ -1342,10 +1345,12 @@ impl Ins {
             Opcode::Bcctr => vec![
                 Field::BO(OpaqueU(((self.code >> 21u8) & 0x1f) as _)),
                 Field::BI(OpaqueU(((self.code >> 16u8) & 0x1f) as _)),
+                Field::BH(OpaqueU(((self.code >> 11u8) & 0x3) as _)),
             ],
             Opcode::Bclr => vec![
                 Field::BO(OpaqueU(((self.code >> 21u8) & 0x1f) as _)),
                 Field::BI(OpaqueU(((self.code >> 16u8) & 0x1f) as _)),
+                Field::BH(OpaqueU(((self.code >> 11u8) & 0x3) as _)),
             ],
             Opcode::Cmp => vec![
                 Field::crfD(CRField(((self.code >> 23u8) & 0x7) as _)),
@@ -5946,6 +5951,10 @@ impl Ins {
     #[inline(always)]
     pub fn field_BI(&self) -> usize {
         ((self.code >> 16u8) & 0x1f) as _
+    }
+    #[inline(always)]
+    pub fn field_BH(&self) -> usize {
+        ((self.code >> 11u8) & 0x3) as _
     }
     #[inline(always)]
     pub fn field_BD(&self) -> isize {
