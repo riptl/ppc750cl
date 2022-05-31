@@ -1976,7 +1976,7 @@ mnemonics:
     condition: MB == 0 && ME == 31
   - name: slwi
     opcode: rlwinm
-    args: [ rA, rS, ME ]
+    args: [ rA, rS, SH ]
     condition: MB == 0 && 31 - SH == ME
   - name: srwi
     opcode: rlwinm

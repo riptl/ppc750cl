@@ -784,6 +784,9 @@ fn test_ins_rlwimi() {
 fn test_ins_rlwinm() {
     assert_asm!(0x54000423, "rlwinm. r0, r0, 0, 16, 17");
     assert_asm!(0x54000432, "rlwinm r0, r0, 0, 16, 25");
+
+    // mnemonics
+    assert_asm!(0x57E5103A, "slwi r5, r31, 2");
 }
 
 #[test]

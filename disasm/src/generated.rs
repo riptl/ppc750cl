@@ -5843,7 +5843,7 @@ impl Ins {
                         args: vec![
                             Argument::GPR(GPR(((self.code >> 16u8) & 0x1f) as _)),
                             Argument::GPR(GPR(((self.code >> 21u8) & 0x1f) as _)),
-                            Argument::OpaqueU(OpaqueU(((self.code >> 1u8) & 0x1f) as _)),
+                            Argument::OpaqueU(OpaqueU(((self.code >> 11u8) & 0x1f) as _)),
                         ],
                         ins: self,
                     };
