@@ -94,6 +94,7 @@ fn test_ins_b() {
     assert_asm!(0x4823B4D9, "bl 0x23b4d8");
     assert_asm!(0x4BE03C99, "bl -0x1fc368");
     assert_asm!(0x4BDC1A59, "bl -0x23e5a8");
+    assert_asm!(0x48000063, "bla 0x60");
 }
 
 #[test]
@@ -482,7 +483,7 @@ fn test_ins_lwzx() {
 
 #[test]
 fn test_ins_mfcr() {
-    assert_asm!(0x7C000026, "mfcr cr0");
+    assert_asm!(0x7C000026, "mfcr r0");
 }
 
 #[test]
@@ -622,8 +623,8 @@ fn test_ins_psq_lx() {
             frD(FPR(0)),
             rA(GPR(0)),
             rB(GPR(0)),
-            ps_W(OpaqueU(0)),
-            ps_l(GQR(0))
+            ps_WX(OpaqueU(0)),
+            ps_IX(GQR(0))
         ]
     );
     assert_eq!(ins.defs(), vec![frD(FPR(0))]);
@@ -709,6 +710,11 @@ fn test_ins_ps_merge11() {
 }
 
 #[test]
+fn test_ins_ps_mr() {
+    assert_asm!(0x10200090, "ps_mr f1, f0");
+}
+
+#[test]
 fn test_ins_ps_msub() {
     assert_asm!(0x10A53778, "ps_msub f5, f5, f29, f6");
 }
@@ -783,6 +789,9 @@ fn test_ins_rlwimi() {
 fn test_ins_rlwinm() {
     assert_asm!(0x54000423, "rlwinm. r0, r0, 0, 16, 17");
     assert_asm!(0x54000432, "rlwinm r0, r0, 0, 16, 25");
+
+    // mnemonics
+    assert_asm!(0x57E5103A, "slwi r5, r31, 2");
 }
 
 #[test]
@@ -815,6 +824,7 @@ fn test_ins_srawi() {
 #[test]
 fn test_ins_srw() {
     assert_asm!(0x7C001C30, "srw r0, r0, r3");
+    assert_asm!(0x7C600430, "srw r0, r3, r0");
 }
 
 #[test]
@@ -957,6 +967,7 @@ fn test_ins_sync() {
 #[test]
 fn test_ins_xor() {
     assert_asm!(0x7C052A78, "xor r5, r0, r5");
+    assert_asm!(0x7D275279, "xor. r7, r9, r10");
 }
 
 #[test]

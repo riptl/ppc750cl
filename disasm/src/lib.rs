@@ -229,6 +229,8 @@ pub struct Ins {
 }
 
 impl Ins {
+    const BLR: u32 = 0x4e800020;
+
     /// Constructs an instruction from the given machine code and address.
     pub fn new(code: u32, addr: u32) -> Self {
         Self {
@@ -283,19 +285,24 @@ impl Ins {
 
     pub fn branch_dest(&self) -> Option<u32> {
         self.branch_offset().and_then(|offset| {
-            if offset < 0 {
-                self.addr.checked_sub((-offset) as u32)
+            if self.field_AA() {
+                Some(offset as u32)
             } else {
-                self.addr.checked_add(offset as u32)
+                if offset < 0 {
+                    self.addr.checked_sub((-offset) as u32)
+                } else {
+                    self.addr.checked_add(offset as u32)
+                }
             }
         })
     }
 
     pub fn is_branch(&self) -> bool {
-        match self.op {
-            Opcode::B | Opcode::Bc | Opcode::Bcctr | Opcode::Bclr => true,
-            _ => false,
-        }
+        matches!(self.op, Opcode::B | Opcode::Bc | Opcode::Bcctr | Opcode::Bclr)
+    }
+
+    pub fn is_direct_branch(&self) -> bool {
+        matches!(self.op, Opcode::B | Opcode::Bc)
     }
 
     pub fn is_unconditional_branch(&self) -> bool {
@@ -312,9 +319,10 @@ impl Ins {
         self.is_branch() && !self.is_unconditional_branch()
     }
 
+    #[inline]
     pub fn is_blr(&self) -> bool {
         // self.op == Opcode::Bclr && self.is_unconditional_branch() && !self.field_LK()
-        self.code == 0x4e800020
+        self.code == Ins::BLR
     }
 }
 
