@@ -1450,7 +1450,7 @@ opcodes:
     desc: Paired Single Move Register
     bitmask: 0xfc1f07fe
     pattern: 0x10000090
-    args: [ frD, frA, frB ]
+    args: [ frD, frB ]
     defs: [ frD ]
     uses: [ frB ]
 

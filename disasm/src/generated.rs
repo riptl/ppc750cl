@@ -2075,7 +2075,6 @@ impl Ins {
             ],
             Opcode::PsMr => vec![
                 Field::frD(FPR(((self.code >> 21u8) & 0x1f) as _)),
-                Field::frA(FPR(((self.code >> 16u8) & 0x1f) as _)),
                 Field::frB(FPR(((self.code >> 11u8) & 0x1f) as _)),
             ],
             Opcode::PsMsub => vec![

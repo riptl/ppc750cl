@@ -710,6 +710,11 @@ fn test_ins_ps_merge11() {
 }
 
 #[test]
+fn test_ins_ps_mr() {
+    assert_asm!(0x10200090, "ps_mr f1, f0");
+}
+
+#[test]
 fn test_ins_ps_msub() {
     assert_asm!(0x10A53778, "ps_msub f5, f5, f29, f6");
 }
