@@ -146,6 +146,7 @@ impl Dol {
 
 #[derive(Debug, Clone, Copy, Eq, PartialEq)]
 pub enum DolSectionType {
+    Text,
     Data,
     Bss,
 }
@@ -168,9 +169,15 @@ impl From<&DolHeaderData> for DolHeader {
     fn from(header: &DolHeaderData) -> Self {
         let mut sections = Vec::with_capacity(DolHeaderData::SECTION_COUNT);
         for i in 0..DolHeaderData::SECTION_COUNT {
+            let kind = if i < 7 {
+                DolSectionType::Text
+            } else {
+                DolSectionType::Data
+            };
+
             if header.section_sizes[i] > 0 {
                 sections.push(DolSection {
-                    kind: DolSectionType::Data,
+                    kind,
                     index: i,
                     offset: header.section_offsets[i],
                     target: header.section_targets[i],
