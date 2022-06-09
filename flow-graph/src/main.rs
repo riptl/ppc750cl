@@ -44,7 +44,8 @@ fn main() {
     let dol = Dol::read_from(&dol_file).expect("Invalid DOL file");
     drop(dol_file);
     let mut bytes = vec![0u8; (stop_addr - start_addr) as usize];
-    dol.virtual_read(&mut bytes, start_addr);
+    dol.virtual_read(&mut bytes, start_addr)
+        .expect("Invalid address range");
 
     // Create control flow graph.
     let ins_list: Vec<Ins> = disasm_iter(&bytes, start_addr).collect();

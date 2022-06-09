@@ -24,6 +24,8 @@ pub enum Error {
     OverlappingSections(u32, u32),
     #[error("Section sizes too large")]
     SectionsTooLarge,
+    #[error("Attempted to access {0:08X} past DOL bounds")]
+    OutOfBounds(u32),
 }
 
 impl From<bincode::Error> for Error {
@@ -107,16 +109,44 @@ impl Dol {
         })
     }
 
-    /// Reads bytes into a destination buffer given a virtual address.
-    pub fn virtual_read(&self, dest: &mut [u8], virtual_addr: u32) {
+    pub fn section_data(&self, section: &DolSection) -> &[u8] {
+        self.virtual_data_at(section.target, section.size).unwrap()
+    }
+
+    /// Returns a slice of DOL data. Does not support bss.
+    pub fn virtual_data_at(&self, virtual_addr: u32, read_len: u32) -> Result<&[u8]> {
+        if virtual_addr < self.memory_offset {
+            return Err(Error::OutOfBounds(virtual_addr));
+        }
+
         let offset = (virtual_addr - self.memory_offset) as usize;
-        // TODO Gracefully handle errors.
-        dest.copy_from_slice(&self.memory[offset..offset + dest.len()])
+        if offset + (read_len as usize) < self.memory.len() {
+            Ok(&self.memory[offset..offset + (read_len as usize)])
+        } else {
+            Err(Error::OutOfBounds(virtual_addr + read_len))
+        }
+    }
+
+    /// Reads bytes into a destination buffer given a virtual address.
+    pub fn virtual_read(&self, data: &mut [u8], virtual_addr: u32) -> Result<()> {
+        if virtual_addr < self.memory_offset {
+            return Err(Error::OutOfBounds(virtual_addr));
+        }
+
+        let offset = (virtual_addr - self.memory_offset) as usize;
+        let read_len = data.len();
+        if offset + read_len < self.memory.len() {
+            data.copy_from_slice(&self.memory[offset..offset + data.len()]);
+            Ok(())
+        } else {
+            Err(Error::OutOfBounds(virtual_addr + (read_len as u32)))
+        }
     }
 }
 
 #[derive(Debug, Clone, Copy, Eq, PartialEq)]
 pub enum DolSectionType {
+    Text,
     Data,
     Bss,
 }
@@ -132,15 +162,22 @@ pub struct DolSection {
 
 pub struct DolHeader {
     pub sections: Vec<DolSection>,
+    pub entry_point: u32,
 }
 
 impl From<&DolHeaderData> for DolHeader {
     fn from(header: &DolHeaderData) -> Self {
         let mut sections = Vec::with_capacity(DolHeaderData::SECTION_COUNT);
         for i in 0..DolHeaderData::SECTION_COUNT {
+            let kind = if i < 7 {
+                DolSectionType::Text
+            } else {
+                DolSectionType::Data
+            };
+
             if header.section_sizes[i] > 0 {
                 sections.push(DolSection {
-                    kind: DolSectionType::Data,
+                    kind,
                     index: i,
                     offset: header.section_offsets[i],
                     target: header.section_targets[i],
@@ -159,7 +196,21 @@ impl From<&DolHeaderData> for DolHeader {
         }
         // Sort sections by target address to prepare them for mapping.
         sections.sort_by_key(|s| s.target);
-        Self { sections }
+        Self {
+            sections,
+            entry_point: header.entry_point,
+        }
+    }
+}
+
+impl DolHeader {
+    pub fn section_at(&self, addr: u32) -> Option<&DolSection> {
+        for section in &self.sections {
+            if (section.target..(section.target + section.size)).contains(&addr) {
+                return Some(section);
+            }
+        }
+        None
     }
 }
 

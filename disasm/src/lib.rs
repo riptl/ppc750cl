@@ -298,7 +298,10 @@ impl Ins {
     }
 
     pub fn is_branch(&self) -> bool {
-        matches!(self.op, Opcode::B | Opcode::Bc | Opcode::Bcctr | Opcode::Bclr)
+        matches!(
+            self.op,
+            Opcode::B | Opcode::Bc | Opcode::Bcctr | Opcode::Bclr
+        )
     }
 
     pub fn is_direct_branch(&self) -> bool {

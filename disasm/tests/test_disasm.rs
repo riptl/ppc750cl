@@ -498,7 +498,7 @@ fn test_ins_mfmsr() {
 
 #[test]
 fn test_ins_mfspr() {
-    assert_asm!(0x7E1A02A6, "mfspr r16, 832");
+    assert_asm!(0x7E1A02A6, "mfspr r16, 26");
 }
 
 #[test]
@@ -508,7 +508,7 @@ fn test_ins_mfsr() {
 
 #[test]
 fn test_ins_mftb() {
-    assert_asm!(0x7C8C42E6, "mftb r4, 392");
+    assert_asm!(0x7C8C42E6, "mftb r4, 268");
 }
 
 #[test]
@@ -539,7 +539,7 @@ fn test_ins_mtmsr() {
 
 #[test]
 fn test_ins_mtspr() {
-    assert_asm!(0x7E75FBA6, "mtspr 703, r19");
+    assert_asm!(0x7E75FBA6, "mtspr 1013, r19");
 }
 
 #[test]
