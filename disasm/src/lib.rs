@@ -278,7 +278,7 @@ impl Ins {
     pub fn branch_offset(&self) -> Option<i32> {
         match self.op {
             Opcode::B => Some(self.field_LI() as i32),
-            Opcode::Bc | Opcode::Bcctr | Opcode::Bclr => Some(self.field_BD() as i32),
+            Opcode::Bc => Some(self.field_BD() as i32),
             _ => None,
         }
     }
