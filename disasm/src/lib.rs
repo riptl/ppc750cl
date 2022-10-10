@@ -108,7 +108,18 @@ field_arg!(SPR, u16);
 // Condition register field.
 field_arg!(CRField, u8, "cr{}");
 // Condition register bit (index + condition case).
-field_arg!(CRBit, u8, "{}");
+field_arg_no_display!(CRBit, u8);
+impl Display for CRBit {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        let cr = self.0 >> 2;
+        let cc = self.0 & 3;
+        if cr != 0 {
+            write!(f, "4*{}+", CRField(cr))?;
+        }
+        const CR_NAMES: [&str; 4] = ["lt", "gt", "eq", "so"];
+        f.write_str(CR_NAMES[cc as usize])
+    }
+}
 // Paired-single graphics quantization register
 field_arg!(GQR, u8, "qr{}");
 // Unsigned immediate.
