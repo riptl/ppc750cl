@@ -20,7 +20,7 @@ fields:
     arg: OpaqueU
     bits: 6..11
   - name: BI
-    arg: OpaqueU
+    arg: CRBit
     bits: 11..16
   - name: BH
     arg: OpaqueU
@@ -175,6 +175,18 @@ modifiers:
   - name: AA
     suffix: a
     bit: 30
+  # Predict branch to be taken
+  - name: BP
+    suffix: +
+    condition: BO & 1 == 1 && BD >= 0
+  # Predict branch not to be taken (fall through)
+  - name: BNP
+    suffix: '-'
+    condition: BO & 1 == 1 && BD < 0
+  # Predict branch to be taken (implicit dest for LR/CTR)
+  - name: BP_ND
+    suffix: +
+    condition: BO & 1 == 1
 
 opcodes:
   - name: add
@@ -302,14 +314,14 @@ opcodes:
     desc: Branch Conditional
     bitmask: 0xfc000000
     pattern: 0x40000000
-    modifiers: [ LK, AA ]
+    modifiers: [ LK, AA, BP, BNP ]
     args: [ BO, BI, BD ]
 
   - name: bcctr
     desc: Branch Conditional to Count Register
     bitmask: 0xfc007ffe
     pattern: 0x4c000420
-    modifiers: [ LK ]
+    modifiers: [ LK, BP_ND ]
     args: [ BO, BI, BH ]
     uses: [ ctr ]
 
@@ -317,7 +329,7 @@ opcodes:
     desc: Branch Conditional to Link Register
     bitmask: 0xfc007ffe
     pattern: 0x4c000020
-    modifiers: [ LK ]
+    modifiers: [ LK, BP_ND ]
     args: [ BO, BI, BH ]
     uses: [ lr ]
 
@@ -1974,14 +1986,34 @@ mnemonics:
     condition: rA == 0 && rS == 0 && uimm == 0
 
   # Rotates/Shifts
+  - name: rotlw
+    opcode: rlwnm
+    args: [ rA, rS, rB ]
+    condition: MB == 0 && ME == 31
+
+  # TODO rlwimi: inslwi/insrwi
+
+  # Rotates/Shifts Immediate
+  - name: clrrwi
+    opcode: rlwinm
+    args: [ rA, rS, ME=31-ME ]
+    condition: SH == 0 && MB == 0 && ME < 32
   - name: clrlwi
     opcode: rlwinm
     args: [ rA, rS, MB ]
     condition: SH == 0 && ME == 31
+  - name: clrlslwi
+    opcode: rlwinm
+    args: [ rA, rS, MB=32-SH, SH ]
+    condition: SH < 32 && MB >= SH && ME == 31 - SH
   - name: rotlwi
     opcode: rlwinm
     args: [ rA, rS, SH ]
-    condition: MB == 0 && ME == 31
+    condition: MB == 0 && ME == 31 && SH <= 16
+  - name: rotrwi
+    opcode: rlwinm
+    args: [ rA, rS, SH=32-SH ]
+    condition: MB == 0 && ME == 31 && SH > 16
   - name: slwi
     opcode: rlwinm
     args: [ rA, rS, SH ]
@@ -1990,6 +2022,14 @@ mnemonics:
     opcode: rlwinm
     args: [ rA, rS, MB ]
     condition: ME == 31 && 32 - MB == SH
+  - name: extlwi
+    opcode: rlwinm
+    args: [ rA, rS, ME=ME+1, SH ]
+    condition: MB == 0
+  - name: extrwi
+    opcode: rlwinm
+    args: [ rA, rS, MB=32-MB, SH=SH-(32-MB) ]
+    condition: ME == 31 && SH >= 32 - MB
 
   # Compares Word
   - name: cmpwi
@@ -2070,11 +2110,11 @@ mnemonics:
     condition: crbD == crbA && crbD == crbB
   - name: crmove
     opcode: cror
-    args: [ crbD, crbA, crbB ]
+    args: [ crbD, crbA ]
     condition: crbA == crbB
   - name: crnot
     opcode: crnor
-    args: [ crbD, crbA, crbB ]
+    args: [ crbD, crbA ]
     condition: crbA == crbB
 
   # Misc
@@ -2223,111 +2263,109 @@ mnemonics:
     condition: spr & 0b1111111001 == 537
 
   # Branch Conditional
-  # bc branch always
-  - name: b
-    opcode: bc
-    modifiers: [ LK, AA ]
-    condition: BO == 20 && BI == 0
   # bc branch if negative
   - name: blt
     opcode: bc
-    modifiers: [ LK, AA ]
     args: [ BD ]
-    condition: BO == 12 && BI & 0b11 == 0b00 && crfS == 0
+    condition: BO & 0b11110 == 12 && BI == 0
   - name: blt
     opcode: bc
-    modifiers: [ LK, AA ]
     args: [ crfS, BD ]
-    condition: BO == 12 && BI & 0b11 == 0b00
+    condition: BO & 0b11110 == 12 && BI & 0b11 == 0
   # bc branch if not positive
   - name: ble
     opcode: bc
-    modifiers: [ LK, AA ]
     args: [ BD ]
-    condition: BO == 4 && BI & 0b11 == 0b01 && crfS == 0
+    condition: BO & 0b11110 == 4 && BI == 1
   - name: ble
     opcode: bc
-    modifiers: [ LK, AA ]
     args: [ crfS, BD ]
-    condition: BO == 4 && BI & 0b11 == 0b01
+    condition: BO & 0b11110 == 4 && BI & 0b11 == 1
   # bc branch if zero
   - name: beq
     opcode: bc
-    modifiers: [ LK, AA ]
     args: [ BD ]
-    condition: BO == 12 && BI & 0b11 == 0b10 && crfS == 0
+    condition: BO & 0b11110 == 12 && BI == 2
   - name: beq
     opcode: bc
-    modifiers: [ LK, AA ]
     args: [ crfS, BD ]
-    condition: BO == 12 && BI & 0b11 == 0b10
+    condition: BO & 0b11110 == 12 && BI & 0b11 == 2
   # bc branch if not negative
   - name: bge
     opcode: bc
-    modifiers: [ LK, AA ]
     args: [ BD ]
-    condition: BO == 4 && BI & 0b11 == 0b00 && crfS == 0
+    condition: BO & 0b11110 == 4 && BI == 0
   - name: bge
     opcode: bc
-    modifiers: [ LK, AA ]
     args: [ crfS, BD ]
-    condition: BO == 4 && BI & 0b11 == 0b00
+    condition: BO & 0b11110 == 4 && BI & 0b11 == 0
   # bc branch if positive
   - name: bgt
     opcode: bc
-    modifiers: [ LK, AA ]
     args: [ BD ]
-    condition: BO == 12 && BI & 0b11 == 0b01 && crfS == 0
+    condition: BO & 0b11110 == 12 && BI == 1
   - name: bgt
     opcode: bc
-    modifiers: [ LK, AA ]
     args: [ crfS, BD ]
-    condition: BO == 12 && BI & 0b11 == 0b01
+    condition: BO & 0b11110 == 12 && BI & 0b11 == 1
   # bc branch if not zero
   - name: bne
     opcode: bc
-    modifiers: [ LK, AA ]
     args: [ BD ]
-    condition: BO == 4 && BI & 0b11 == 0b10 && crfS == 0
+    condition: BO & 0b11110 == 4 && BI == 2
   - name: bne
     opcode: bc
-    modifiers: [ LK, AA ]
     args: [ crfS, BD ]
-    condition: BO == 4 && BI & 0b11 == 0b10
+    condition: BO & 0b11110 == 4 && BI & 0b11 == 2
   # bc branch if summary overflow
   - name: bso
     opcode: bc
-    modifiers: [ LK, AA ]
     args: [ BD ]
-    condition: BO == 12 && BI & 0b11 == 0b11 && crfS == 0
+    condition: BO & 0b11110 == 12 && BI == 3
   - name: bso
     opcode: bc
-    modifiers: [ LK, AA ]
     args: [ crfS, BD ]
-    condition: BO == 12 && BI & 0b11 == 0b11
+    condition: BO & 0b11110 == 12 && BI & 0b11 == 3
   # bc branch if not summary overflow
   - name: bns
     opcode: bc
-    modifiers: [ LK, AA ]
     args: [ BD ]
-    condition: BO == 4 && BI & 0b11 == 0b11 && crfS == 0
+    condition: BO & 0b11110 == 4 && BI == 3
   - name: bns
     opcode: bc
-    modifiers: [ LK, AA ]
     args: [ crfS, BD ]
-    condition: BO == 4 && BI & 0b11 == 0b11
+    condition: BO & 0b11110 == 4 && BI & 0b11 == 3
 
+  # bc decrement CTR, branch if CTR non-zero
   - name: bdnz
     opcode: bc
-    modifiers: [ LK, AA ]
     args: [ BD ]
-    condition: BO == 16 && BI == 0
+    condition: BO & 0b11110 == 16 && BI == 0
+  # bc decrement CTR, branch if CTR non-zero AND condition true
+  - name: bdnzt
+    opcode: bc
+    args: [ BI, BD ]
+    condition: BO & 0b11110 == 8
+  # bc decrement CTR, branch if CTR non-zero AND condition false
+  - name: bdnzf
+    opcode: bc
+    args: [ BI, BD ]
+    condition: BO & 0b11110 == 0
+  # bc decrement CTR, branch if CTR zero
   - name: bdz
     opcode: bc
-    modifiers: [ LK, AA ]
     args: [ BD ]
-    condition: BO == 18 && BI == 0
-  # TODO support conditional bd...
+    condition: BO & 0b11110 == 18 && BI == 0
+  # bc decrement CTR, branch if CTR zero AND condition true
+  - name: bdzt
+    opcode: bc
+    args: [ BI, BD ]
+    condition: BO & 0b11110 == 10
+  # bc decrement CTR, branch if CTR zero AND condition false
+  - name: bdzf
+    opcode: bc
+    args: [ BI, BD ]
+    condition: BO & 0b11110 == 2
 
   # Branch Conditional to Count Register
   # bcctr branch always
@@ -2338,86 +2376,69 @@ mnemonics:
   # bcctr branch if negative
   - name: bltctr
     opcode: bcctr
-    modifiers: [ LK ]
-    condition: BO == 12 && BI & 0b11 == 0b00 && crfS == 0
+    condition: BO & 0b11110 == 12 && BI == 0
   - name: bltctr
     opcode: bcctr
-    modifiers: [ LK ]
     args: [ crfS ]
-    condition: BO == 12 && BI & 0b11 == 0b00
+    condition: BO & 0b11110 == 12 && BI & 0b11 == 0
   # bcctr branch if not positive
   - name: blectr
     opcode: bcctr
-    modifiers: [ LK ]
-    condition: BO == 4 && BI & 0b11 == 0b01 && crfS == 0
+    condition: BO & 0b11110 == 4 && BI == 1
   - name: blectr
     opcode: bcctr
-    modifiers: [ LK ]
     args: [ crfS ]
-    condition: BO == 4 && BI & 0b11 == 0b01
+    condition: BO & 0b11110 == 4 && BI & 0b11 == 1
   # bcctr branch if zero
   - name: beqctr
     opcode: bcctr
-    modifiers: [ LK ]
-    condition: BO == 12 && BI & 0b11 == 0b10 && crfS == 0
+    condition: BO & 0b11110 == 12 && BI == 2
   - name: beqctr
     opcode: bcctr
-    modifiers: [ LK ]
     args: [ crfS ]
-    condition: BO == 12 && BI & 0b11 == 0b10
+    condition: BO & 0b11110 == 12 && BI & 0b11 == 2
   # bcctr branch if not negative
   - name: bgectr
     opcode: bcctr
-    modifiers: [ LK ]
-    condition: BO == 4 && BI & 0b11 == 0b00 && crfS == 0
+    condition: BO & 0b11110 == 4 && BI == 0
   - name: bgectr
     opcode: bcctr
-    modifiers: [ LK ]
     args: [ crfS ]
-    condition: BO == 4 && BI & 0b11 == 0b00
+    condition: BO & 0b11110 == 4 && BI & 0b11 == 0
   # bcctr branch if positive
   - name: bgtctr
     opcode: bcctr
-    modifiers: [ LK ]
-    condition: BO == 12 && BI & 0b11 == 0b01 && crfS == 0
+    condition: BO & 0b11110 == 12 && BI == 1
   - name: bgtctr
     opcode: bcctr
-    modifiers: [ LK ]
     args: [ crfS ]
-    condition: BO == 12 && BI & 0b11 == 0b01
+    condition: BO & 0b11110 == 12 && BI & 0b11 == 1
   # bcctr branch if not zero
   - name: bnectr
     opcode: bcctr
-    modifiers: [ LK ]
-    condition: BO == 4 && BI & 0b11 == 0b10 && crfS == 0
+    condition: BO & 0b11110 == 4 && BI == 2
   - name: bnectr
     opcode: bcctr
-    modifiers: [ LK ]
     args: [ crfS ]
-    condition: BO == 4 && BI & 0b11 == 0b10
+    condition: BO & 0b11110 == 4 && BI & 0b11 == 2
   # bcctr branch if summary overflow
   - name: bsoctr
     opcode: bcctr
-    modifiers: [ LK ]
-    condition: BO == 12 && BI & 0b11 == 0b11 && crfS == 0
+    condition: BO & 0b11110 == 12 && BI == 3
   - name: bsoctr
     opcode: bcctr
-    modifiers: [ LK ]
     args: [ crfS ]
-    condition: BO == 12 && BI & 0b11 == 0b11
+    condition: BO & 0b11110 == 12 && BI & 0b11 == 3
   # bcctr branch if not summary overflow
   - name: bnsctr
     opcode: bcctr
-    modifiers: [ LK ]
-    condition: BO == 4 && BI & 0b11 == 0b11 && crfS == 0
+    condition: BO & 0b11110 == 4 && BI == 3
   - name: bnsctr
     opcode: bcctr
-    modifiers: [ LK ]
     args: [ crfS ]
-    condition: BO == 4 && BI & 0b11 == 0b11
+    condition: BO & 0b11110 == 4 && BI & 0b11 == 3
 
   # Branch Conditional to Link Register
-
   # bclr branch always
   - name: blr
     opcode: bclr
@@ -2426,80 +2447,92 @@ mnemonics:
   # bclr branch if negative
   - name: bltlr
     opcode: bclr
-    modifiers: [ LK ]
-    condition: BO == 12 && BI & 0b11 == 0b00 && crfS == 0
+    condition: BO & 0b11110 == 12 && BI == 0
   - name: bltlr
     opcode: bclr
-    modifiers: [ LK ]
     args: [ crfS ]
-    condition: BO == 12 && BI & 0b11 == 0b00
+    condition: BO & 0b11110 == 12 && BI & 0b11 == 0
   # bclr branch if not positive
   - name: blelr
     opcode: bclr
-    modifiers: [ LK ]
-    condition: BO == 4 && BI & 0b11 == 0b01 && crfS == 0
+    condition: BO & 0b11110 == 4 && BI == 1
   - name: blelr
     opcode: bclr
-    modifiers: [ LK ]
     args: [ crfS ]
-    condition: BO == 4 && BI & 0b11 == 0b01
+    condition: BO & 0b11110 == 4 && BI & 0b11 == 1
   # bclr branch if zero
   - name: beqlr
     opcode: bclr
-    modifiers: [ LK ]
-    condition: BO == 12 && BI & 0b11 == 0b10 && crfS == 0
+    condition: BO & 0b11110 == 12 && BI == 2
   - name: beqlr
     opcode: bclr
-    modifiers: [ LK ]
     args: [ crfS ]
-    condition: BO == 12 && BI & 0b11 == 0b10
+    condition: BO & 0b11110 == 12 && BI & 0b11 == 2
   # bclr branch if not negative
   - name: bgelr
     opcode: bclr
-    modifiers: [ LK ]
-    condition: BO == 4 && BI & 0b11 == 0b00 && crfS == 0
+    condition: BO & 0b11110 == 4 && BI == 0
   - name: bgelr
     opcode: bclr
-    modifiers: [ LK ]
     args: [ crfS ]
-    condition: BO == 4 && BI & 0b11 == 0b00
+    condition: BO & 0b11110 == 4 && BI & 0b11 == 0
   # bclr branch if positive
   - name: bgtlr
     opcode: bclr
-    modifiers: [ LK ]
-    condition: BO == 12 && BI & 0b11 == 0b01 && crfS == 0
+    condition: BO & 0b11110 == 12 && BI == 1
   - name: bgtlr
     opcode: bclr
-    modifiers: [ LK ]
     args: [ crfS ]
-    condition: BO == 12 && BI & 0b11 == 0b01
+    condition: BO & 0b11110 == 12 && BI & 0b11 == 1
   # bclr branch if not zero
   - name: bnelr
     opcode: bclr
-    modifiers: [ LK ]
-    condition: BO == 4 && BI & 0b11 == 0b10 && crfS == 0
+    condition: BO & 0b11110 == 4 && BI == 2
   - name: bnelr
     opcode: bclr
-    modifiers: [ LK ]
     args: [ crfS ]
-    condition: BO == 4 && BI & 0b11 == 0b10
+    condition: BO & 0b11110 == 4 && BI & 0b11 == 2
   # bclr branch if summary overflow
   - name: bsolr
     opcode: bclr
-    modifiers: [ LK ]
-    condition: BO == 12 && BI & 0b11 == 0b11 && crfS == 0
+    condition: BO & 0b11110 == 12 && BI == 3
   - name: bsolr
     opcode: bclr
-    modifiers: [ LK ]
     args: [ crfS ]
-    condition: BO == 12 && BI & 0b11 == 0b11
+    condition: BO & 0b11110 == 12 && BI & 0b11 == 3
   # bclr branch if not summary overflow
   - name: bnslr
     opcode: bclr
-    modifiers: [ LK ]
-    condition: BO == 4 && BI & 0b11 == 0b11 && crfS == 0
+    condition: BO & 0b11110 == 4 && BI == 3
   - name: bnslr
     opcode: bclr
-    modifiers: [ LK ]
     args: [ crfS ]
-    condition: BO == 4 && BI & 0b11 == 0b11
+    condition: BO & 0b11110 == 4 && BI & 0b11 == 3
+  # bclr decrement CTR, branch if CTR non-zero
+  - name: bdnzlr
+    opcode: bclr
+    condition: BO & 0b11110 == 16 && BI == 0
+  # bclr decrement CTR, branch if CTR non-zero AND condition true
+  - name: bdnztlr
+    opcode: bclr
+    args: [ BI ]
+    condition: BO & 0b11110 == 8
+  # bclr decrement CTR, branch if CTR non-zero AND condition false
+  - name: bdnzflr
+    opcode: bclr
+    args: [ BI ]
+    condition: BO & 0b11110 == 0
+  # bclr decrement CTR, branch if CTR zero
+  - name: bdzlr
+    opcode: bclr
+    condition: BO & 0b11110 == 18 && BI == 0
+  # bclr decrement CTR, branch if CTR zero AND condition true
+  - name: bdztlr
+    opcode: bclr
+    args: [ BI ]
+    condition: BO & 0b11110 == 10
+  # bclr decrement CTR, branch if CTR zero AND condition false
+  - name: bdzflr
+    opcode: bclr
+    args: [ BI ]
+    condition: BO & 0b11110 == 0

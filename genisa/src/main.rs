@@ -6,7 +6,7 @@ use std::process::{Command, Stdio};
 use std::str::FromStr;
 
 use itertools::Itertools;
-use proc_macro2::{Ident, Literal, Span, TokenStream, TokenTree};
+use proc_macro2::{Group, Ident, Literal, Span, TokenStream, TokenTree};
 use quote::quote;
 use serde::{Deserialize, Deserializer};
 use syn::{LitChar, LitInt, LitStr};
@@ -74,8 +74,8 @@ pub(crate) struct BitRange(Range<u8>);
 
 impl<'de> Deserialize<'de> for BitRange {
     fn deserialize<D>(deserializer: D) -> std::result::Result<Self, D::Error>
-    where
-        D: Deserializer<'de>,
+        where
+            D: Deserializer<'de>,
     {
         let range_str: String = Deserialize::deserialize(deserializer)?;
         if let Some((start_str, stop_str)) = range_str.split_once("..") {
@@ -232,7 +232,8 @@ impl Opcode {
 pub(crate) struct Mnemonic {
     name: String,
     opcode: String,
-    modifiers: Vec<String>,
+    // Overrides modifier list from opcode
+    modifiers: Option<Vec<String>>,
     args: Vec<String>,
     condition: String,
 }
@@ -243,23 +244,31 @@ pub(crate) struct Modifier {
     name: String,
     suffix: char,
     bit: u8,
+    condition: String,
 }
 
 impl Modifier {
-    fn express_value_self(&self) -> TokenStream {
-        let modifier_bit = self.bit as usize;
-        quote!(self.bit(#modifier_bit))
+    fn express_value_self(&self, field_by_name: &HashMap<String, &Field>) -> Result<TokenStream> {
+        if self.condition.is_empty() {
+            let modifier_bit = self.bit as usize;
+            Ok(quote!(self.bit(#modifier_bit)))
+        } else {
+            compile_mnemonic_condition(
+                field_by_name,
+                &self.condition,
+            )
+        }
     }
 
-    fn construct_accessor(&self) -> TokenStream {
+    fn construct_accessor(&self, field_by_name: &HashMap<String, &Field>) -> Result<TokenStream> {
         let field_variant = to_rust_ident("field_", &self.name);
-        let value = self.express_value_self();
-        quote! {
+        let value = self.express_value_self(field_by_name)?;
+        Ok(quote! {
             #[inline(always)]
             pub fn #field_variant(&self) -> bool {
                 #value
             }
-        }
+        })
     }
 }
 
@@ -482,7 +491,7 @@ impl Isa {
             });
 
             // Generate modifiers.
-            let suffix = express_suffix(&modifier_by_name, opcode)?;
+            let suffix = express_suffix(&modifier_by_name, &field_by_name, &opcode.modifiers)?;
             suffix_match_arms.push(quote! {
                 Opcode::#ident => #suffix,
             });
@@ -556,21 +565,29 @@ impl Isa {
                     )?);
                     // Emit branch.
                     let mnemonic_lit = LitStr::new(&mnemonic.name, Span::call_site());
+                    // Emit suffix.
+                    let modifiers = mnemonic.modifiers.as_ref().unwrap_or(&opcode.modifiers);
+                    let suffix = express_suffix(&modifier_by_name, &field_by_name, modifiers)?;
                     // Extract arguments.
                     let mut args = Vec::new();
                     for arg in &mnemonic.args {
+                        let (field_name, expression) = arg.split_once('=').unwrap_or((arg, arg));
                         let field = field_by_name
-                            .get(arg)
+                            .get(field_name)
                             .unwrap_or_else(|| panic!("field not found: {}", arg));
                         let variant = Ident::new(field.arg.as_ref().unwrap(), Span::call_site());
-                        let value = field.express_value_self();
-                        args.push(quote!(Argument::#variant(#variant(#value as _)),));
+                        let value = compile_mnemonic_condition(
+                            &field_by_name,
+                            expression,
+                        )?;
+                        args.push(quote!(Argument::#variant(#variant((#value) as _)),));
                     }
                     let args = token_stream!(args);
                     simplified_conditions.push(quote! {
                         {
                             return SimplifiedIns {
                                 mnemonic: #mnemonic_lit,
+                                suffix: #suffix,
                                 args: vec![#args],
                                 ins: self,
                             };
@@ -592,11 +609,10 @@ impl Isa {
         let simplified_ins_match_arms = token_stream!(simplified_ins_match_arms);
         let field_accessors =
             TokenStream::from_iter(self.fields.iter().map(|field| field.construct_accessor()));
-        let modifier_accessors = TokenStream::from_iter(
-            self.modifiers
-                .iter()
-                .map(|modifier| modifier.construct_accessor()),
-        );
+        let modifiers: Vec<TokenStream> = self.modifiers
+            .iter()
+            .map(|modifier| modifier.construct_accessor(&field_by_name)).try_collect()?;
+        let modifier_accessors = TokenStream::from_iter(modifiers);
         // Generate final fields function.
         let ins_impl = quote! {
             #[allow(clippy::all, unused_mut)]
@@ -701,31 +717,41 @@ fn compile_mnemonic_condition(
     code: &str,
 ) -> Result<TokenStream> {
     let src_stream = TokenStream::from_str(code)?;
-    let token_iter = src_stream.into_iter().flat_map(|token| {
-        if let TokenTree::Ident(ref ident) = token {
-            if let Some(field) = field_by_name.get(&ident.to_string()) {
-                return field.express_value_self();
+    fn map_ident(field_by_name: &HashMap<String, &Field>, token: TokenTree) -> TokenStream {
+        match token {
+            TokenTree::Ident(ref ident) => {
+                if let Some(field) = field_by_name.get(&ident.to_string()) {
+                    return field.express_value_self();
+                }
             }
+            TokenTree::Group(ref group) => {
+                let iter = group.stream().into_iter().flat_map(|token| map_ident(field_by_name, token));
+                let stream = TokenStream::from_iter(iter);
+                return TokenStream::from(TokenTree::Group(Group::new(group.delimiter(), stream)));
+            }
+            _ => {}
         }
         token.into()
-    });
+    }
+    let token_iter = src_stream.into_iter().flat_map(|token| map_ident(field_by_name, token));
     Ok(TokenStream::from_iter(token_iter))
 }
 
 fn express_suffix(
     modifier_by_name: &HashMap<String, &Modifier>,
-    opcode: &Opcode,
+    field_by_name: &HashMap<String, &Field>,
+    modifiers: &[String],
 ) -> Result<TokenStream> {
-    Ok(if opcode.modifiers.is_empty() {
+    Ok(if modifiers.is_empty() {
         quote!(String::new())
     } else {
         let mut chars = Vec::new();
-        for mod_name in &opcode.modifiers {
+        for mod_name in modifiers {
             let modifier: &Modifier = modifier_by_name
                 .get(mod_name)
                 .ok_or_else(|| Error::from(format!("undefined modifier {}", mod_name)))?;
             let lit_char = LitChar::new(modifier.suffix, Span::call_site());
-            let modifier_bit = modifier.express_value_self();
+            let modifier_bit = modifier.express_value_self(field_by_name)?;
             chars.push(quote! {
                 if #modifier_bit {
                     s.push(#lit_char);

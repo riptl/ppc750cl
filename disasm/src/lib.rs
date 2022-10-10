@@ -215,8 +215,6 @@ impl Display for Bit {
 // Unsigned opaque argument.
 field_arg!(OpaqueU, u32);
 
-const SPR_LR: usize = 16;
-
 #[derive(Debug, Clone)]
 pub enum Argument {
     GPR(GPR),
@@ -373,12 +371,10 @@ impl Ins {
         self.branch_offset().and_then(|offset| {
             if self.field_AA() {
                 Some(offset as u32)
+            } else if offset < 0 {
+                self.addr.checked_sub((-offset) as u32)
             } else {
-                if offset < 0 {
-                    self.addr.checked_sub((-offset) as u32)
-                } else {
-                    self.addr.checked_add(offset as u32)
-                }
+                self.addr.checked_add(offset as u32)
             }
         })
     }
@@ -419,12 +415,13 @@ impl Ins {
 pub struct SimplifiedIns {
     pub ins: Ins,
     pub mnemonic: &'static str,
+    pub suffix: String,
     pub args: Vec<Argument>,
 }
 
 impl Display for SimplifiedIns {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}{} ", self.mnemonic, self.ins.suffix())?;
+        write!(f, "{}{} ", self.mnemonic, self.suffix)?;
         let mut writing_offset = false;
         for (i, argument) in self.args.iter().enumerate() {
             write!(f, "{}", argument)?;
@@ -449,6 +446,7 @@ impl SimplifiedIns {
     pub(crate) fn basic_form(ins: Ins) -> Self {
         Self {
             mnemonic: ins.op.mnemonic(),
+            suffix: ins.suffix(),
             args: ins
                 .fields()
                 .iter()
