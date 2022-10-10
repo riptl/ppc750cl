@@ -496,7 +496,10 @@ fn test_ins_mfmsr() {
 
 #[test]
 fn test_ins_mfspr() {
-    assert_asm!(0x7E1A02A6, "mfspr r16, 26");
+    assert_asm!(0x7E1A02A6, "mfsrr0 r16");
+    assert_asm!(0x7C70FAA6, "mfspr r3, HID0");
+    assert_asm!(0x7C7482A6, "mfibatu r3, 2");
+    assert_asm!(0x7C7782A6, "mfibatl r3, 3");
 }
 
 #[test]
@@ -537,7 +540,16 @@ fn test_ins_mtmsr() {
 
 #[test]
 fn test_ins_mtspr() {
-    assert_asm!(0x7E75FBA6, "mtspr 1013, r19");
+    assert_asm!(0x7E75FBA6, "mtspr DABR, r19");
+    assert_asm!(0x7C70FBA6, "mtspr HID0, r3");
+    assert_asm!(0x7C7603A6, "mtdec r3");
+    assert_asm!(0x7C7043A6, "mtsprg 0, r3");
+    assert_asm!(0x7C7143A6, "mtsprg 1, r3");
+    assert_asm!(0x7C7343A6, "mtsprg 3, r3");
+    assert_asm!(0x7C7083A6, "mtibatu 0, r3");
+    assert_asm!(0x7C7483A6, "mtibatu 2, r3");
+    assert_asm!(0x7C7783A6, "mtibatl 3, r3");
+    assert_asm!(0x7C7D83A6, "mtdbatl 2, r3");
 }
 
 #[test]

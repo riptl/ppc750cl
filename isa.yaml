@@ -141,6 +141,14 @@ fields:
     arg: OpaqueU
     desc: Immediate for mtfsfi
     bits: 16..20
+  - name: spr_SPRG
+    arg: OpaqueU
+    desc: SPRG index for m[tf]sprg
+    bits: 14..16
+  - name: spr_BAT
+    arg: OpaqueU
+    desc: IBAT/DBAT index for m[tf][id]bat[ul]
+    bits: 13..15
   - name: TO
     arg: OpaqueU
     desc: Bitset for tw and twi
@@ -2099,10 +2107,58 @@ mnemonics:
     opcode: mtspr
     args: [ rS ]
     condition: spr == 18
-  - name: mtdbatu
+  - name: mtdar
     opcode: mtspr
     args: [ rS ]
-    condition: spr == 397
+    condition: spr == 19
+  - name: mtdec
+    opcode: mtspr
+    args: [ rS ]
+    condition: spr == 22
+  - name: mtsdr1
+    opcode: mtspr
+    args: [ rS ]
+    condition: spr == 25
+  - name: mtsrr0
+    opcode: mtspr
+    args: [ rS ]
+    condition: spr == 26
+  - name: mtsrr1
+    opcode: mtspr
+    args: [ rS ]
+    condition: spr == 27
+  - name: mtsprg
+    opcode: mtspr
+    args: [ spr_SPRG, rS ]
+    condition: spr & 0b1111111100 == 272
+  - name: mtear
+    opcode: mtspr
+    args: [ rS ]
+    condition: spr == 282
+  - name: mttbl
+    opcode: mtspr
+    args: [ rS ]
+    condition: spr == 284
+  - name: mttbu
+    opcode: mtspr
+    args: [ rS ]
+    condition: spr == 285
+  - name: mtibatu
+    opcode: mtspr
+    args: [ spr_BAT, rS ]
+    condition: spr & 0b1111111001 == 528
+  - name: mtibatl
+    opcode: mtspr
+    args: [ spr_BAT, rS ]
+    condition: spr & 0b1111111001 == 529
+  - name: mtdbatu
+    opcode: mtspr
+    args: [ spr_BAT, rS ]
+    condition: spr & 0b1111111001 == 536
+  - name: mtdbatl
+    opcode: mtspr
+    args: [ spr_BAT, rS ]
+    condition: spr & 0b1111111001 == 537
 
   # Move from special-purpose register
   - name: mfxer
@@ -2121,10 +2177,50 @@ mnemonics:
     opcode: mfspr
     args: [ rD ]
     condition: spr == 18
-  - name: mfdbatu
+  - name: mfdar
     opcode: mfspr
     args: [ rD ]
-    condition: spr == 397
+    condition: spr == 19
+  - name: mfdec
+    opcode: mfspr
+    args: [ rD ]
+    condition: spr == 22
+  - name: mfsdr1
+    opcode: mfspr
+    args: [ rD ]
+    condition: spr == 25
+  - name: mfsrr0
+    opcode: mfspr
+    args: [ rD ]
+    condition: spr == 26
+  - name: mfsrr1
+    opcode: mfspr
+    args: [ rD ]
+    condition: spr == 27
+  - name: mfsprg
+    opcode: mfspr
+    args: [ rD, spr_SPRG ]
+    condition: spr & 0b1111111100 == 272
+  - name: mfear
+    opcode: mfspr
+    args: [ rD ]
+    condition: spr == 282
+  - name: mfibatu
+    opcode: mfspr
+    args: [ rD, spr_BAT ]
+    condition: spr & 0b1111111001 == 528
+  - name: mfibatl
+    opcode: mfspr
+    args: [ rD, spr_BAT ]
+    condition: spr & 0b1111111001 == 529
+  - name: mfdbatu
+    opcode: mfspr
+    args: [ rD, spr_BAT ]
+    condition: spr & 0b1111111001 == 536
+  - name: mfdbatl
+    opcode: mfspr
+    args: [ rD, spr_BAT ]
+    condition: spr & 0b1111111001 == 537
 
   # Branch Conditional
   # bc branch always
