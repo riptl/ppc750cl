@@ -2002,10 +2002,6 @@ mnemonics:
     opcode: rlwinm
     args: [ rA, rS, MB ]
     condition: SH == 0 && ME == 31
-  - name: clrlslwi
-    opcode: rlwinm
-    args: [ rA, rS, MB=32-SH, SH ]
-    condition: SH < 32 && MB >= SH && ME == 31 - SH
   - name: rotlwi
     opcode: rlwinm
     args: [ rA, rS, SH ]
@@ -2022,6 +2018,10 @@ mnemonics:
     opcode: rlwinm
     args: [ rA, rS, MB ]
     condition: ME == 31 && 32 - MB == SH
+  - name: clrlslwi
+    opcode: rlwinm
+    args: [ rA, rS, MB=MB+SH, SH ]
+    condition: SH < 32 && ME == 31 - SH
   - name: extlwi
     opcode: rlwinm
     args: [ rA, rS, ME=ME+1, SH ]

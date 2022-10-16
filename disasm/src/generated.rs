@@ -7408,30 +7408,6 @@ impl Ins {
                         ins: self,
                     };
                 }
-                if ((self.code >> 11u8) & 0x1f) < 32
-                    && ((self.code >> 6u8) & 0x1f) >= ((self.code >> 11u8) & 0x1f)
-                    && ((self.code >> 1u8) & 0x1f) == 31 - ((self.code >> 11u8) & 0x1f)
-                {
-                    return SimplifiedIns {
-                        mnemonic: "clrlslwi",
-                        suffix: {
-                            {
-                                let mut s = String::with_capacity(4);
-                                if self.bit(31usize) {
-                                    s.push('.');
-                                }
-                                s
-                            }
-                        },
-                        args: vec![
-                            Argument::GPR(GPR(((self.code >> 16u8) & 0x1f) as _)),
-                            Argument::GPR(GPR(((self.code >> 21u8) & 0x1f) as _)),
-                            Argument::OpaqueU(OpaqueU((32 - ((self.code >> 11u8) & 0x1f)) as _)),
-                            Argument::OpaqueU(OpaqueU(((self.code >> 11u8) & 0x1f) as _)),
-                        ],
-                        ins: self,
-                    };
-                }
                 if ((self.code >> 6u8) & 0x1f) == 0
                     && ((self.code >> 1u8) & 0x1f) == 31
                     && ((self.code >> 11u8) & 0x1f) <= 16
@@ -7518,6 +7494,31 @@ impl Ins {
                             Argument::GPR(GPR(((self.code >> 16u8) & 0x1f) as _)),
                             Argument::GPR(GPR(((self.code >> 21u8) & 0x1f) as _)),
                             Argument::OpaqueU(OpaqueU(((self.code >> 6u8) & 0x1f) as _)),
+                        ],
+                        ins: self,
+                    };
+                }
+                if ((self.code >> 11u8) & 0x1f) < 32
+                    && ((self.code >> 1u8) & 0x1f) == 31 - ((self.code >> 11u8) & 0x1f)
+                {
+                    return SimplifiedIns {
+                        mnemonic: "clrlslwi",
+                        suffix: {
+                            {
+                                let mut s = String::with_capacity(4);
+                                if self.bit(31usize) {
+                                    s.push('.');
+                                }
+                                s
+                            }
+                        },
+                        args: vec![
+                            Argument::GPR(GPR(((self.code >> 16u8) & 0x1f) as _)),
+                            Argument::GPR(GPR(((self.code >> 21u8) & 0x1f) as _)),
+                            Argument::OpaqueU(OpaqueU(
+                                (((self.code >> 6u8) & 0x1f) + ((self.code >> 11u8) & 0x1f)) as _,
+                            )),
+                            Argument::OpaqueU(OpaqueU(((self.code >> 11u8) & 0x1f) as _)),
                         ],
                         ins: self,
                     };

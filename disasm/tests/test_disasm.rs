@@ -861,7 +861,9 @@ fn test_ins_rlwinm() {
     assert_asm!(0x5483E03E, "rotrwi r3, r4, 4");
     assert_asm!(0x5464043E, "clrlwi r4, r3, 16");
     assert_asm!(0x54830036, "clrrwi r3, r4, 4");
-    assert_asm!(0x54640fbc, "clrlslwi r4, r3, 31, 1");
+    assert_asm!(0x54640FBC, "clrlslwi r4, r3, 31, 1");
+    assert_asm!(0x54092DB4, "clrlslwi r9, r0, 27, 5");
+    assert_asm!(0x54096226, "clrlslwi r9, r0, 20, 12");
 }
 
 #[test]
