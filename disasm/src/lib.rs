@@ -104,11 +104,97 @@ field_arg!(FPR, u8, "f{}");
 // Segment register.
 field_arg!(SR, u8);
 // Special-purpose register.
-field_arg!(SPR, u16);
+field_arg_no_display!(SPR, u16);
+impl Display for SPR {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        f.write_str(match self.0 {
+            1 => "XER",
+            8 => "LR",
+            9 => "CTR",
+            18 => "DSISR",
+            19 => "DAR",
+            22 => "DEC",
+            25 => "SDR1",
+            26 => "SRR0",
+            27 => "SRR1",
+            272 => "SPRG0",
+            273 => "SPRG1",
+            274 => "SPRG2",
+            275 => "SPRG3",
+            282 => "EAR",
+            287 => "PVR",
+            528 => "IBAT0U",
+            529 => "IBAT0L",
+            530 => "IBAT1U",
+            531 => "IBAT1L",
+            532 => "IBAT2U",
+            533 => "IBAT2L",
+            534 => "IBAT3U",
+            535 => "IBAT3L",
+            536 => "DBAT0U",
+            537 => "DBAT0L",
+            538 => "DBAT1U",
+            539 => "DBAT1L",
+            540 => "DBAT2U",
+            541 => "DBAT2L",
+            542 => "DBAT3U",
+            543 => "DBAT3L",
+            912 => "GQR0",
+            913 => "GQR1",
+            914 => "GQR2",
+            915 => "GQR3",
+            916 => "GQR4",
+            917 => "GQR5",
+            918 => "GQR6",
+            919 => "GQR7",
+            920 => "HID2",
+            921 => "WPAR",
+            922 => "DMA_U",
+            923 => "DMA_L",
+            936 => "UMMCR0",
+            937 => "UPMC1",
+            938 => "UPMC2",
+            939 => "USIA",
+            940 => "UMMCR1",
+            941 => "UPMC3",
+            942 => "UPMC4",
+            943 => "USDA",
+            952 => "MMCR0",
+            953 => "PMC1",
+            954 => "PMC2",
+            955 => "SIA",
+            956 => "MMCR1",
+            957 => "PMC3",
+            958 => "PMC4",
+            959 => "SDA",
+            1008 => "HID0",
+            1009 => "HID1",
+            1010 => "IABR",
+            1013 => "DABR",
+            1017 => "L2CR",
+            1019 => "ICTC",
+            1020 => "THRM1",
+            1021 => "THRM2",
+            1022 => "THRM3",
+            _ => return write!(f, "{}", self.0),
+        })
+    }
+}
 // Condition register field.
 field_arg!(CRField, u8, "cr{}");
 // Condition register bit (index + condition case).
-field_arg!(CRBit, u8, "{}");
+field_arg_no_display!(CRBit, u8);
+impl Display for CRBit {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        let cr = self.0 >> 2;
+        let cc = self.0 & 3;
+        if cr != 0 {
+            write!(f, "4*{}+", CRField(cr))?;
+        }
+        const CR_NAMES: [&str; 4] = ["lt", "gt", "eq", "so"];
+        f.write_str(CR_NAMES[cc as usize])
+    }
+}
 // Paired-single graphics quantization register
 field_arg!(GQR, u8, "qr{}");
 // Unsigned immediate.
@@ -128,8 +214,6 @@ impl Display for Bit {
 }
 // Unsigned opaque argument.
 field_arg!(OpaqueU, u32);
-
-const SPR_LR: usize = 16;
 
 #[derive(Debug, Clone)]
 pub enum Argument {
@@ -287,12 +371,10 @@ impl Ins {
         self.branch_offset().and_then(|offset| {
             if self.field_AA() {
                 Some(offset as u32)
+            } else if offset < 0 {
+                self.addr.checked_sub((-offset) as u32)
             } else {
-                if offset < 0 {
-                    self.addr.checked_sub((-offset) as u32)
-                } else {
-                    self.addr.checked_add(offset as u32)
-                }
+                self.addr.checked_add(offset as u32)
             }
         })
     }
@@ -333,12 +415,13 @@ impl Ins {
 pub struct SimplifiedIns {
     pub ins: Ins,
     pub mnemonic: &'static str,
+    pub suffix: String,
     pub args: Vec<Argument>,
 }
 
 impl Display for SimplifiedIns {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}{} ", self.mnemonic, self.ins.suffix())?;
+        write!(f, "{}{} ", self.mnemonic, self.suffix)?;
         let mut writing_offset = false;
         for (i, argument) in self.args.iter().enumerate() {
             write!(f, "{}", argument)?;
@@ -363,6 +446,7 @@ impl SimplifiedIns {
     pub(crate) fn basic_form(ins: Ins) -> Self {
         Self {
             mnemonic: ins.op.mnemonic(),
+            suffix: ins.suffix(),
             args: ins
                 .fields()
                 .iter()

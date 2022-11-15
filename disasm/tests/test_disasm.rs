@@ -95,6 +95,7 @@ fn test_ins_b() {
     assert_asm!(0x4BE03C99, "bl -0x1fc368");
     assert_asm!(0x4BDC1A59, "bl -0x23e5a8");
     assert_asm!(0x48000063, "bla 0x60");
+    assert_asm!(0x48000002, "ba 0x0");
 }
 
 #[test]
@@ -121,18 +122,29 @@ fn test_ins_bc() {
     assert_asm!(0x418502E4, "bgt cr1, 0x2e4");
     assert_asm!(0x419A0138, "beq cr6, 0x138");
     assert_asm!(0x419C0008, "blt cr7, 0x8");
+    assert_asm!(0x4240FFF0, "bdz -0x10");
     assert_asm!(0x4200F560, "bdnz -0xaa0");
+    assert_asm!(0x40010014, "bdnzf gt, 0x14");
+    assert_asm!(0x40410035, "bdzfl gt, 0x34");
+    assert_asm!(0x41430023, "bdztla so, 0x20");
+    assert_asm!(0x4108FFE3, "bdnztla 4*cr2+lt, -0x20");
+    assert_asm!(0x40A20008, "bne+ 0x8");
 }
 
 #[test]
 fn test_ins_bcctr() {
     assert_asm!(0x4E800420, "bctr");
     assert_asm!(0x4E800421, "bctrl");
+    assert_asm!(0x4D820420, "beqctr");
+    assert_asm!(0x4D8D0421, "bgtctrl cr3");
+    assert_asm!(0x4DA20420, "beqctr+");
+    assert_asm!(0x4DB90421, "bgtctrl+ cr6");
 }
 
 #[test]
 fn test_ins_bclr() {
     assert_asm!(0x4C800020, "bgelr");
+    assert_asm!(0x4CA00020, "bgelr+");
     assert_asm!(0x4C810020, "blelr");
     assert_asm!(0x4C820020, "bnelr");
     assert_asm!(0x4C9E0020, "bnelr cr7");
@@ -142,6 +154,8 @@ fn test_ins_bclr() {
     assert_asm!(0x4D860020, "beqlr cr1");
     assert_asm!(0x4E800020, "blr");
     assert_asm!(0x4E800021, "blrl");
+    assert_asm!(0x4D000020, "bdnztlr lt");
+    assert_asm!(0x4C1F0021, "bdnzflrl 4*cr7+so");
 }
 
 #[test]
@@ -149,11 +163,10 @@ fn test_ins_cmp() {
     assert_asm!(0x7C030000, "cmpw r3, r0");
 }
 
-/*
 #[test]
 fn test_ins_cmpi() {
     assert_asm!(0x2C050D00, "cmpwi r5, 0xd00");
-    assert_asm!(0x2F1F0000, "cmpwi cr6, r31, 0");
+    assert_asm!(0x2F1F0000, "cmpwi cr6, r31, 0x0");
 }
 
 #[test]
@@ -166,7 +179,6 @@ fn test_ins_cmpli() {
     assert_asm!(0x2803FFF3, "cmplwi r3, 0xfff3");
     assert_asm!(0x2884F8F0, "cmplwi cr1, r4, 0xf8f0");
 }
-*/
 
 #[test]
 fn test_ins_cntlzw() {
@@ -174,8 +186,45 @@ fn test_ins_cntlzw() {
 }
 
 #[test]
+fn test_ins_crand() {
+    assert_asm!(0x4C853202, "crand 4*cr1+lt, 4*cr1+gt, 4*cr1+eq");
+}
+
+#[test]
+fn test_ins_crandc() {
+    assert_asm!(0x4C642902, "crandc so, 4*cr1+lt, 4*cr1+gt");
+}
+
+#[test]
+fn test_ins_creqv() {
+    assert_asm!(0x4CE00A42, "creqv 4*cr1+so, lt, gt");
+}
+
+#[test]
+fn test_ins_crnand() {
+    assert_asm!(0x4C2219C2, "crnand gt, eq, so");
+}
+
+#[test]
 fn test_ins_cror() {
-    assert_asm!(0x4C411382, "cror 2, 1, 2");
+    assert_asm!(0x4C411382, "cror eq, gt, eq");
+    assert_asm!(0x4CA63B82, "cror 4*cr1+gt, 4*cr1+eq, 4*cr1+so");
+}
+
+#[test]
+fn test_ins_crorc() {
+    assert_asm!(0x4C432342, "crorc eq, so, 4*cr1+lt");
+}
+
+#[test]
+fn test_ins_crnor() {
+    assert_asm!(0x4C011042, "crnor lt, gt, eq");
+    assert_asm!(0x4CA63042, "crnot 4*cr1+gt, 4*cr1+eq");
+}
+
+#[test]
+fn test_ins_crxor() {
+    assert_asm!(0x4CC70182, "crxor 4*cr1+eq, 4*cr1+so, lt");
 }
 
 #[test]
@@ -498,7 +547,10 @@ fn test_ins_mfmsr() {
 
 #[test]
 fn test_ins_mfspr() {
-    assert_asm!(0x7E1A02A6, "mfspr r16, 26");
+    assert_asm!(0x7E1A02A6, "mfsrr0 r16");
+    assert_asm!(0x7C70FAA6, "mfspr r3, HID0");
+    assert_asm!(0x7C7482A6, "mfibatu r3, 2");
+    assert_asm!(0x7C7782A6, "mfibatl r3, 3");
 }
 
 #[test]
@@ -516,14 +568,14 @@ fn test_ins_mtcrf() {
     assert_asm!(0x7C6FF120, "mtcrf 255, r3");
 }
 
-/*
 #[test]
-fn test_ins_mtfsb0() {}
- */
+fn test_ins_mtfsb0() {
+    assert_asm!(0xFFA0008C, "mtfsb0 4*cr7+gt")
+}
 
 #[test]
 fn test_ins_mtfsb1() {
-    assert_asm!(0xFFA0004C, "mtfsb1 29");
+    assert_asm!(0xFFA0004C, "mtfsb1 4*cr7+gt");
 }
 
 #[test]
@@ -539,7 +591,16 @@ fn test_ins_mtmsr() {
 
 #[test]
 fn test_ins_mtspr() {
-    assert_asm!(0x7E75FBA6, "mtspr 1013, r19");
+    assert_asm!(0x7E75FBA6, "mtspr DABR, r19");
+    assert_asm!(0x7C70FBA6, "mtspr HID0, r3");
+    assert_asm!(0x7C7603A6, "mtdec r3");
+    assert_asm!(0x7C7043A6, "mtsprg 0, r3");
+    assert_asm!(0x7C7143A6, "mtsprg 1, r3");
+    assert_asm!(0x7C7343A6, "mtsprg 3, r3");
+    assert_asm!(0x7C7083A6, "mtibatu 0, r3");
+    assert_asm!(0x7C7483A6, "mtibatu 2, r3");
+    assert_asm!(0x7C7783A6, "mtibatl 3, r3");
+    assert_asm!(0x7C7D83A6, "mtdbatl 2, r3");
 }
 
 #[test]
@@ -624,7 +685,7 @@ fn test_ins_psq_lx() {
             rA(GPR(0)),
             rB(GPR(0)),
             ps_WX(OpaqueU(0)),
-            ps_IX(GQR(0))
+            ps_IX(GQR(0)),
         ]
     );
     assert_eq!(ins.defs(), vec![frD(FPR(0))]);
@@ -792,12 +853,24 @@ fn test_ins_rlwinm() {
 
     // mnemonics
     assert_asm!(0x57E5103A, "slwi r5, r31, 2");
+    assert_asm!(0x54832026, "extlwi r3, r4, 20, 4");
+    assert_asm!(0x5483AB3E, "extrwi r3, r4, 20, 1");
+    assert_asm!(0x540027BE, "extrwi r0, r0, 2, 2");
+    assert_asm!(0x54839B3E, "rlwinm r3, r4, 19, 12, 31");
+    assert_asm!(0x5483203E, "rotlwi r3, r4, 4");
+    assert_asm!(0x5483E03E, "rotrwi r3, r4, 4");
+    assert_asm!(0x5464043E, "clrlwi r4, r3, 16");
+    assert_asm!(0x54830036, "clrrwi r3, r4, 4");
+    assert_asm!(0x54640FBC, "clrlslwi r4, r3, 31, 1");
+    assert_asm!(0x54092DB4, "clrlslwi r9, r0, 27, 5");
+    assert_asm!(0x54096226, "clrlslwi r9, r0, 20, 12");
 }
 
 #[test]
 fn test_ins_rlwnm() {
     assert_asm!(0x5D6A67FE, "rlwnm r10, r11, r12, 31, 31");
     assert_asm!(0x5FC52EFE, "rlwnm r5, r30, r5, 27, 31");
+    assert_asm!(0x5FC5283F, "rotlw. r5, r30, r5");
 }
 
 #[test]

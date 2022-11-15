@@ -1132,7 +1132,7 @@ pub enum Field {
     offset(Offset),
     ps_offset(Offset),
     BO(OpaqueU),
-    BI(OpaqueU),
+    BI(CRBit),
     BH(OpaqueU),
     BD(BranchDest),
     LI(BranchDest),
@@ -1165,6 +1165,8 @@ pub enum Field {
     tbr(OpaqueU),
     mtfsf_FM(OpaqueU),
     mtfsf_IMM(OpaqueU),
+    spr_SPRG(OpaqueU),
+    spr_BAT(OpaqueU),
     TO(OpaqueU),
     L(OpaqueU),
     xer,
@@ -1179,7 +1181,7 @@ impl Field {
             Field::offset(x) => Some(Argument::Offset(*x)),
             Field::ps_offset(x) => Some(Argument::Offset(*x)),
             Field::BO(x) => Some(Argument::OpaqueU(*x)),
-            Field::BI(x) => Some(Argument::OpaqueU(*x)),
+            Field::BI(x) => Some(Argument::CRBit(*x)),
             Field::BH(x) => Some(Argument::OpaqueU(*x)),
             Field::BD(x) => Some(Argument::BranchDest(*x)),
             Field::LI(x) => Some(Argument::BranchDest(*x)),
@@ -1212,6 +1214,8 @@ impl Field {
             Field::tbr(x) => Some(Argument::OpaqueU(*x)),
             Field::mtfsf_FM(x) => Some(Argument::OpaqueU(*x)),
             Field::mtfsf_IMM(x) => Some(Argument::OpaqueU(*x)),
+            Field::spr_SPRG(x) => Some(Argument::OpaqueU(*x)),
+            Field::spr_BAT(x) => Some(Argument::OpaqueU(*x)),
             Field::TO(x) => Some(Argument::OpaqueU(*x)),
             Field::L(x) => Some(Argument::OpaqueU(*x)),
             _ => None,
@@ -1257,6 +1261,8 @@ impl Field {
             Field::tbr(_) => "tbr",
             Field::mtfsf_FM(_) => "mtfsf_FM",
             Field::mtfsf_IMM(_) => "mtfsf_IMM",
+            Field::spr_SPRG(_) => "spr_SPRG",
+            Field::spr_BAT(_) => "spr_BAT",
             Field::TO(_) => "TO",
             Field::L(_) => "L",
             Field::xer => "xer",
@@ -1345,7 +1351,7 @@ impl Ins {
             ))],
             Opcode::Bc => vec![
                 Field::BO(OpaqueU(((self.code >> 21u8) & 0x1f) as _)),
-                Field::BI(OpaqueU(((self.code >> 16u8) & 0x1f) as _)),
+                Field::BI(CRBit(((self.code >> 16u8) & 0x1f) as _)),
                 Field::BD(BranchDest(
                     ((((((self.code >> 2u8) & 0x3fff) ^ 0x2000).wrapping_sub(0x2000)) as i32)
                         << 2u8) as _,
@@ -1353,12 +1359,12 @@ impl Ins {
             ],
             Opcode::Bcctr => vec![
                 Field::BO(OpaqueU(((self.code >> 21u8) & 0x1f) as _)),
-                Field::BI(OpaqueU(((self.code >> 16u8) & 0x1f) as _)),
+                Field::BI(CRBit(((self.code >> 16u8) & 0x1f) as _)),
                 Field::BH(OpaqueU(((self.code >> 11u8) & 0x3) as _)),
             ],
             Opcode::Bclr => vec![
                 Field::BO(OpaqueU(((self.code >> 21u8) & 0x1f) as _)),
-                Field::BI(OpaqueU(((self.code >> 16u8) & 0x1f) as _)),
+                Field::BI(CRBit(((self.code >> 16u8) & 0x1f) as _)),
                 Field::BH(OpaqueU(((self.code >> 11u8) & 0x3) as _)),
             ],
             Opcode::Cmp => vec![
@@ -4219,6 +4225,20 @@ impl Ins {
                 if self.bit(30usize) {
                     s.push('a');
                 }
+                if ((self.code >> 21u8) & 0x1f) & 1 == 1
+                    && ((((((self.code >> 2u8) & 0x3fff) ^ 0x2000).wrapping_sub(0x2000)) as i32)
+                        << 2u8)
+                        >= 0
+                {
+                    s.push('+');
+                }
+                if ((self.code >> 21u8) & 0x1f) & 1 == 1
+                    && ((((((self.code >> 2u8) & 0x3fff) ^ 0x2000).wrapping_sub(0x2000)) as i32)
+                        << 2u8)
+                        < 0
+                {
+                    s.push('-');
+                }
                 s
             }
             Opcode::Bcctr => {
@@ -4226,12 +4246,18 @@ impl Ins {
                 if self.bit(31usize) {
                     s.push('l');
                 }
+                if ((self.code >> 21u8) & 0x1f) & 1 == 1 {
+                    s.push('+');
+                }
                 s
             }
             Opcode::Bclr => {
                 let mut s = String::with_capacity(4);
                 if self.bit(31usize) {
                     s.push('l');
+                }
+                if ((self.code >> 21u8) & 0x1f) & 1 == 1 {
+                    s.push('+');
                 }
                 s
             }
@@ -4823,6 +4849,7 @@ impl Ins {
                 if ((self.code >> 16u8) & 0x1f) == 0 {
                     return SimplifiedIns {
                         mnemonic: "li",
+                        suffix: String::new(),
                         args: vec![
                             Argument::GPR(GPR(((self.code >> 21u8) & 0x1f) as _)),
                             Argument::Simm(Simm(
@@ -4838,6 +4865,7 @@ impl Ins {
                 if ((self.code >> 16u8) & 0x1f) == 0 {
                     return SimplifiedIns {
                         mnemonic: "lis",
+                        suffix: String::new(),
                         args: vec![
                             Argument::GPR(GPR(((self.code >> 21u8) & 0x1f) as _)),
                             Argument::Uimm(Uimm((self.code & 0xffff) as _)),
@@ -4847,19 +4875,40 @@ impl Ins {
                 }
             }
             Opcode::Bc => {
-                if ((self.code >> 21u8) & 0x1f) == 20 && ((self.code >> 16u8) & 0x1f) == 0 {
-                    return SimplifiedIns {
-                        mnemonic: "b",
-                        args: vec![],
-                        ins: self,
-                    };
-                }
-                if ((self.code >> 21u8) & 0x1f) == 12
-                    && ((self.code >> 16u8) & 0x1f) & 0b11 == 0b00
-                    && ((self.code >> 18u8) & 0x7) == 0
+                if ((self.code >> 21u8) & 0x1f) & 0b11110 == 12 && ((self.code >> 16u8) & 0x1f) == 0
                 {
                     return SimplifiedIns {
                         mnemonic: "blt",
+                        suffix: {
+                            {
+                                let mut s = String::with_capacity(4);
+                                if self.bit(31usize) {
+                                    s.push('l');
+                                }
+                                if self.bit(30usize) {
+                                    s.push('a');
+                                }
+                                if ((self.code >> 21u8) & 0x1f) & 1 == 1
+                                    && ((((((self.code >> 2u8) & 0x3fff) ^ 0x2000)
+                                        .wrapping_sub(0x2000))
+                                        as i32)
+                                        << 2u8)
+                                        >= 0
+                                {
+                                    s.push('+');
+                                }
+                                if ((self.code >> 21u8) & 0x1f) & 1 == 1
+                                    && ((((((self.code >> 2u8) & 0x3fff) ^ 0x2000)
+                                        .wrapping_sub(0x2000))
+                                        as i32)
+                                        << 2u8)
+                                        < 0
+                                {
+                                    s.push('-');
+                                }
+                                s
+                            }
+                        },
                         args: vec![Argument::BranchDest(BranchDest(
                             ((((((self.code >> 2u8) & 0x3fff) ^ 0x2000).wrapping_sub(0x2000))
                                 as i32)
@@ -4868,10 +4917,41 @@ impl Ins {
                         ins: self,
                     };
                 }
-                if ((self.code >> 21u8) & 0x1f) == 12 && ((self.code >> 16u8) & 0x1f) & 0b11 == 0b00
+                if ((self.code >> 21u8) & 0x1f) & 0b11110 == 12
+                    && ((self.code >> 16u8) & 0x1f) & 0b11 == 0
                 {
                     return SimplifiedIns {
                         mnemonic: "blt",
+                        suffix: {
+                            {
+                                let mut s = String::with_capacity(4);
+                                if self.bit(31usize) {
+                                    s.push('l');
+                                }
+                                if self.bit(30usize) {
+                                    s.push('a');
+                                }
+                                if ((self.code >> 21u8) & 0x1f) & 1 == 1
+                                    && ((((((self.code >> 2u8) & 0x3fff) ^ 0x2000)
+                                        .wrapping_sub(0x2000))
+                                        as i32)
+                                        << 2u8)
+                                        >= 0
+                                {
+                                    s.push('+');
+                                }
+                                if ((self.code >> 21u8) & 0x1f) & 1 == 1
+                                    && ((((((self.code >> 2u8) & 0x3fff) ^ 0x2000)
+                                        .wrapping_sub(0x2000))
+                                        as i32)
+                                        << 2u8)
+                                        < 0
+                                {
+                                    s.push('-');
+                                }
+                                s
+                            }
+                        },
                         args: vec![
                             Argument::CRField(CRField(((self.code >> 18u8) & 0x7) as _)),
                             Argument::BranchDest(BranchDest(
@@ -4883,12 +4963,40 @@ impl Ins {
                         ins: self,
                     };
                 }
-                if ((self.code >> 21u8) & 0x1f) == 4
-                    && ((self.code >> 16u8) & 0x1f) & 0b11 == 0b01
-                    && ((self.code >> 18u8) & 0x7) == 0
+                if ((self.code >> 21u8) & 0x1f) & 0b11110 == 4 && ((self.code >> 16u8) & 0x1f) == 1
                 {
                     return SimplifiedIns {
                         mnemonic: "ble",
+                        suffix: {
+                            {
+                                let mut s = String::with_capacity(4);
+                                if self.bit(31usize) {
+                                    s.push('l');
+                                }
+                                if self.bit(30usize) {
+                                    s.push('a');
+                                }
+                                if ((self.code >> 21u8) & 0x1f) & 1 == 1
+                                    && ((((((self.code >> 2u8) & 0x3fff) ^ 0x2000)
+                                        .wrapping_sub(0x2000))
+                                        as i32)
+                                        << 2u8)
+                                        >= 0
+                                {
+                                    s.push('+');
+                                }
+                                if ((self.code >> 21u8) & 0x1f) & 1 == 1
+                                    && ((((((self.code >> 2u8) & 0x3fff) ^ 0x2000)
+                                        .wrapping_sub(0x2000))
+                                        as i32)
+                                        << 2u8)
+                                        < 0
+                                {
+                                    s.push('-');
+                                }
+                                s
+                            }
+                        },
                         args: vec![Argument::BranchDest(BranchDest(
                             ((((((self.code >> 2u8) & 0x3fff) ^ 0x2000).wrapping_sub(0x2000))
                                 as i32)
@@ -4897,10 +5005,41 @@ impl Ins {
                         ins: self,
                     };
                 }
-                if ((self.code >> 21u8) & 0x1f) == 4 && ((self.code >> 16u8) & 0x1f) & 0b11 == 0b01
+                if ((self.code >> 21u8) & 0x1f) & 0b11110 == 4
+                    && ((self.code >> 16u8) & 0x1f) & 0b11 == 1
                 {
                     return SimplifiedIns {
                         mnemonic: "ble",
+                        suffix: {
+                            {
+                                let mut s = String::with_capacity(4);
+                                if self.bit(31usize) {
+                                    s.push('l');
+                                }
+                                if self.bit(30usize) {
+                                    s.push('a');
+                                }
+                                if ((self.code >> 21u8) & 0x1f) & 1 == 1
+                                    && ((((((self.code >> 2u8) & 0x3fff) ^ 0x2000)
+                                        .wrapping_sub(0x2000))
+                                        as i32)
+                                        << 2u8)
+                                        >= 0
+                                {
+                                    s.push('+');
+                                }
+                                if ((self.code >> 21u8) & 0x1f) & 1 == 1
+                                    && ((((((self.code >> 2u8) & 0x3fff) ^ 0x2000)
+                                        .wrapping_sub(0x2000))
+                                        as i32)
+                                        << 2u8)
+                                        < 0
+                                {
+                                    s.push('-');
+                                }
+                                s
+                            }
+                        },
                         args: vec![
                             Argument::CRField(CRField(((self.code >> 18u8) & 0x7) as _)),
                             Argument::BranchDest(BranchDest(
@@ -4912,12 +5051,40 @@ impl Ins {
                         ins: self,
                     };
                 }
-                if ((self.code >> 21u8) & 0x1f) == 12
-                    && ((self.code >> 16u8) & 0x1f) & 0b11 == 0b10
-                    && ((self.code >> 18u8) & 0x7) == 0
+                if ((self.code >> 21u8) & 0x1f) & 0b11110 == 12 && ((self.code >> 16u8) & 0x1f) == 2
                 {
                     return SimplifiedIns {
                         mnemonic: "beq",
+                        suffix: {
+                            {
+                                let mut s = String::with_capacity(4);
+                                if self.bit(31usize) {
+                                    s.push('l');
+                                }
+                                if self.bit(30usize) {
+                                    s.push('a');
+                                }
+                                if ((self.code >> 21u8) & 0x1f) & 1 == 1
+                                    && ((((((self.code >> 2u8) & 0x3fff) ^ 0x2000)
+                                        .wrapping_sub(0x2000))
+                                        as i32)
+                                        << 2u8)
+                                        >= 0
+                                {
+                                    s.push('+');
+                                }
+                                if ((self.code >> 21u8) & 0x1f) & 1 == 1
+                                    && ((((((self.code >> 2u8) & 0x3fff) ^ 0x2000)
+                                        .wrapping_sub(0x2000))
+                                        as i32)
+                                        << 2u8)
+                                        < 0
+                                {
+                                    s.push('-');
+                                }
+                                s
+                            }
+                        },
                         args: vec![Argument::BranchDest(BranchDest(
                             ((((((self.code >> 2u8) & 0x3fff) ^ 0x2000).wrapping_sub(0x2000))
                                 as i32)
@@ -4926,10 +5093,41 @@ impl Ins {
                         ins: self,
                     };
                 }
-                if ((self.code >> 21u8) & 0x1f) == 12 && ((self.code >> 16u8) & 0x1f) & 0b11 == 0b10
+                if ((self.code >> 21u8) & 0x1f) & 0b11110 == 12
+                    && ((self.code >> 16u8) & 0x1f) & 0b11 == 2
                 {
                     return SimplifiedIns {
                         mnemonic: "beq",
+                        suffix: {
+                            {
+                                let mut s = String::with_capacity(4);
+                                if self.bit(31usize) {
+                                    s.push('l');
+                                }
+                                if self.bit(30usize) {
+                                    s.push('a');
+                                }
+                                if ((self.code >> 21u8) & 0x1f) & 1 == 1
+                                    && ((((((self.code >> 2u8) & 0x3fff) ^ 0x2000)
+                                        .wrapping_sub(0x2000))
+                                        as i32)
+                                        << 2u8)
+                                        >= 0
+                                {
+                                    s.push('+');
+                                }
+                                if ((self.code >> 21u8) & 0x1f) & 1 == 1
+                                    && ((((((self.code >> 2u8) & 0x3fff) ^ 0x2000)
+                                        .wrapping_sub(0x2000))
+                                        as i32)
+                                        << 2u8)
+                                        < 0
+                                {
+                                    s.push('-');
+                                }
+                                s
+                            }
+                        },
                         args: vec![
                             Argument::CRField(CRField(((self.code >> 18u8) & 0x7) as _)),
                             Argument::BranchDest(BranchDest(
@@ -4941,12 +5139,40 @@ impl Ins {
                         ins: self,
                     };
                 }
-                if ((self.code >> 21u8) & 0x1f) == 4
-                    && ((self.code >> 16u8) & 0x1f) & 0b11 == 0b00
-                    && ((self.code >> 18u8) & 0x7) == 0
+                if ((self.code >> 21u8) & 0x1f) & 0b11110 == 4 && ((self.code >> 16u8) & 0x1f) == 0
                 {
                     return SimplifiedIns {
                         mnemonic: "bge",
+                        suffix: {
+                            {
+                                let mut s = String::with_capacity(4);
+                                if self.bit(31usize) {
+                                    s.push('l');
+                                }
+                                if self.bit(30usize) {
+                                    s.push('a');
+                                }
+                                if ((self.code >> 21u8) & 0x1f) & 1 == 1
+                                    && ((((((self.code >> 2u8) & 0x3fff) ^ 0x2000)
+                                        .wrapping_sub(0x2000))
+                                        as i32)
+                                        << 2u8)
+                                        >= 0
+                                {
+                                    s.push('+');
+                                }
+                                if ((self.code >> 21u8) & 0x1f) & 1 == 1
+                                    && ((((((self.code >> 2u8) & 0x3fff) ^ 0x2000)
+                                        .wrapping_sub(0x2000))
+                                        as i32)
+                                        << 2u8)
+                                        < 0
+                                {
+                                    s.push('-');
+                                }
+                                s
+                            }
+                        },
                         args: vec![Argument::BranchDest(BranchDest(
                             ((((((self.code >> 2u8) & 0x3fff) ^ 0x2000).wrapping_sub(0x2000))
                                 as i32)
@@ -4955,10 +5181,41 @@ impl Ins {
                         ins: self,
                     };
                 }
-                if ((self.code >> 21u8) & 0x1f) == 4 && ((self.code >> 16u8) & 0x1f) & 0b11 == 0b00
+                if ((self.code >> 21u8) & 0x1f) & 0b11110 == 4
+                    && ((self.code >> 16u8) & 0x1f) & 0b11 == 0
                 {
                     return SimplifiedIns {
                         mnemonic: "bge",
+                        suffix: {
+                            {
+                                let mut s = String::with_capacity(4);
+                                if self.bit(31usize) {
+                                    s.push('l');
+                                }
+                                if self.bit(30usize) {
+                                    s.push('a');
+                                }
+                                if ((self.code >> 21u8) & 0x1f) & 1 == 1
+                                    && ((((((self.code >> 2u8) & 0x3fff) ^ 0x2000)
+                                        .wrapping_sub(0x2000))
+                                        as i32)
+                                        << 2u8)
+                                        >= 0
+                                {
+                                    s.push('+');
+                                }
+                                if ((self.code >> 21u8) & 0x1f) & 1 == 1
+                                    && ((((((self.code >> 2u8) & 0x3fff) ^ 0x2000)
+                                        .wrapping_sub(0x2000))
+                                        as i32)
+                                        << 2u8)
+                                        < 0
+                                {
+                                    s.push('-');
+                                }
+                                s
+                            }
+                        },
                         args: vec![
                             Argument::CRField(CRField(((self.code >> 18u8) & 0x7) as _)),
                             Argument::BranchDest(BranchDest(
@@ -4970,12 +5227,40 @@ impl Ins {
                         ins: self,
                     };
                 }
-                if ((self.code >> 21u8) & 0x1f) == 12
-                    && ((self.code >> 16u8) & 0x1f) & 0b11 == 0b01
-                    && ((self.code >> 18u8) & 0x7) == 0
+                if ((self.code >> 21u8) & 0x1f) & 0b11110 == 12 && ((self.code >> 16u8) & 0x1f) == 1
                 {
                     return SimplifiedIns {
                         mnemonic: "bgt",
+                        suffix: {
+                            {
+                                let mut s = String::with_capacity(4);
+                                if self.bit(31usize) {
+                                    s.push('l');
+                                }
+                                if self.bit(30usize) {
+                                    s.push('a');
+                                }
+                                if ((self.code >> 21u8) & 0x1f) & 1 == 1
+                                    && ((((((self.code >> 2u8) & 0x3fff) ^ 0x2000)
+                                        .wrapping_sub(0x2000))
+                                        as i32)
+                                        << 2u8)
+                                        >= 0
+                                {
+                                    s.push('+');
+                                }
+                                if ((self.code >> 21u8) & 0x1f) & 1 == 1
+                                    && ((((((self.code >> 2u8) & 0x3fff) ^ 0x2000)
+                                        .wrapping_sub(0x2000))
+                                        as i32)
+                                        << 2u8)
+                                        < 0
+                                {
+                                    s.push('-');
+                                }
+                                s
+                            }
+                        },
                         args: vec![Argument::BranchDest(BranchDest(
                             ((((((self.code >> 2u8) & 0x3fff) ^ 0x2000).wrapping_sub(0x2000))
                                 as i32)
@@ -4984,10 +5269,41 @@ impl Ins {
                         ins: self,
                     };
                 }
-                if ((self.code >> 21u8) & 0x1f) == 12 && ((self.code >> 16u8) & 0x1f) & 0b11 == 0b01
+                if ((self.code >> 21u8) & 0x1f) & 0b11110 == 12
+                    && ((self.code >> 16u8) & 0x1f) & 0b11 == 1
                 {
                     return SimplifiedIns {
                         mnemonic: "bgt",
+                        suffix: {
+                            {
+                                let mut s = String::with_capacity(4);
+                                if self.bit(31usize) {
+                                    s.push('l');
+                                }
+                                if self.bit(30usize) {
+                                    s.push('a');
+                                }
+                                if ((self.code >> 21u8) & 0x1f) & 1 == 1
+                                    && ((((((self.code >> 2u8) & 0x3fff) ^ 0x2000)
+                                        .wrapping_sub(0x2000))
+                                        as i32)
+                                        << 2u8)
+                                        >= 0
+                                {
+                                    s.push('+');
+                                }
+                                if ((self.code >> 21u8) & 0x1f) & 1 == 1
+                                    && ((((((self.code >> 2u8) & 0x3fff) ^ 0x2000)
+                                        .wrapping_sub(0x2000))
+                                        as i32)
+                                        << 2u8)
+                                        < 0
+                                {
+                                    s.push('-');
+                                }
+                                s
+                            }
+                        },
                         args: vec![
                             Argument::CRField(CRField(((self.code >> 18u8) & 0x7) as _)),
                             Argument::BranchDest(BranchDest(
@@ -4999,12 +5315,40 @@ impl Ins {
                         ins: self,
                     };
                 }
-                if ((self.code >> 21u8) & 0x1f) == 4
-                    && ((self.code >> 16u8) & 0x1f) & 0b11 == 0b10
-                    && ((self.code >> 18u8) & 0x7) == 0
+                if ((self.code >> 21u8) & 0x1f) & 0b11110 == 4 && ((self.code >> 16u8) & 0x1f) == 2
                 {
                     return SimplifiedIns {
                         mnemonic: "bne",
+                        suffix: {
+                            {
+                                let mut s = String::with_capacity(4);
+                                if self.bit(31usize) {
+                                    s.push('l');
+                                }
+                                if self.bit(30usize) {
+                                    s.push('a');
+                                }
+                                if ((self.code >> 21u8) & 0x1f) & 1 == 1
+                                    && ((((((self.code >> 2u8) & 0x3fff) ^ 0x2000)
+                                        .wrapping_sub(0x2000))
+                                        as i32)
+                                        << 2u8)
+                                        >= 0
+                                {
+                                    s.push('+');
+                                }
+                                if ((self.code >> 21u8) & 0x1f) & 1 == 1
+                                    && ((((((self.code >> 2u8) & 0x3fff) ^ 0x2000)
+                                        .wrapping_sub(0x2000))
+                                        as i32)
+                                        << 2u8)
+                                        < 0
+                                {
+                                    s.push('-');
+                                }
+                                s
+                            }
+                        },
                         args: vec![Argument::BranchDest(BranchDest(
                             ((((((self.code >> 2u8) & 0x3fff) ^ 0x2000).wrapping_sub(0x2000))
                                 as i32)
@@ -5013,10 +5357,41 @@ impl Ins {
                         ins: self,
                     };
                 }
-                if ((self.code >> 21u8) & 0x1f) == 4 && ((self.code >> 16u8) & 0x1f) & 0b11 == 0b10
+                if ((self.code >> 21u8) & 0x1f) & 0b11110 == 4
+                    && ((self.code >> 16u8) & 0x1f) & 0b11 == 2
                 {
                     return SimplifiedIns {
                         mnemonic: "bne",
+                        suffix: {
+                            {
+                                let mut s = String::with_capacity(4);
+                                if self.bit(31usize) {
+                                    s.push('l');
+                                }
+                                if self.bit(30usize) {
+                                    s.push('a');
+                                }
+                                if ((self.code >> 21u8) & 0x1f) & 1 == 1
+                                    && ((((((self.code >> 2u8) & 0x3fff) ^ 0x2000)
+                                        .wrapping_sub(0x2000))
+                                        as i32)
+                                        << 2u8)
+                                        >= 0
+                                {
+                                    s.push('+');
+                                }
+                                if ((self.code >> 21u8) & 0x1f) & 1 == 1
+                                    && ((((((self.code >> 2u8) & 0x3fff) ^ 0x2000)
+                                        .wrapping_sub(0x2000))
+                                        as i32)
+                                        << 2u8)
+                                        < 0
+                                {
+                                    s.push('-');
+                                }
+                                s
+                            }
+                        },
                         args: vec![
                             Argument::CRField(CRField(((self.code >> 18u8) & 0x7) as _)),
                             Argument::BranchDest(BranchDest(
@@ -5028,12 +5403,40 @@ impl Ins {
                         ins: self,
                     };
                 }
-                if ((self.code >> 21u8) & 0x1f) == 12
-                    && ((self.code >> 16u8) & 0x1f) & 0b11 == 0b11
-                    && ((self.code >> 18u8) & 0x7) == 0
+                if ((self.code >> 21u8) & 0x1f) & 0b11110 == 12 && ((self.code >> 16u8) & 0x1f) == 3
                 {
                     return SimplifiedIns {
                         mnemonic: "bso",
+                        suffix: {
+                            {
+                                let mut s = String::with_capacity(4);
+                                if self.bit(31usize) {
+                                    s.push('l');
+                                }
+                                if self.bit(30usize) {
+                                    s.push('a');
+                                }
+                                if ((self.code >> 21u8) & 0x1f) & 1 == 1
+                                    && ((((((self.code >> 2u8) & 0x3fff) ^ 0x2000)
+                                        .wrapping_sub(0x2000))
+                                        as i32)
+                                        << 2u8)
+                                        >= 0
+                                {
+                                    s.push('+');
+                                }
+                                if ((self.code >> 21u8) & 0x1f) & 1 == 1
+                                    && ((((((self.code >> 2u8) & 0x3fff) ^ 0x2000)
+                                        .wrapping_sub(0x2000))
+                                        as i32)
+                                        << 2u8)
+                                        < 0
+                                {
+                                    s.push('-');
+                                }
+                                s
+                            }
+                        },
                         args: vec![Argument::BranchDest(BranchDest(
                             ((((((self.code >> 2u8) & 0x3fff) ^ 0x2000).wrapping_sub(0x2000))
                                 as i32)
@@ -5042,10 +5445,41 @@ impl Ins {
                         ins: self,
                     };
                 }
-                if ((self.code >> 21u8) & 0x1f) == 12 && ((self.code >> 16u8) & 0x1f) & 0b11 == 0b11
+                if ((self.code >> 21u8) & 0x1f) & 0b11110 == 12
+                    && ((self.code >> 16u8) & 0x1f) & 0b11 == 3
                 {
                     return SimplifiedIns {
                         mnemonic: "bso",
+                        suffix: {
+                            {
+                                let mut s = String::with_capacity(4);
+                                if self.bit(31usize) {
+                                    s.push('l');
+                                }
+                                if self.bit(30usize) {
+                                    s.push('a');
+                                }
+                                if ((self.code >> 21u8) & 0x1f) & 1 == 1
+                                    && ((((((self.code >> 2u8) & 0x3fff) ^ 0x2000)
+                                        .wrapping_sub(0x2000))
+                                        as i32)
+                                        << 2u8)
+                                        >= 0
+                                {
+                                    s.push('+');
+                                }
+                                if ((self.code >> 21u8) & 0x1f) & 1 == 1
+                                    && ((((((self.code >> 2u8) & 0x3fff) ^ 0x2000)
+                                        .wrapping_sub(0x2000))
+                                        as i32)
+                                        << 2u8)
+                                        < 0
+                                {
+                                    s.push('-');
+                                }
+                                s
+                            }
+                        },
                         args: vec![
                             Argument::CRField(CRField(((self.code >> 18u8) & 0x7) as _)),
                             Argument::BranchDest(BranchDest(
@@ -5057,12 +5491,40 @@ impl Ins {
                         ins: self,
                     };
                 }
-                if ((self.code >> 21u8) & 0x1f) == 4
-                    && ((self.code >> 16u8) & 0x1f) & 0b11 == 0b11
-                    && ((self.code >> 18u8) & 0x7) == 0
+                if ((self.code >> 21u8) & 0x1f) & 0b11110 == 4 && ((self.code >> 16u8) & 0x1f) == 3
                 {
                     return SimplifiedIns {
                         mnemonic: "bns",
+                        suffix: {
+                            {
+                                let mut s = String::with_capacity(4);
+                                if self.bit(31usize) {
+                                    s.push('l');
+                                }
+                                if self.bit(30usize) {
+                                    s.push('a');
+                                }
+                                if ((self.code >> 21u8) & 0x1f) & 1 == 1
+                                    && ((((((self.code >> 2u8) & 0x3fff) ^ 0x2000)
+                                        .wrapping_sub(0x2000))
+                                        as i32)
+                                        << 2u8)
+                                        >= 0
+                                {
+                                    s.push('+');
+                                }
+                                if ((self.code >> 21u8) & 0x1f) & 1 == 1
+                                    && ((((((self.code >> 2u8) & 0x3fff) ^ 0x2000)
+                                        .wrapping_sub(0x2000))
+                                        as i32)
+                                        << 2u8)
+                                        < 0
+                                {
+                                    s.push('-');
+                                }
+                                s
+                            }
+                        },
                         args: vec![Argument::BranchDest(BranchDest(
                             ((((((self.code >> 2u8) & 0x3fff) ^ 0x2000).wrapping_sub(0x2000))
                                 as i32)
@@ -5071,10 +5533,41 @@ impl Ins {
                         ins: self,
                     };
                 }
-                if ((self.code >> 21u8) & 0x1f) == 4 && ((self.code >> 16u8) & 0x1f) & 0b11 == 0b11
+                if ((self.code >> 21u8) & 0x1f) & 0b11110 == 4
+                    && ((self.code >> 16u8) & 0x1f) & 0b11 == 3
                 {
                     return SimplifiedIns {
                         mnemonic: "bns",
+                        suffix: {
+                            {
+                                let mut s = String::with_capacity(4);
+                                if self.bit(31usize) {
+                                    s.push('l');
+                                }
+                                if self.bit(30usize) {
+                                    s.push('a');
+                                }
+                                if ((self.code >> 21u8) & 0x1f) & 1 == 1
+                                    && ((((((self.code >> 2u8) & 0x3fff) ^ 0x2000)
+                                        .wrapping_sub(0x2000))
+                                        as i32)
+                                        << 2u8)
+                                        >= 0
+                                {
+                                    s.push('+');
+                                }
+                                if ((self.code >> 21u8) & 0x1f) & 1 == 1
+                                    && ((((((self.code >> 2u8) & 0x3fff) ^ 0x2000)
+                                        .wrapping_sub(0x2000))
+                                        as i32)
+                                        << 2u8)
+                                        < 0
+                                {
+                                    s.push('-');
+                                }
+                                s
+                            }
+                        },
                         args: vec![
                             Argument::CRField(CRField(((self.code >> 18u8) & 0x7) as _)),
                             Argument::BranchDest(BranchDest(
@@ -5086,9 +5579,40 @@ impl Ins {
                         ins: self,
                     };
                 }
-                if ((self.code >> 21u8) & 0x1f) == 16 && ((self.code >> 16u8) & 0x1f) == 0 {
+                if ((self.code >> 21u8) & 0x1f) & 0b11110 == 16 && ((self.code >> 16u8) & 0x1f) == 0
+                {
                     return SimplifiedIns {
                         mnemonic: "bdnz",
+                        suffix: {
+                            {
+                                let mut s = String::with_capacity(4);
+                                if self.bit(31usize) {
+                                    s.push('l');
+                                }
+                                if self.bit(30usize) {
+                                    s.push('a');
+                                }
+                                if ((self.code >> 21u8) & 0x1f) & 1 == 1
+                                    && ((((((self.code >> 2u8) & 0x3fff) ^ 0x2000)
+                                        .wrapping_sub(0x2000))
+                                        as i32)
+                                        << 2u8)
+                                        >= 0
+                                {
+                                    s.push('+');
+                                }
+                                if ((self.code >> 21u8) & 0x1f) & 1 == 1
+                                    && ((((((self.code >> 2u8) & 0x3fff) ^ 0x2000)
+                                        .wrapping_sub(0x2000))
+                                        as i32)
+                                        << 2u8)
+                                        < 0
+                                {
+                                    s.push('-');
+                                }
+                                s
+                            }
+                        },
                         args: vec![Argument::BranchDest(BranchDest(
                             ((((((self.code >> 2u8) & 0x3fff) ^ 0x2000).wrapping_sub(0x2000))
                                 as i32)
@@ -5097,14 +5621,221 @@ impl Ins {
                         ins: self,
                     };
                 }
-                if ((self.code >> 21u8) & 0x1f) == 18 && ((self.code >> 16u8) & 0x1f) == 0 {
+                if ((self.code >> 21u8) & 0x1f) & 0b11110 == 8 {
+                    return SimplifiedIns {
+                        mnemonic: "bdnzt",
+                        suffix: {
+                            {
+                                let mut s = String::with_capacity(4);
+                                if self.bit(31usize) {
+                                    s.push('l');
+                                }
+                                if self.bit(30usize) {
+                                    s.push('a');
+                                }
+                                if ((self.code >> 21u8) & 0x1f) & 1 == 1
+                                    && ((((((self.code >> 2u8) & 0x3fff) ^ 0x2000)
+                                        .wrapping_sub(0x2000))
+                                        as i32)
+                                        << 2u8)
+                                        >= 0
+                                {
+                                    s.push('+');
+                                }
+                                if ((self.code >> 21u8) & 0x1f) & 1 == 1
+                                    && ((((((self.code >> 2u8) & 0x3fff) ^ 0x2000)
+                                        .wrapping_sub(0x2000))
+                                        as i32)
+                                        << 2u8)
+                                        < 0
+                                {
+                                    s.push('-');
+                                }
+                                s
+                            }
+                        },
+                        args: vec![
+                            Argument::CRBit(CRBit(((self.code >> 16u8) & 0x1f) as _)),
+                            Argument::BranchDest(BranchDest(
+                                ((((((self.code >> 2u8) & 0x3fff) ^ 0x2000).wrapping_sub(0x2000))
+                                    as i32)
+                                    << 2u8) as _,
+                            )),
+                        ],
+                        ins: self,
+                    };
+                }
+                if ((self.code >> 21u8) & 0x1f) & 0b11110 == 0 {
+                    return SimplifiedIns {
+                        mnemonic: "bdnzf",
+                        suffix: {
+                            {
+                                let mut s = String::with_capacity(4);
+                                if self.bit(31usize) {
+                                    s.push('l');
+                                }
+                                if self.bit(30usize) {
+                                    s.push('a');
+                                }
+                                if ((self.code >> 21u8) & 0x1f) & 1 == 1
+                                    && ((((((self.code >> 2u8) & 0x3fff) ^ 0x2000)
+                                        .wrapping_sub(0x2000))
+                                        as i32)
+                                        << 2u8)
+                                        >= 0
+                                {
+                                    s.push('+');
+                                }
+                                if ((self.code >> 21u8) & 0x1f) & 1 == 1
+                                    && ((((((self.code >> 2u8) & 0x3fff) ^ 0x2000)
+                                        .wrapping_sub(0x2000))
+                                        as i32)
+                                        << 2u8)
+                                        < 0
+                                {
+                                    s.push('-');
+                                }
+                                s
+                            }
+                        },
+                        args: vec![
+                            Argument::CRBit(CRBit(((self.code >> 16u8) & 0x1f) as _)),
+                            Argument::BranchDest(BranchDest(
+                                ((((((self.code >> 2u8) & 0x3fff) ^ 0x2000).wrapping_sub(0x2000))
+                                    as i32)
+                                    << 2u8) as _,
+                            )),
+                        ],
+                        ins: self,
+                    };
+                }
+                if ((self.code >> 21u8) & 0x1f) & 0b11110 == 18 && ((self.code >> 16u8) & 0x1f) == 0
+                {
                     return SimplifiedIns {
                         mnemonic: "bdz",
+                        suffix: {
+                            {
+                                let mut s = String::with_capacity(4);
+                                if self.bit(31usize) {
+                                    s.push('l');
+                                }
+                                if self.bit(30usize) {
+                                    s.push('a');
+                                }
+                                if ((self.code >> 21u8) & 0x1f) & 1 == 1
+                                    && ((((((self.code >> 2u8) & 0x3fff) ^ 0x2000)
+                                        .wrapping_sub(0x2000))
+                                        as i32)
+                                        << 2u8)
+                                        >= 0
+                                {
+                                    s.push('+');
+                                }
+                                if ((self.code >> 21u8) & 0x1f) & 1 == 1
+                                    && ((((((self.code >> 2u8) & 0x3fff) ^ 0x2000)
+                                        .wrapping_sub(0x2000))
+                                        as i32)
+                                        << 2u8)
+                                        < 0
+                                {
+                                    s.push('-');
+                                }
+                                s
+                            }
+                        },
                         args: vec![Argument::BranchDest(BranchDest(
                             ((((((self.code >> 2u8) & 0x3fff) ^ 0x2000).wrapping_sub(0x2000))
                                 as i32)
                                 << 2u8) as _,
                         ))],
+                        ins: self,
+                    };
+                }
+                if ((self.code >> 21u8) & 0x1f) & 0b11110 == 10 {
+                    return SimplifiedIns {
+                        mnemonic: "bdzt",
+                        suffix: {
+                            {
+                                let mut s = String::with_capacity(4);
+                                if self.bit(31usize) {
+                                    s.push('l');
+                                }
+                                if self.bit(30usize) {
+                                    s.push('a');
+                                }
+                                if ((self.code >> 21u8) & 0x1f) & 1 == 1
+                                    && ((((((self.code >> 2u8) & 0x3fff) ^ 0x2000)
+                                        .wrapping_sub(0x2000))
+                                        as i32)
+                                        << 2u8)
+                                        >= 0
+                                {
+                                    s.push('+');
+                                }
+                                if ((self.code >> 21u8) & 0x1f) & 1 == 1
+                                    && ((((((self.code >> 2u8) & 0x3fff) ^ 0x2000)
+                                        .wrapping_sub(0x2000))
+                                        as i32)
+                                        << 2u8)
+                                        < 0
+                                {
+                                    s.push('-');
+                                }
+                                s
+                            }
+                        },
+                        args: vec![
+                            Argument::CRBit(CRBit(((self.code >> 16u8) & 0x1f) as _)),
+                            Argument::BranchDest(BranchDest(
+                                ((((((self.code >> 2u8) & 0x3fff) ^ 0x2000).wrapping_sub(0x2000))
+                                    as i32)
+                                    << 2u8) as _,
+                            )),
+                        ],
+                        ins: self,
+                    };
+                }
+                if ((self.code >> 21u8) & 0x1f) & 0b11110 == 2 {
+                    return SimplifiedIns {
+                        mnemonic: "bdzf",
+                        suffix: {
+                            {
+                                let mut s = String::with_capacity(4);
+                                if self.bit(31usize) {
+                                    s.push('l');
+                                }
+                                if self.bit(30usize) {
+                                    s.push('a');
+                                }
+                                if ((self.code >> 21u8) & 0x1f) & 1 == 1
+                                    && ((((((self.code >> 2u8) & 0x3fff) ^ 0x2000)
+                                        .wrapping_sub(0x2000))
+                                        as i32)
+                                        << 2u8)
+                                        >= 0
+                                {
+                                    s.push('+');
+                                }
+                                if ((self.code >> 21u8) & 0x1f) & 1 == 1
+                                    && ((((((self.code >> 2u8) & 0x3fff) ^ 0x2000)
+                                        .wrapping_sub(0x2000))
+                                        as i32)
+                                        << 2u8)
+                                        < 0
+                                {
+                                    s.push('-');
+                                }
+                                s
+                            }
+                        },
+                        args: vec![
+                            Argument::CRBit(CRBit(((self.code >> 16u8) & 0x1f) as _)),
+                            Argument::BranchDest(BranchDest(
+                                ((((((self.code >> 2u8) & 0x3fff) ^ 0x2000).wrapping_sub(0x2000))
+                                    as i32)
+                                    << 2u8) as _,
+                            )),
+                        ],
                         ins: self,
                     };
                 }
@@ -5113,150 +5844,343 @@ impl Ins {
                 if ((self.code >> 21u8) & 0x1f) == 20 && ((self.code >> 16u8) & 0x1f) == 0 {
                     return SimplifiedIns {
                         mnemonic: "bctr",
+                        suffix: {
+                            {
+                                let mut s = String::with_capacity(4);
+                                if self.bit(31usize) {
+                                    s.push('l');
+                                }
+                                s
+                            }
+                        },
                         args: vec![],
                         ins: self,
                     };
                 }
-                if ((self.code >> 21u8) & 0x1f) == 12
-                    && ((self.code >> 16u8) & 0x1f) & 0b11 == 0b00
-                    && ((self.code >> 18u8) & 0x7) == 0
+                if ((self.code >> 21u8) & 0x1f) & 0b11110 == 12 && ((self.code >> 16u8) & 0x1f) == 0
                 {
                     return SimplifiedIns {
                         mnemonic: "bltctr",
+                        suffix: {
+                            {
+                                let mut s = String::with_capacity(4);
+                                if self.bit(31usize) {
+                                    s.push('l');
+                                }
+                                if ((self.code >> 21u8) & 0x1f) & 1 == 1 {
+                                    s.push('+');
+                                }
+                                s
+                            }
+                        },
                         args: vec![],
                         ins: self,
                     };
                 }
-                if ((self.code >> 21u8) & 0x1f) == 12 && ((self.code >> 16u8) & 0x1f) & 0b11 == 0b00
+                if ((self.code >> 21u8) & 0x1f) & 0b11110 == 12
+                    && ((self.code >> 16u8) & 0x1f) & 0b11 == 0
                 {
                     return SimplifiedIns {
                         mnemonic: "bltctr",
+                        suffix: {
+                            {
+                                let mut s = String::with_capacity(4);
+                                if self.bit(31usize) {
+                                    s.push('l');
+                                }
+                                if ((self.code >> 21u8) & 0x1f) & 1 == 1 {
+                                    s.push('+');
+                                }
+                                s
+                            }
+                        },
                         args: vec![Argument::CRField(CRField(((self.code >> 18u8) & 0x7) as _))],
                         ins: self,
                     };
                 }
-                if ((self.code >> 21u8) & 0x1f) == 4
-                    && ((self.code >> 16u8) & 0x1f) & 0b11 == 0b01
-                    && ((self.code >> 18u8) & 0x7) == 0
+                if ((self.code >> 21u8) & 0x1f) & 0b11110 == 4 && ((self.code >> 16u8) & 0x1f) == 1
                 {
                     return SimplifiedIns {
                         mnemonic: "blectr",
+                        suffix: {
+                            {
+                                let mut s = String::with_capacity(4);
+                                if self.bit(31usize) {
+                                    s.push('l');
+                                }
+                                if ((self.code >> 21u8) & 0x1f) & 1 == 1 {
+                                    s.push('+');
+                                }
+                                s
+                            }
+                        },
                         args: vec![],
                         ins: self,
                     };
                 }
-                if ((self.code >> 21u8) & 0x1f) == 4 && ((self.code >> 16u8) & 0x1f) & 0b11 == 0b01
+                if ((self.code >> 21u8) & 0x1f) & 0b11110 == 4
+                    && ((self.code >> 16u8) & 0x1f) & 0b11 == 1
                 {
                     return SimplifiedIns {
                         mnemonic: "blectr",
+                        suffix: {
+                            {
+                                let mut s = String::with_capacity(4);
+                                if self.bit(31usize) {
+                                    s.push('l');
+                                }
+                                if ((self.code >> 21u8) & 0x1f) & 1 == 1 {
+                                    s.push('+');
+                                }
+                                s
+                            }
+                        },
                         args: vec![Argument::CRField(CRField(((self.code >> 18u8) & 0x7) as _))],
                         ins: self,
                     };
                 }
-                if ((self.code >> 21u8) & 0x1f) == 12
-                    && ((self.code >> 16u8) & 0x1f) & 0b11 == 0b10
-                    && ((self.code >> 18u8) & 0x7) == 0
+                if ((self.code >> 21u8) & 0x1f) & 0b11110 == 12 && ((self.code >> 16u8) & 0x1f) == 2
                 {
                     return SimplifiedIns {
                         mnemonic: "beqctr",
+                        suffix: {
+                            {
+                                let mut s = String::with_capacity(4);
+                                if self.bit(31usize) {
+                                    s.push('l');
+                                }
+                                if ((self.code >> 21u8) & 0x1f) & 1 == 1 {
+                                    s.push('+');
+                                }
+                                s
+                            }
+                        },
                         args: vec![],
                         ins: self,
                     };
                 }
-                if ((self.code >> 21u8) & 0x1f) == 12 && ((self.code >> 16u8) & 0x1f) & 0b11 == 0b10
+                if ((self.code >> 21u8) & 0x1f) & 0b11110 == 12
+                    && ((self.code >> 16u8) & 0x1f) & 0b11 == 2
                 {
                     return SimplifiedIns {
                         mnemonic: "beqctr",
+                        suffix: {
+                            {
+                                let mut s = String::with_capacity(4);
+                                if self.bit(31usize) {
+                                    s.push('l');
+                                }
+                                if ((self.code >> 21u8) & 0x1f) & 1 == 1 {
+                                    s.push('+');
+                                }
+                                s
+                            }
+                        },
                         args: vec![Argument::CRField(CRField(((self.code >> 18u8) & 0x7) as _))],
                         ins: self,
                     };
                 }
-                if ((self.code >> 21u8) & 0x1f) == 4
-                    && ((self.code >> 16u8) & 0x1f) & 0b11 == 0b00
-                    && ((self.code >> 18u8) & 0x7) == 0
+                if ((self.code >> 21u8) & 0x1f) & 0b11110 == 4 && ((self.code >> 16u8) & 0x1f) == 0
                 {
                     return SimplifiedIns {
                         mnemonic: "bgectr",
+                        suffix: {
+                            {
+                                let mut s = String::with_capacity(4);
+                                if self.bit(31usize) {
+                                    s.push('l');
+                                }
+                                if ((self.code >> 21u8) & 0x1f) & 1 == 1 {
+                                    s.push('+');
+                                }
+                                s
+                            }
+                        },
                         args: vec![],
                         ins: self,
                     };
                 }
-                if ((self.code >> 21u8) & 0x1f) == 4 && ((self.code >> 16u8) & 0x1f) & 0b11 == 0b00
+                if ((self.code >> 21u8) & 0x1f) & 0b11110 == 4
+                    && ((self.code >> 16u8) & 0x1f) & 0b11 == 0
                 {
                     return SimplifiedIns {
                         mnemonic: "bgectr",
+                        suffix: {
+                            {
+                                let mut s = String::with_capacity(4);
+                                if self.bit(31usize) {
+                                    s.push('l');
+                                }
+                                if ((self.code >> 21u8) & 0x1f) & 1 == 1 {
+                                    s.push('+');
+                                }
+                                s
+                            }
+                        },
                         args: vec![Argument::CRField(CRField(((self.code >> 18u8) & 0x7) as _))],
                         ins: self,
                     };
                 }
-                if ((self.code >> 21u8) & 0x1f) == 12
-                    && ((self.code >> 16u8) & 0x1f) & 0b11 == 0b01
-                    && ((self.code >> 18u8) & 0x7) == 0
+                if ((self.code >> 21u8) & 0x1f) & 0b11110 == 12 && ((self.code >> 16u8) & 0x1f) == 1
                 {
                     return SimplifiedIns {
                         mnemonic: "bgtctr",
+                        suffix: {
+                            {
+                                let mut s = String::with_capacity(4);
+                                if self.bit(31usize) {
+                                    s.push('l');
+                                }
+                                if ((self.code >> 21u8) & 0x1f) & 1 == 1 {
+                                    s.push('+');
+                                }
+                                s
+                            }
+                        },
                         args: vec![],
                         ins: self,
                     };
                 }
-                if ((self.code >> 21u8) & 0x1f) == 12 && ((self.code >> 16u8) & 0x1f) & 0b11 == 0b01
+                if ((self.code >> 21u8) & 0x1f) & 0b11110 == 12
+                    && ((self.code >> 16u8) & 0x1f) & 0b11 == 1
                 {
                     return SimplifiedIns {
                         mnemonic: "bgtctr",
+                        suffix: {
+                            {
+                                let mut s = String::with_capacity(4);
+                                if self.bit(31usize) {
+                                    s.push('l');
+                                }
+                                if ((self.code >> 21u8) & 0x1f) & 1 == 1 {
+                                    s.push('+');
+                                }
+                                s
+                            }
+                        },
                         args: vec![Argument::CRField(CRField(((self.code >> 18u8) & 0x7) as _))],
                         ins: self,
                     };
                 }
-                if ((self.code >> 21u8) & 0x1f) == 4
-                    && ((self.code >> 16u8) & 0x1f) & 0b11 == 0b10
-                    && ((self.code >> 18u8) & 0x7) == 0
+                if ((self.code >> 21u8) & 0x1f) & 0b11110 == 4 && ((self.code >> 16u8) & 0x1f) == 2
                 {
                     return SimplifiedIns {
                         mnemonic: "bnectr",
+                        suffix: {
+                            {
+                                let mut s = String::with_capacity(4);
+                                if self.bit(31usize) {
+                                    s.push('l');
+                                }
+                                if ((self.code >> 21u8) & 0x1f) & 1 == 1 {
+                                    s.push('+');
+                                }
+                                s
+                            }
+                        },
                         args: vec![],
                         ins: self,
                     };
                 }
-                if ((self.code >> 21u8) & 0x1f) == 4 && ((self.code >> 16u8) & 0x1f) & 0b11 == 0b10
+                if ((self.code >> 21u8) & 0x1f) & 0b11110 == 4
+                    && ((self.code >> 16u8) & 0x1f) & 0b11 == 2
                 {
                     return SimplifiedIns {
                         mnemonic: "bnectr",
+                        suffix: {
+                            {
+                                let mut s = String::with_capacity(4);
+                                if self.bit(31usize) {
+                                    s.push('l');
+                                }
+                                if ((self.code >> 21u8) & 0x1f) & 1 == 1 {
+                                    s.push('+');
+                                }
+                                s
+                            }
+                        },
                         args: vec![Argument::CRField(CRField(((self.code >> 18u8) & 0x7) as _))],
                         ins: self,
                     };
                 }
-                if ((self.code >> 21u8) & 0x1f) == 12
-                    && ((self.code >> 16u8) & 0x1f) & 0b11 == 0b11
-                    && ((self.code >> 18u8) & 0x7) == 0
+                if ((self.code >> 21u8) & 0x1f) & 0b11110 == 12 && ((self.code >> 16u8) & 0x1f) == 3
                 {
                     return SimplifiedIns {
                         mnemonic: "bsoctr",
+                        suffix: {
+                            {
+                                let mut s = String::with_capacity(4);
+                                if self.bit(31usize) {
+                                    s.push('l');
+                                }
+                                if ((self.code >> 21u8) & 0x1f) & 1 == 1 {
+                                    s.push('+');
+                                }
+                                s
+                            }
+                        },
                         args: vec![],
                         ins: self,
                     };
                 }
-                if ((self.code >> 21u8) & 0x1f) == 12 && ((self.code >> 16u8) & 0x1f) & 0b11 == 0b11
+                if ((self.code >> 21u8) & 0x1f) & 0b11110 == 12
+                    && ((self.code >> 16u8) & 0x1f) & 0b11 == 3
                 {
                     return SimplifiedIns {
                         mnemonic: "bsoctr",
+                        suffix: {
+                            {
+                                let mut s = String::with_capacity(4);
+                                if self.bit(31usize) {
+                                    s.push('l');
+                                }
+                                if ((self.code >> 21u8) & 0x1f) & 1 == 1 {
+                                    s.push('+');
+                                }
+                                s
+                            }
+                        },
                         args: vec![Argument::CRField(CRField(((self.code >> 18u8) & 0x7) as _))],
                         ins: self,
                     };
                 }
-                if ((self.code >> 21u8) & 0x1f) == 4
-                    && ((self.code >> 16u8) & 0x1f) & 0b11 == 0b11
-                    && ((self.code >> 18u8) & 0x7) == 0
+                if ((self.code >> 21u8) & 0x1f) & 0b11110 == 4 && ((self.code >> 16u8) & 0x1f) == 3
                 {
                     return SimplifiedIns {
                         mnemonic: "bnsctr",
+                        suffix: {
+                            {
+                                let mut s = String::with_capacity(4);
+                                if self.bit(31usize) {
+                                    s.push('l');
+                                }
+                                if ((self.code >> 21u8) & 0x1f) & 1 == 1 {
+                                    s.push('+');
+                                }
+                                s
+                            }
+                        },
                         args: vec![],
                         ins: self,
                     };
                 }
-                if ((self.code >> 21u8) & 0x1f) == 4 && ((self.code >> 16u8) & 0x1f) & 0b11 == 0b11
+                if ((self.code >> 21u8) & 0x1f) & 0b11110 == 4
+                    && ((self.code >> 16u8) & 0x1f) & 0b11 == 3
                 {
                     return SimplifiedIns {
                         mnemonic: "bnsctr",
+                        suffix: {
+                            {
+                                let mut s = String::with_capacity(4);
+                                if self.bit(31usize) {
+                                    s.push('l');
+                                }
+                                if ((self.code >> 21u8) & 0x1f) & 1 == 1 {
+                                    s.push('+');
+                                }
+                                s
+                            }
+                        },
                         args: vec![Argument::CRField(CRField(((self.code >> 18u8) & 0x7) as _))],
                         ins: self,
                     };
@@ -5266,151 +6190,460 @@ impl Ins {
                 if ((self.code >> 21u8) & 0x1f) == 20 && ((self.code >> 16u8) & 0x1f) == 0 {
                     return SimplifiedIns {
                         mnemonic: "blr",
+                        suffix: {
+                            {
+                                let mut s = String::with_capacity(4);
+                                if self.bit(31usize) {
+                                    s.push('l');
+                                }
+                                s
+                            }
+                        },
                         args: vec![],
                         ins: self,
                     };
                 }
-                if ((self.code >> 21u8) & 0x1f) == 12
-                    && ((self.code >> 16u8) & 0x1f) & 0b11 == 0b00
-                    && ((self.code >> 18u8) & 0x7) == 0
+                if ((self.code >> 21u8) & 0x1f) & 0b11110 == 12 && ((self.code >> 16u8) & 0x1f) == 0
                 {
                     return SimplifiedIns {
                         mnemonic: "bltlr",
+                        suffix: {
+                            {
+                                let mut s = String::with_capacity(4);
+                                if self.bit(31usize) {
+                                    s.push('l');
+                                }
+                                if ((self.code >> 21u8) & 0x1f) & 1 == 1 {
+                                    s.push('+');
+                                }
+                                s
+                            }
+                        },
                         args: vec![],
                         ins: self,
                     };
                 }
-                if ((self.code >> 21u8) & 0x1f) == 12 && ((self.code >> 16u8) & 0x1f) & 0b11 == 0b00
+                if ((self.code >> 21u8) & 0x1f) & 0b11110 == 12
+                    && ((self.code >> 16u8) & 0x1f) & 0b11 == 0
                 {
                     return SimplifiedIns {
                         mnemonic: "bltlr",
+                        suffix: {
+                            {
+                                let mut s = String::with_capacity(4);
+                                if self.bit(31usize) {
+                                    s.push('l');
+                                }
+                                if ((self.code >> 21u8) & 0x1f) & 1 == 1 {
+                                    s.push('+');
+                                }
+                                s
+                            }
+                        },
                         args: vec![Argument::CRField(CRField(((self.code >> 18u8) & 0x7) as _))],
                         ins: self,
                     };
                 }
-                if ((self.code >> 21u8) & 0x1f) == 4
-                    && ((self.code >> 16u8) & 0x1f) & 0b11 == 0b01
-                    && ((self.code >> 18u8) & 0x7) == 0
+                if ((self.code >> 21u8) & 0x1f) & 0b11110 == 4 && ((self.code >> 16u8) & 0x1f) == 1
                 {
                     return SimplifiedIns {
                         mnemonic: "blelr",
+                        suffix: {
+                            {
+                                let mut s = String::with_capacity(4);
+                                if self.bit(31usize) {
+                                    s.push('l');
+                                }
+                                if ((self.code >> 21u8) & 0x1f) & 1 == 1 {
+                                    s.push('+');
+                                }
+                                s
+                            }
+                        },
                         args: vec![],
                         ins: self,
                     };
                 }
-                if ((self.code >> 21u8) & 0x1f) == 4 && ((self.code >> 16u8) & 0x1f) & 0b11 == 0b01
+                if ((self.code >> 21u8) & 0x1f) & 0b11110 == 4
+                    && ((self.code >> 16u8) & 0x1f) & 0b11 == 1
                 {
                     return SimplifiedIns {
                         mnemonic: "blelr",
+                        suffix: {
+                            {
+                                let mut s = String::with_capacity(4);
+                                if self.bit(31usize) {
+                                    s.push('l');
+                                }
+                                if ((self.code >> 21u8) & 0x1f) & 1 == 1 {
+                                    s.push('+');
+                                }
+                                s
+                            }
+                        },
                         args: vec![Argument::CRField(CRField(((self.code >> 18u8) & 0x7) as _))],
                         ins: self,
                     };
                 }
-                if ((self.code >> 21u8) & 0x1f) == 12
-                    && ((self.code >> 16u8) & 0x1f) & 0b11 == 0b10
-                    && ((self.code >> 18u8) & 0x7) == 0
+                if ((self.code >> 21u8) & 0x1f) & 0b11110 == 12 && ((self.code >> 16u8) & 0x1f) == 2
                 {
                     return SimplifiedIns {
                         mnemonic: "beqlr",
+                        suffix: {
+                            {
+                                let mut s = String::with_capacity(4);
+                                if self.bit(31usize) {
+                                    s.push('l');
+                                }
+                                if ((self.code >> 21u8) & 0x1f) & 1 == 1 {
+                                    s.push('+');
+                                }
+                                s
+                            }
+                        },
                         args: vec![],
                         ins: self,
                     };
                 }
-                if ((self.code >> 21u8) & 0x1f) == 12 && ((self.code >> 16u8) & 0x1f) & 0b11 == 0b10
+                if ((self.code >> 21u8) & 0x1f) & 0b11110 == 12
+                    && ((self.code >> 16u8) & 0x1f) & 0b11 == 2
                 {
                     return SimplifiedIns {
                         mnemonic: "beqlr",
+                        suffix: {
+                            {
+                                let mut s = String::with_capacity(4);
+                                if self.bit(31usize) {
+                                    s.push('l');
+                                }
+                                if ((self.code >> 21u8) & 0x1f) & 1 == 1 {
+                                    s.push('+');
+                                }
+                                s
+                            }
+                        },
                         args: vec![Argument::CRField(CRField(((self.code >> 18u8) & 0x7) as _))],
                         ins: self,
                     };
                 }
-                if ((self.code >> 21u8) & 0x1f) == 4
-                    && ((self.code >> 16u8) & 0x1f) & 0b11 == 0b00
-                    && ((self.code >> 18u8) & 0x7) == 0
+                if ((self.code >> 21u8) & 0x1f) & 0b11110 == 4 && ((self.code >> 16u8) & 0x1f) == 0
                 {
                     return SimplifiedIns {
                         mnemonic: "bgelr",
+                        suffix: {
+                            {
+                                let mut s = String::with_capacity(4);
+                                if self.bit(31usize) {
+                                    s.push('l');
+                                }
+                                if ((self.code >> 21u8) & 0x1f) & 1 == 1 {
+                                    s.push('+');
+                                }
+                                s
+                            }
+                        },
                         args: vec![],
                         ins: self,
                     };
                 }
-                if ((self.code >> 21u8) & 0x1f) == 4 && ((self.code >> 16u8) & 0x1f) & 0b11 == 0b00
+                if ((self.code >> 21u8) & 0x1f) & 0b11110 == 4
+                    && ((self.code >> 16u8) & 0x1f) & 0b11 == 0
                 {
                     return SimplifiedIns {
                         mnemonic: "bgelr",
+                        suffix: {
+                            {
+                                let mut s = String::with_capacity(4);
+                                if self.bit(31usize) {
+                                    s.push('l');
+                                }
+                                if ((self.code >> 21u8) & 0x1f) & 1 == 1 {
+                                    s.push('+');
+                                }
+                                s
+                            }
+                        },
                         args: vec![Argument::CRField(CRField(((self.code >> 18u8) & 0x7) as _))],
                         ins: self,
                     };
                 }
-                if ((self.code >> 21u8) & 0x1f) == 12
-                    && ((self.code >> 16u8) & 0x1f) & 0b11 == 0b01
-                    && ((self.code >> 18u8) & 0x7) == 0
+                if ((self.code >> 21u8) & 0x1f) & 0b11110 == 12 && ((self.code >> 16u8) & 0x1f) == 1
                 {
                     return SimplifiedIns {
                         mnemonic: "bgtlr",
+                        suffix: {
+                            {
+                                let mut s = String::with_capacity(4);
+                                if self.bit(31usize) {
+                                    s.push('l');
+                                }
+                                if ((self.code >> 21u8) & 0x1f) & 1 == 1 {
+                                    s.push('+');
+                                }
+                                s
+                            }
+                        },
                         args: vec![],
                         ins: self,
                     };
                 }
-                if ((self.code >> 21u8) & 0x1f) == 12 && ((self.code >> 16u8) & 0x1f) & 0b11 == 0b01
+                if ((self.code >> 21u8) & 0x1f) & 0b11110 == 12
+                    && ((self.code >> 16u8) & 0x1f) & 0b11 == 1
                 {
                     return SimplifiedIns {
                         mnemonic: "bgtlr",
+                        suffix: {
+                            {
+                                let mut s = String::with_capacity(4);
+                                if self.bit(31usize) {
+                                    s.push('l');
+                                }
+                                if ((self.code >> 21u8) & 0x1f) & 1 == 1 {
+                                    s.push('+');
+                                }
+                                s
+                            }
+                        },
                         args: vec![Argument::CRField(CRField(((self.code >> 18u8) & 0x7) as _))],
                         ins: self,
                     };
                 }
-                if ((self.code >> 21u8) & 0x1f) == 4
-                    && ((self.code >> 16u8) & 0x1f) & 0b11 == 0b10
-                    && ((self.code >> 18u8) & 0x7) == 0
+                if ((self.code >> 21u8) & 0x1f) & 0b11110 == 4 && ((self.code >> 16u8) & 0x1f) == 2
                 {
                     return SimplifiedIns {
                         mnemonic: "bnelr",
+                        suffix: {
+                            {
+                                let mut s = String::with_capacity(4);
+                                if self.bit(31usize) {
+                                    s.push('l');
+                                }
+                                if ((self.code >> 21u8) & 0x1f) & 1 == 1 {
+                                    s.push('+');
+                                }
+                                s
+                            }
+                        },
                         args: vec![],
                         ins: self,
                     };
                 }
-                if ((self.code >> 21u8) & 0x1f) == 4 && ((self.code >> 16u8) & 0x1f) & 0b11 == 0b10
+                if ((self.code >> 21u8) & 0x1f) & 0b11110 == 4
+                    && ((self.code >> 16u8) & 0x1f) & 0b11 == 2
                 {
                     return SimplifiedIns {
                         mnemonic: "bnelr",
+                        suffix: {
+                            {
+                                let mut s = String::with_capacity(4);
+                                if self.bit(31usize) {
+                                    s.push('l');
+                                }
+                                if ((self.code >> 21u8) & 0x1f) & 1 == 1 {
+                                    s.push('+');
+                                }
+                                s
+                            }
+                        },
                         args: vec![Argument::CRField(CRField(((self.code >> 18u8) & 0x7) as _))],
                         ins: self,
                     };
                 }
-                if ((self.code >> 21u8) & 0x1f) == 12
-                    && ((self.code >> 16u8) & 0x1f) & 0b11 == 0b11
-                    && ((self.code >> 18u8) & 0x7) == 0
+                if ((self.code >> 21u8) & 0x1f) & 0b11110 == 12 && ((self.code >> 16u8) & 0x1f) == 3
                 {
                     return SimplifiedIns {
                         mnemonic: "bsolr",
+                        suffix: {
+                            {
+                                let mut s = String::with_capacity(4);
+                                if self.bit(31usize) {
+                                    s.push('l');
+                                }
+                                if ((self.code >> 21u8) & 0x1f) & 1 == 1 {
+                                    s.push('+');
+                                }
+                                s
+                            }
+                        },
                         args: vec![],
                         ins: self,
                     };
                 }
-                if ((self.code >> 21u8) & 0x1f) == 12 && ((self.code >> 16u8) & 0x1f) & 0b11 == 0b11
+                if ((self.code >> 21u8) & 0x1f) & 0b11110 == 12
+                    && ((self.code >> 16u8) & 0x1f) & 0b11 == 3
                 {
                     return SimplifiedIns {
                         mnemonic: "bsolr",
+                        suffix: {
+                            {
+                                let mut s = String::with_capacity(4);
+                                if self.bit(31usize) {
+                                    s.push('l');
+                                }
+                                if ((self.code >> 21u8) & 0x1f) & 1 == 1 {
+                                    s.push('+');
+                                }
+                                s
+                            }
+                        },
                         args: vec![Argument::CRField(CRField(((self.code >> 18u8) & 0x7) as _))],
                         ins: self,
                     };
                 }
-                if ((self.code >> 21u8) & 0x1f) == 4
-                    && ((self.code >> 16u8) & 0x1f) & 0b11 == 0b11
-                    && ((self.code >> 18u8) & 0x7) == 0
+                if ((self.code >> 21u8) & 0x1f) & 0b11110 == 4 && ((self.code >> 16u8) & 0x1f) == 3
                 {
                     return SimplifiedIns {
                         mnemonic: "bnslr",
+                        suffix: {
+                            {
+                                let mut s = String::with_capacity(4);
+                                if self.bit(31usize) {
+                                    s.push('l');
+                                }
+                                if ((self.code >> 21u8) & 0x1f) & 1 == 1 {
+                                    s.push('+');
+                                }
+                                s
+                            }
+                        },
                         args: vec![],
                         ins: self,
                     };
                 }
-                if ((self.code >> 21u8) & 0x1f) == 4 && ((self.code >> 16u8) & 0x1f) & 0b11 == 0b11
+                if ((self.code >> 21u8) & 0x1f) & 0b11110 == 4
+                    && ((self.code >> 16u8) & 0x1f) & 0b11 == 3
                 {
                     return SimplifiedIns {
                         mnemonic: "bnslr",
+                        suffix: {
+                            {
+                                let mut s = String::with_capacity(4);
+                                if self.bit(31usize) {
+                                    s.push('l');
+                                }
+                                if ((self.code >> 21u8) & 0x1f) & 1 == 1 {
+                                    s.push('+');
+                                }
+                                s
+                            }
+                        },
                         args: vec![Argument::CRField(CRField(((self.code >> 18u8) & 0x7) as _))],
+                        ins: self,
+                    };
+                }
+                if ((self.code >> 21u8) & 0x1f) & 0b11110 == 16 && ((self.code >> 16u8) & 0x1f) == 0
+                {
+                    return SimplifiedIns {
+                        mnemonic: "bdnzlr",
+                        suffix: {
+                            {
+                                let mut s = String::with_capacity(4);
+                                if self.bit(31usize) {
+                                    s.push('l');
+                                }
+                                if ((self.code >> 21u8) & 0x1f) & 1 == 1 {
+                                    s.push('+');
+                                }
+                                s
+                            }
+                        },
+                        args: vec![],
+                        ins: self,
+                    };
+                }
+                if ((self.code >> 21u8) & 0x1f) & 0b11110 == 8 {
+                    return SimplifiedIns {
+                        mnemonic: "bdnztlr",
+                        suffix: {
+                            {
+                                let mut s = String::with_capacity(4);
+                                if self.bit(31usize) {
+                                    s.push('l');
+                                }
+                                if ((self.code >> 21u8) & 0x1f) & 1 == 1 {
+                                    s.push('+');
+                                }
+                                s
+                            }
+                        },
+                        args: vec![Argument::CRBit(CRBit(((self.code >> 16u8) & 0x1f) as _))],
+                        ins: self,
+                    };
+                }
+                if ((self.code >> 21u8) & 0x1f) & 0b11110 == 0 {
+                    return SimplifiedIns {
+                        mnemonic: "bdnzflr",
+                        suffix: {
+                            {
+                                let mut s = String::with_capacity(4);
+                                if self.bit(31usize) {
+                                    s.push('l');
+                                }
+                                if ((self.code >> 21u8) & 0x1f) & 1 == 1 {
+                                    s.push('+');
+                                }
+                                s
+                            }
+                        },
+                        args: vec![Argument::CRBit(CRBit(((self.code >> 16u8) & 0x1f) as _))],
+                        ins: self,
+                    };
+                }
+                if ((self.code >> 21u8) & 0x1f) & 0b11110 == 18 && ((self.code >> 16u8) & 0x1f) == 0
+                {
+                    return SimplifiedIns {
+                        mnemonic: "bdzlr",
+                        suffix: {
+                            {
+                                let mut s = String::with_capacity(4);
+                                if self.bit(31usize) {
+                                    s.push('l');
+                                }
+                                if ((self.code >> 21u8) & 0x1f) & 1 == 1 {
+                                    s.push('+');
+                                }
+                                s
+                            }
+                        },
+                        args: vec![],
+                        ins: self,
+                    };
+                }
+                if ((self.code >> 21u8) & 0x1f) & 0b11110 == 10 {
+                    return SimplifiedIns {
+                        mnemonic: "bdztlr",
+                        suffix: {
+                            {
+                                let mut s = String::with_capacity(4);
+                                if self.bit(31usize) {
+                                    s.push('l');
+                                }
+                                if ((self.code >> 21u8) & 0x1f) & 1 == 1 {
+                                    s.push('+');
+                                }
+                                s
+                            }
+                        },
+                        args: vec![Argument::CRBit(CRBit(((self.code >> 16u8) & 0x1f) as _))],
+                        ins: self,
+                    };
+                }
+                if ((self.code >> 21u8) & 0x1f) & 0b11110 == 0 {
+                    return SimplifiedIns {
+                        mnemonic: "bdzflr",
+                        suffix: {
+                            {
+                                let mut s = String::with_capacity(4);
+                                if self.bit(31usize) {
+                                    s.push('l');
+                                }
+                                if ((self.code >> 21u8) & 0x1f) & 1 == 1 {
+                                    s.push('+');
+                                }
+                                s
+                            }
+                        },
+                        args: vec![Argument::CRBit(CRBit(((self.code >> 16u8) & 0x1f) as _))],
                         ins: self,
                     };
                 }
@@ -5419,6 +6652,7 @@ impl Ins {
                 if ((self.code >> 23u8) & 0x7) == 0 && ((self.code >> 21u8) & 0x1) == 0 {
                     return SimplifiedIns {
                         mnemonic: "cmpw",
+                        suffix: String::new(),
                         args: vec![
                             Argument::GPR(GPR(((self.code >> 16u8) & 0x1f) as _)),
                             Argument::GPR(GPR(((self.code >> 11u8) & 0x1f) as _)),
@@ -5429,6 +6663,7 @@ impl Ins {
                 if ((self.code >> 21u8) & 0x1) == 0 {
                     return SimplifiedIns {
                         mnemonic: "cmpw",
+                        suffix: String::new(),
                         args: vec![
                             Argument::CRField(CRField(((self.code >> 23u8) & 0x7) as _)),
                             Argument::GPR(GPR(((self.code >> 16u8) & 0x1f) as _)),
@@ -5440,6 +6675,7 @@ impl Ins {
                 if ((self.code >> 23u8) & 0x7) == 0 && ((self.code >> 21u8) & 0x1) == 1 {
                     return SimplifiedIns {
                         mnemonic: "cmpd",
+                        suffix: String::new(),
                         args: vec![
                             Argument::GPR(GPR(((self.code >> 16u8) & 0x1f) as _)),
                             Argument::GPR(GPR(((self.code >> 11u8) & 0x1f) as _)),
@@ -5450,6 +6686,7 @@ impl Ins {
                 if ((self.code >> 21u8) & 0x1) == 1 {
                     return SimplifiedIns {
                         mnemonic: "cmpd",
+                        suffix: String::new(),
                         args: vec![
                             Argument::CRField(CRField(((self.code >> 23u8) & 0x7) as _)),
                             Argument::GPR(GPR(((self.code >> 16u8) & 0x1f) as _)),
@@ -5463,6 +6700,7 @@ impl Ins {
                 if ((self.code >> 23u8) & 0x7) == 0 && ((self.code >> 21u8) & 0x1) == 0 {
                     return SimplifiedIns {
                         mnemonic: "cmpwi",
+                        suffix: String::new(),
                         args: vec![
                             Argument::GPR(GPR(((self.code >> 16u8) & 0x1f) as _)),
                             Argument::Simm(Simm(
@@ -5476,6 +6714,7 @@ impl Ins {
                 if ((self.code >> 21u8) & 0x1) == 0 {
                     return SimplifiedIns {
                         mnemonic: "cmpwi",
+                        suffix: String::new(),
                         args: vec![
                             Argument::CRField(CRField(((self.code >> 23u8) & 0x7) as _)),
                             Argument::GPR(GPR(((self.code >> 16u8) & 0x1f) as _)),
@@ -5490,6 +6729,7 @@ impl Ins {
                 if ((self.code >> 23u8) & 0x7) == 0 && ((self.code >> 21u8) & 0x1) == 1 {
                     return SimplifiedIns {
                         mnemonic: "cmpdi",
+                        suffix: String::new(),
                         args: vec![
                             Argument::GPR(GPR(((self.code >> 16u8) & 0x1f) as _)),
                             Argument::Simm(Simm(
@@ -5503,6 +6743,7 @@ impl Ins {
                 if ((self.code >> 21u8) & 0x1) == 1 {
                     return SimplifiedIns {
                         mnemonic: "cmpdi",
+                        suffix: String::new(),
                         args: vec![
                             Argument::CRField(CRField(((self.code >> 23u8) & 0x7) as _)),
                             Argument::GPR(GPR(((self.code >> 16u8) & 0x1f) as _)),
@@ -5519,6 +6760,7 @@ impl Ins {
                 if ((self.code >> 23u8) & 0x7) == 0 && ((self.code >> 21u8) & 0x1) == 0 {
                     return SimplifiedIns {
                         mnemonic: "cmplw",
+                        suffix: String::new(),
                         args: vec![
                             Argument::GPR(GPR(((self.code >> 16u8) & 0x1f) as _)),
                             Argument::GPR(GPR(((self.code >> 11u8) & 0x1f) as _)),
@@ -5529,6 +6771,7 @@ impl Ins {
                 if ((self.code >> 21u8) & 0x1) == 0 {
                     return SimplifiedIns {
                         mnemonic: "cmplw",
+                        suffix: String::new(),
                         args: vec![
                             Argument::CRField(CRField(((self.code >> 23u8) & 0x7) as _)),
                             Argument::GPR(GPR(((self.code >> 16u8) & 0x1f) as _)),
@@ -5540,6 +6783,7 @@ impl Ins {
                 if ((self.code >> 23u8) & 0x7) == 0 && ((self.code >> 21u8) & 0x1) == 1 {
                     return SimplifiedIns {
                         mnemonic: "cmpld",
+                        suffix: String::new(),
                         args: vec![
                             Argument::GPR(GPR(((self.code >> 16u8) & 0x1f) as _)),
                             Argument::GPR(GPR(((self.code >> 11u8) & 0x1f) as _)),
@@ -5550,6 +6794,7 @@ impl Ins {
                 if ((self.code >> 21u8) & 0x1) == 1 {
                     return SimplifiedIns {
                         mnemonic: "cmpld",
+                        suffix: String::new(),
                         args: vec![
                             Argument::CRField(CRField(((self.code >> 23u8) & 0x7) as _)),
                             Argument::GPR(GPR(((self.code >> 16u8) & 0x1f) as _)),
@@ -5563,6 +6808,7 @@ impl Ins {
                 if ((self.code >> 23u8) & 0x7) == 0 && ((self.code >> 21u8) & 0x1) == 0 {
                     return SimplifiedIns {
                         mnemonic: "cmplwi",
+                        suffix: String::new(),
                         args: vec![
                             Argument::GPR(GPR(((self.code >> 16u8) & 0x1f) as _)),
                             Argument::Uimm(Uimm((self.code & 0xffff) as _)),
@@ -5573,6 +6819,7 @@ impl Ins {
                 if ((self.code >> 21u8) & 0x1) == 0 {
                     return SimplifiedIns {
                         mnemonic: "cmplwi",
+                        suffix: String::new(),
                         args: vec![
                             Argument::CRField(CRField(((self.code >> 23u8) & 0x7) as _)),
                             Argument::GPR(GPR(((self.code >> 16u8) & 0x1f) as _)),
@@ -5584,6 +6831,7 @@ impl Ins {
                 if ((self.code >> 23u8) & 0x7) == 0 && ((self.code >> 21u8) & 0x1) == 1 {
                     return SimplifiedIns {
                         mnemonic: "cmpldi",
+                        suffix: String::new(),
                         args: vec![
                             Argument::GPR(GPR(((self.code >> 16u8) & 0x1f) as _)),
                             Argument::Uimm(Uimm((self.code & 0xffff) as _)),
@@ -5594,6 +6842,7 @@ impl Ins {
                 if ((self.code >> 21u8) & 0x1) == 1 {
                     return SimplifiedIns {
                         mnemonic: "cmpldi",
+                        suffix: String::new(),
                         args: vec![
                             Argument::CRField(CRField(((self.code >> 23u8) & 0x7) as _)),
                             Argument::GPR(GPR(((self.code >> 16u8) & 0x1f) as _)),
@@ -5609,6 +6858,7 @@ impl Ins {
                 {
                     return SimplifiedIns {
                         mnemonic: "crset",
+                        suffix: String::new(),
                         args: vec![Argument::CRBit(CRBit(((self.code >> 21u8) & 0x1f) as _))],
                         ins: self,
                     };
@@ -5618,10 +6868,10 @@ impl Ins {
                 if ((self.code >> 16u8) & 0x1f) == ((self.code >> 11u8) & 0x1f) {
                     return SimplifiedIns {
                         mnemonic: "crnot",
+                        suffix: String::new(),
                         args: vec![
                             Argument::CRBit(CRBit(((self.code >> 21u8) & 0x1f) as _)),
                             Argument::CRBit(CRBit(((self.code >> 16u8) & 0x1f) as _)),
-                            Argument::CRBit(CRBit(((self.code >> 11u8) & 0x1f) as _)),
                         ],
                         ins: self,
                     };
@@ -5631,10 +6881,10 @@ impl Ins {
                 if ((self.code >> 16u8) & 0x1f) == ((self.code >> 11u8) & 0x1f) {
                     return SimplifiedIns {
                         mnemonic: "crmove",
+                        suffix: String::new(),
                         args: vec![
                             Argument::CRBit(CRBit(((self.code >> 21u8) & 0x1f) as _)),
                             Argument::CRBit(CRBit(((self.code >> 16u8) & 0x1f) as _)),
-                            Argument::CRBit(CRBit(((self.code >> 11u8) & 0x1f) as _)),
                         ],
                         ins: self,
                     };
@@ -5646,6 +6896,7 @@ impl Ins {
                 {
                     return SimplifiedIns {
                         mnemonic: "crclr",
+                        suffix: String::new(),
                         args: vec![Argument::CRBit(CRBit(((self.code >> 21u8) & 0x1f) as _))],
                         ins: self,
                     };
@@ -5659,6 +6910,7 @@ impl Ins {
                 {
                     return SimplifiedIns {
                         mnemonic: "mfxer",
+                        suffix: String::new(),
                         args: vec![Argument::GPR(GPR(((self.code >> 21u8) & 0x1f) as _))],
                         ins: self,
                     };
@@ -5670,6 +6922,7 @@ impl Ins {
                 {
                     return SimplifiedIns {
                         mnemonic: "mflr",
+                        suffix: String::new(),
                         args: vec![Argument::GPR(GPR(((self.code >> 21u8) & 0x1f) as _))],
                         ins: self,
                     };
@@ -5681,6 +6934,7 @@ impl Ins {
                 {
                     return SimplifiedIns {
                         mnemonic: "mfctr",
+                        suffix: String::new(),
                         args: vec![Argument::GPR(GPR(((self.code >> 21u8) & 0x1f) as _))],
                         ins: self,
                     };
@@ -5692,6 +6946,7 @@ impl Ins {
                 {
                     return SimplifiedIns {
                         mnemonic: "mfdsisr",
+                        suffix: String::new(),
                         args: vec![Argument::GPR(GPR(((self.code >> 21u8) & 0x1f) as _))],
                         ins: self,
                     };
@@ -5699,11 +6954,152 @@ impl Ins {
                 if (((((self.code >> 11u8) & 0x3ff) & 0b11111_00000u32) >> 5u32)
                     | ((((self.code >> 11u8) & 0x3ff) & 0b00000_11111u32) << 5u32))
                     as u32
-                    == 397
+                    == 19
+                {
+                    return SimplifiedIns {
+                        mnemonic: "mfdar",
+                        suffix: String::new(),
+                        args: vec![Argument::GPR(GPR(((self.code >> 21u8) & 0x1f) as _))],
+                        ins: self,
+                    };
+                }
+                if (((((self.code >> 11u8) & 0x3ff) & 0b11111_00000u32) >> 5u32)
+                    | ((((self.code >> 11u8) & 0x3ff) & 0b00000_11111u32) << 5u32))
+                    as u32
+                    == 22
+                {
+                    return SimplifiedIns {
+                        mnemonic: "mfdec",
+                        suffix: String::new(),
+                        args: vec![Argument::GPR(GPR(((self.code >> 21u8) & 0x1f) as _))],
+                        ins: self,
+                    };
+                }
+                if (((((self.code >> 11u8) & 0x3ff) & 0b11111_00000u32) >> 5u32)
+                    | ((((self.code >> 11u8) & 0x3ff) & 0b00000_11111u32) << 5u32))
+                    as u32
+                    == 25
+                {
+                    return SimplifiedIns {
+                        mnemonic: "mfsdr1",
+                        suffix: String::new(),
+                        args: vec![Argument::GPR(GPR(((self.code >> 21u8) & 0x1f) as _))],
+                        ins: self,
+                    };
+                }
+                if (((((self.code >> 11u8) & 0x3ff) & 0b11111_00000u32) >> 5u32)
+                    | ((((self.code >> 11u8) & 0x3ff) & 0b00000_11111u32) << 5u32))
+                    as u32
+                    == 26
+                {
+                    return SimplifiedIns {
+                        mnemonic: "mfsrr0",
+                        suffix: String::new(),
+                        args: vec![Argument::GPR(GPR(((self.code >> 21u8) & 0x1f) as _))],
+                        ins: self,
+                    };
+                }
+                if (((((self.code >> 11u8) & 0x3ff) & 0b11111_00000u32) >> 5u32)
+                    | ((((self.code >> 11u8) & 0x3ff) & 0b00000_11111u32) << 5u32))
+                    as u32
+                    == 27
+                {
+                    return SimplifiedIns {
+                        mnemonic: "mfsrr1",
+                        suffix: String::new(),
+                        args: vec![Argument::GPR(GPR(((self.code >> 21u8) & 0x1f) as _))],
+                        ins: self,
+                    };
+                }
+                if (((((self.code >> 11u8) & 0x3ff) & 0b11111_00000u32) >> 5u32)
+                    | ((((self.code >> 11u8) & 0x3ff) & 0b00000_11111u32) << 5u32))
+                    as u32
+                    & 0b1111111100
+                    == 272
+                {
+                    return SimplifiedIns {
+                        mnemonic: "mfsprg",
+                        suffix: String::new(),
+                        args: vec![
+                            Argument::GPR(GPR(((self.code >> 21u8) & 0x1f) as _)),
+                            Argument::OpaqueU(OpaqueU(((self.code >> 16u8) & 0x3) as _)),
+                        ],
+                        ins: self,
+                    };
+                }
+                if (((((self.code >> 11u8) & 0x3ff) & 0b11111_00000u32) >> 5u32)
+                    | ((((self.code >> 11u8) & 0x3ff) & 0b00000_11111u32) << 5u32))
+                    as u32
+                    == 282
+                {
+                    return SimplifiedIns {
+                        mnemonic: "mfear",
+                        suffix: String::new(),
+                        args: vec![Argument::GPR(GPR(((self.code >> 21u8) & 0x1f) as _))],
+                        ins: self,
+                    };
+                }
+                if (((((self.code >> 11u8) & 0x3ff) & 0b11111_00000u32) >> 5u32)
+                    | ((((self.code >> 11u8) & 0x3ff) & 0b00000_11111u32) << 5u32))
+                    as u32
+                    & 0b1111111001
+                    == 528
+                {
+                    return SimplifiedIns {
+                        mnemonic: "mfibatu",
+                        suffix: String::new(),
+                        args: vec![
+                            Argument::GPR(GPR(((self.code >> 21u8) & 0x1f) as _)),
+                            Argument::OpaqueU(OpaqueU(((self.code >> 17u8) & 0x3) as _)),
+                        ],
+                        ins: self,
+                    };
+                }
+                if (((((self.code >> 11u8) & 0x3ff) & 0b11111_00000u32) >> 5u32)
+                    | ((((self.code >> 11u8) & 0x3ff) & 0b00000_11111u32) << 5u32))
+                    as u32
+                    & 0b1111111001
+                    == 529
+                {
+                    return SimplifiedIns {
+                        mnemonic: "mfibatl",
+                        suffix: String::new(),
+                        args: vec![
+                            Argument::GPR(GPR(((self.code >> 21u8) & 0x1f) as _)),
+                            Argument::OpaqueU(OpaqueU(((self.code >> 17u8) & 0x3) as _)),
+                        ],
+                        ins: self,
+                    };
+                }
+                if (((((self.code >> 11u8) & 0x3ff) & 0b11111_00000u32) >> 5u32)
+                    | ((((self.code >> 11u8) & 0x3ff) & 0b00000_11111u32) << 5u32))
+                    as u32
+                    & 0b1111111001
+                    == 536
                 {
                     return SimplifiedIns {
                         mnemonic: "mfdbatu",
-                        args: vec![Argument::GPR(GPR(((self.code >> 21u8) & 0x1f) as _))],
+                        suffix: String::new(),
+                        args: vec![
+                            Argument::GPR(GPR(((self.code >> 21u8) & 0x1f) as _)),
+                            Argument::OpaqueU(OpaqueU(((self.code >> 17u8) & 0x3) as _)),
+                        ],
+                        ins: self,
+                    };
+                }
+                if (((((self.code >> 11u8) & 0x3ff) & 0b11111_00000u32) >> 5u32)
+                    | ((((self.code >> 11u8) & 0x3ff) & 0b00000_11111u32) << 5u32))
+                    as u32
+                    & 0b1111111001
+                    == 537
+                {
+                    return SimplifiedIns {
+                        mnemonic: "mfdbatl",
+                        suffix: String::new(),
+                        args: vec![
+                            Argument::GPR(GPR(((self.code >> 21u8) & 0x1f) as _)),
+                            Argument::OpaqueU(OpaqueU(((self.code >> 17u8) & 0x3) as _)),
+                        ],
                         ins: self,
                     };
                 }
@@ -5716,6 +7112,7 @@ impl Ins {
                 {
                     return SimplifiedIns {
                         mnemonic: "mtxer",
+                        suffix: String::new(),
                         args: vec![Argument::GPR(GPR(((self.code >> 21u8) & 0x1f) as _))],
                         ins: self,
                     };
@@ -5727,6 +7124,7 @@ impl Ins {
                 {
                     return SimplifiedIns {
                         mnemonic: "mtlr",
+                        suffix: String::new(),
                         args: vec![Argument::GPR(GPR(((self.code >> 21u8) & 0x1f) as _))],
                         ins: self,
                     };
@@ -5738,6 +7136,7 @@ impl Ins {
                 {
                     return SimplifiedIns {
                         mnemonic: "mtctr",
+                        suffix: String::new(),
                         args: vec![Argument::GPR(GPR(((self.code >> 21u8) & 0x1f) as _))],
                         ins: self,
                     };
@@ -5749,6 +7148,7 @@ impl Ins {
                 {
                     return SimplifiedIns {
                         mnemonic: "mtdsisr",
+                        suffix: String::new(),
                         args: vec![Argument::GPR(GPR(((self.code >> 21u8) & 0x1f) as _))],
                         ins: self,
                     };
@@ -5756,11 +7156,176 @@ impl Ins {
                 if (((((self.code >> 11u8) & 0x3ff) & 0b11111_00000u32) >> 5u32)
                     | ((((self.code >> 11u8) & 0x3ff) & 0b00000_11111u32) << 5u32))
                     as u32
-                    == 397
+                    == 19
+                {
+                    return SimplifiedIns {
+                        mnemonic: "mtdar",
+                        suffix: String::new(),
+                        args: vec![Argument::GPR(GPR(((self.code >> 21u8) & 0x1f) as _))],
+                        ins: self,
+                    };
+                }
+                if (((((self.code >> 11u8) & 0x3ff) & 0b11111_00000u32) >> 5u32)
+                    | ((((self.code >> 11u8) & 0x3ff) & 0b00000_11111u32) << 5u32))
+                    as u32
+                    == 22
+                {
+                    return SimplifiedIns {
+                        mnemonic: "mtdec",
+                        suffix: String::new(),
+                        args: vec![Argument::GPR(GPR(((self.code >> 21u8) & 0x1f) as _))],
+                        ins: self,
+                    };
+                }
+                if (((((self.code >> 11u8) & 0x3ff) & 0b11111_00000u32) >> 5u32)
+                    | ((((self.code >> 11u8) & 0x3ff) & 0b00000_11111u32) << 5u32))
+                    as u32
+                    == 25
+                {
+                    return SimplifiedIns {
+                        mnemonic: "mtsdr1",
+                        suffix: String::new(),
+                        args: vec![Argument::GPR(GPR(((self.code >> 21u8) & 0x1f) as _))],
+                        ins: self,
+                    };
+                }
+                if (((((self.code >> 11u8) & 0x3ff) & 0b11111_00000u32) >> 5u32)
+                    | ((((self.code >> 11u8) & 0x3ff) & 0b00000_11111u32) << 5u32))
+                    as u32
+                    == 26
+                {
+                    return SimplifiedIns {
+                        mnemonic: "mtsrr0",
+                        suffix: String::new(),
+                        args: vec![Argument::GPR(GPR(((self.code >> 21u8) & 0x1f) as _))],
+                        ins: self,
+                    };
+                }
+                if (((((self.code >> 11u8) & 0x3ff) & 0b11111_00000u32) >> 5u32)
+                    | ((((self.code >> 11u8) & 0x3ff) & 0b00000_11111u32) << 5u32))
+                    as u32
+                    == 27
+                {
+                    return SimplifiedIns {
+                        mnemonic: "mtsrr1",
+                        suffix: String::new(),
+                        args: vec![Argument::GPR(GPR(((self.code >> 21u8) & 0x1f) as _))],
+                        ins: self,
+                    };
+                }
+                if (((((self.code >> 11u8) & 0x3ff) & 0b11111_00000u32) >> 5u32)
+                    | ((((self.code >> 11u8) & 0x3ff) & 0b00000_11111u32) << 5u32))
+                    as u32
+                    & 0b1111111100
+                    == 272
+                {
+                    return SimplifiedIns {
+                        mnemonic: "mtsprg",
+                        suffix: String::new(),
+                        args: vec![
+                            Argument::OpaqueU(OpaqueU(((self.code >> 16u8) & 0x3) as _)),
+                            Argument::GPR(GPR(((self.code >> 21u8) & 0x1f) as _)),
+                        ],
+                        ins: self,
+                    };
+                }
+                if (((((self.code >> 11u8) & 0x3ff) & 0b11111_00000u32) >> 5u32)
+                    | ((((self.code >> 11u8) & 0x3ff) & 0b00000_11111u32) << 5u32))
+                    as u32
+                    == 282
+                {
+                    return SimplifiedIns {
+                        mnemonic: "mtear",
+                        suffix: String::new(),
+                        args: vec![Argument::GPR(GPR(((self.code >> 21u8) & 0x1f) as _))],
+                        ins: self,
+                    };
+                }
+                if (((((self.code >> 11u8) & 0x3ff) & 0b11111_00000u32) >> 5u32)
+                    | ((((self.code >> 11u8) & 0x3ff) & 0b00000_11111u32) << 5u32))
+                    as u32
+                    == 284
+                {
+                    return SimplifiedIns {
+                        mnemonic: "mttbl",
+                        suffix: String::new(),
+                        args: vec![Argument::GPR(GPR(((self.code >> 21u8) & 0x1f) as _))],
+                        ins: self,
+                    };
+                }
+                if (((((self.code >> 11u8) & 0x3ff) & 0b11111_00000u32) >> 5u32)
+                    | ((((self.code >> 11u8) & 0x3ff) & 0b00000_11111u32) << 5u32))
+                    as u32
+                    == 285
+                {
+                    return SimplifiedIns {
+                        mnemonic: "mttbu",
+                        suffix: String::new(),
+                        args: vec![Argument::GPR(GPR(((self.code >> 21u8) & 0x1f) as _))],
+                        ins: self,
+                    };
+                }
+                if (((((self.code >> 11u8) & 0x3ff) & 0b11111_00000u32) >> 5u32)
+                    | ((((self.code >> 11u8) & 0x3ff) & 0b00000_11111u32) << 5u32))
+                    as u32
+                    & 0b1111111001
+                    == 528
+                {
+                    return SimplifiedIns {
+                        mnemonic: "mtibatu",
+                        suffix: String::new(),
+                        args: vec![
+                            Argument::OpaqueU(OpaqueU(((self.code >> 17u8) & 0x3) as _)),
+                            Argument::GPR(GPR(((self.code >> 21u8) & 0x1f) as _)),
+                        ],
+                        ins: self,
+                    };
+                }
+                if (((((self.code >> 11u8) & 0x3ff) & 0b11111_00000u32) >> 5u32)
+                    | ((((self.code >> 11u8) & 0x3ff) & 0b00000_11111u32) << 5u32))
+                    as u32
+                    & 0b1111111001
+                    == 529
+                {
+                    return SimplifiedIns {
+                        mnemonic: "mtibatl",
+                        suffix: String::new(),
+                        args: vec![
+                            Argument::OpaqueU(OpaqueU(((self.code >> 17u8) & 0x3) as _)),
+                            Argument::GPR(GPR(((self.code >> 21u8) & 0x1f) as _)),
+                        ],
+                        ins: self,
+                    };
+                }
+                if (((((self.code >> 11u8) & 0x3ff) & 0b11111_00000u32) >> 5u32)
+                    | ((((self.code >> 11u8) & 0x3ff) & 0b00000_11111u32) << 5u32))
+                    as u32
+                    & 0b1111111001
+                    == 536
                 {
                     return SimplifiedIns {
                         mnemonic: "mtdbatu",
-                        args: vec![Argument::GPR(GPR(((self.code >> 21u8) & 0x1f) as _))],
+                        suffix: String::new(),
+                        args: vec![
+                            Argument::OpaqueU(OpaqueU(((self.code >> 17u8) & 0x3) as _)),
+                            Argument::GPR(GPR(((self.code >> 21u8) & 0x1f) as _)),
+                        ],
+                        ins: self,
+                    };
+                }
+                if (((((self.code >> 11u8) & 0x3ff) & 0b11111_00000u32) >> 5u32)
+                    | ((((self.code >> 11u8) & 0x3ff) & 0b00000_11111u32) << 5u32))
+                    as u32
+                    & 0b1111111001
+                    == 537
+                {
+                    return SimplifiedIns {
+                        mnemonic: "mtdbatl",
+                        suffix: String::new(),
+                        args: vec![
+                            Argument::OpaqueU(OpaqueU(((self.code >> 17u8) & 0x3) as _)),
+                            Argument::GPR(GPR(((self.code >> 21u8) & 0x1f) as _)),
+                        ],
                         ins: self,
                     };
                 }
@@ -5769,6 +7334,15 @@ impl Ins {
                 if ((self.code >> 21u8) & 0x1f) == ((self.code >> 11u8) & 0x1f) {
                     return SimplifiedIns {
                         mnemonic: "mr",
+                        suffix: {
+                            {
+                                let mut s = String::with_capacity(4);
+                                if self.bit(31usize) {
+                                    s.push('.');
+                                }
+                                s
+                            }
+                        },
                         args: vec![
                             Argument::GPR(GPR(((self.code >> 16u8) & 0x1f) as _)),
                             Argument::GPR(GPR(((self.code >> 21u8) & 0x1f) as _)),
@@ -5784,15 +7358,48 @@ impl Ins {
                 {
                     return SimplifiedIns {
                         mnemonic: "nop",
+                        suffix: String::new(),
                         args: vec![],
                         ins: self,
                     };
                 }
             }
             Opcode::Rlwinm => {
+                if ((self.code >> 11u8) & 0x1f) == 0
+                    && ((self.code >> 6u8) & 0x1f) == 0
+                    && ((self.code >> 1u8) & 0x1f) < 32
+                {
+                    return SimplifiedIns {
+                        mnemonic: "clrrwi",
+                        suffix: {
+                            {
+                                let mut s = String::with_capacity(4);
+                                if self.bit(31usize) {
+                                    s.push('.');
+                                }
+                                s
+                            }
+                        },
+                        args: vec![
+                            Argument::GPR(GPR(((self.code >> 16u8) & 0x1f) as _)),
+                            Argument::GPR(GPR(((self.code >> 21u8) & 0x1f) as _)),
+                            Argument::OpaqueU(OpaqueU((31 - ((self.code >> 1u8) & 0x1f)) as _)),
+                        ],
+                        ins: self,
+                    };
+                }
                 if ((self.code >> 11u8) & 0x1f) == 0 && ((self.code >> 1u8) & 0x1f) == 31 {
                     return SimplifiedIns {
                         mnemonic: "clrlwi",
+                        suffix: {
+                            {
+                                let mut s = String::with_capacity(4);
+                                if self.bit(31usize) {
+                                    s.push('.');
+                                }
+                                s
+                            }
+                        },
                         args: vec![
                             Argument::GPR(GPR(((self.code >> 16u8) & 0x1f) as _)),
                             Argument::GPR(GPR(((self.code >> 21u8) & 0x1f) as _)),
@@ -5801,9 +7408,21 @@ impl Ins {
                         ins: self,
                     };
                 }
-                if ((self.code >> 6u8) & 0x1f) == 0 && ((self.code >> 1u8) & 0x1f) == 31 {
+                if ((self.code >> 6u8) & 0x1f) == 0
+                    && ((self.code >> 1u8) & 0x1f) == 31
+                    && ((self.code >> 11u8) & 0x1f) <= 16
+                {
                     return SimplifiedIns {
                         mnemonic: "rotlwi",
+                        suffix: {
+                            {
+                                let mut s = String::with_capacity(4);
+                                if self.bit(31usize) {
+                                    s.push('.');
+                                }
+                                s
+                            }
+                        },
                         args: vec![
                             Argument::GPR(GPR(((self.code >> 16u8) & 0x1f) as _)),
                             Argument::GPR(GPR(((self.code >> 21u8) & 0x1f) as _)),
@@ -5813,10 +7432,42 @@ impl Ins {
                     };
                 }
                 if ((self.code >> 6u8) & 0x1f) == 0
+                    && ((self.code >> 1u8) & 0x1f) == 31
+                    && ((self.code >> 11u8) & 0x1f) > 16
+                {
+                    return SimplifiedIns {
+                        mnemonic: "rotrwi",
+                        suffix: {
+                            {
+                                let mut s = String::with_capacity(4);
+                                if self.bit(31usize) {
+                                    s.push('.');
+                                }
+                                s
+                            }
+                        },
+                        args: vec![
+                            Argument::GPR(GPR(((self.code >> 16u8) & 0x1f) as _)),
+                            Argument::GPR(GPR(((self.code >> 21u8) & 0x1f) as _)),
+                            Argument::OpaqueU(OpaqueU((32 - ((self.code >> 11u8) & 0x1f)) as _)),
+                        ],
+                        ins: self,
+                    };
+                }
+                if ((self.code >> 6u8) & 0x1f) == 0
                     && 31 - ((self.code >> 11u8) & 0x1f) == ((self.code >> 1u8) & 0x1f)
                 {
                     return SimplifiedIns {
                         mnemonic: "slwi",
+                        suffix: {
+                            {
+                                let mut s = String::with_capacity(4);
+                                if self.bit(31usize) {
+                                    s.push('.');
+                                }
+                                s
+                            }
+                        },
                         args: vec![
                             Argument::GPR(GPR(((self.code >> 16u8) & 0x1f) as _)),
                             Argument::GPR(GPR(((self.code >> 21u8) & 0x1f) as _)),
@@ -5830,10 +7481,113 @@ impl Ins {
                 {
                     return SimplifiedIns {
                         mnemonic: "srwi",
+                        suffix: {
+                            {
+                                let mut s = String::with_capacity(4);
+                                if self.bit(31usize) {
+                                    s.push('.');
+                                }
+                                s
+                            }
+                        },
                         args: vec![
                             Argument::GPR(GPR(((self.code >> 16u8) & 0x1f) as _)),
                             Argument::GPR(GPR(((self.code >> 21u8) & 0x1f) as _)),
                             Argument::OpaqueU(OpaqueU(((self.code >> 6u8) & 0x1f) as _)),
+                        ],
+                        ins: self,
+                    };
+                }
+                if ((self.code >> 11u8) & 0x1f) < 32
+                    && ((self.code >> 1u8) & 0x1f) == 31 - ((self.code >> 11u8) & 0x1f)
+                {
+                    return SimplifiedIns {
+                        mnemonic: "clrlslwi",
+                        suffix: {
+                            {
+                                let mut s = String::with_capacity(4);
+                                if self.bit(31usize) {
+                                    s.push('.');
+                                }
+                                s
+                            }
+                        },
+                        args: vec![
+                            Argument::GPR(GPR(((self.code >> 16u8) & 0x1f) as _)),
+                            Argument::GPR(GPR(((self.code >> 21u8) & 0x1f) as _)),
+                            Argument::OpaqueU(OpaqueU(
+                                (((self.code >> 6u8) & 0x1f) + ((self.code >> 11u8) & 0x1f)) as _,
+                            )),
+                            Argument::OpaqueU(OpaqueU(((self.code >> 11u8) & 0x1f) as _)),
+                        ],
+                        ins: self,
+                    };
+                }
+                if ((self.code >> 6u8) & 0x1f) == 0 {
+                    return SimplifiedIns {
+                        mnemonic: "extlwi",
+                        suffix: {
+                            {
+                                let mut s = String::with_capacity(4);
+                                if self.bit(31usize) {
+                                    s.push('.');
+                                }
+                                s
+                            }
+                        },
+                        args: vec![
+                            Argument::GPR(GPR(((self.code >> 16u8) & 0x1f) as _)),
+                            Argument::GPR(GPR(((self.code >> 21u8) & 0x1f) as _)),
+                            Argument::OpaqueU(OpaqueU((((self.code >> 1u8) & 0x1f) + 1) as _)),
+                            Argument::OpaqueU(OpaqueU(((self.code >> 11u8) & 0x1f) as _)),
+                        ],
+                        ins: self,
+                    };
+                }
+                if ((self.code >> 1u8) & 0x1f) == 31
+                    && ((self.code >> 11u8) & 0x1f) >= 32 - ((self.code >> 6u8) & 0x1f)
+                {
+                    return SimplifiedIns {
+                        mnemonic: "extrwi",
+                        suffix: {
+                            {
+                                let mut s = String::with_capacity(4);
+                                if self.bit(31usize) {
+                                    s.push('.');
+                                }
+                                s
+                            }
+                        },
+                        args: vec![
+                            Argument::GPR(GPR(((self.code >> 16u8) & 0x1f) as _)),
+                            Argument::GPR(GPR(((self.code >> 21u8) & 0x1f) as _)),
+                            Argument::OpaqueU(OpaqueU((32 - ((self.code >> 6u8) & 0x1f)) as _)),
+                            Argument::OpaqueU(OpaqueU(
+                                (((self.code >> 11u8) & 0x1f) - (32 - ((self.code >> 6u8) & 0x1f)))
+                                    as _,
+                            )),
+                        ],
+                        ins: self,
+                    };
+                }
+            }
+            Opcode::Rlwnm => {
+                if ((self.code >> 6u8) & 0x1f) == 0 && ((self.code >> 1u8) & 0x1f) == 31 {
+                    return SimplifiedIns {
+                        mnemonic: "rotlw",
+                        suffix: {
+                            {
+                                let mut s = String::with_capacity(4);
+                                if self.bit(31usize) {
+                                    s.push('.');
+                                }
+                                s
+                            }
+                        },
+                        args: vec![
+                            Argument::GPR(GPR(((self.code >> 16u8) & 0x1f) as _)),
+                            Argument::GPR(GPR(((self.code >> 21u8) & 0x1f) as _)),
+                            Argument::GPR(GPR(((self.code >> 11u8) & 0x1f) as _)),
                         ],
                         ins: self,
                     };
@@ -5843,6 +7597,7 @@ impl Ins {
                 if ((self.code >> 21u8) & 0x1f) == 8 {
                     return SimplifiedIns {
                         mnemonic: "twgti",
+                        suffix: String::new(),
                         args: vec![
                             Argument::GPR(GPR(((self.code >> 16u8) & 0x1f) as _)),
                             Argument::Simm(Simm(
@@ -5856,6 +7611,7 @@ impl Ins {
                 if ((self.code >> 21u8) & 0x1f) == 6 {
                     return SimplifiedIns {
                         mnemonic: "twllei",
+                        suffix: String::new(),
                         args: vec![
                             Argument::GPR(GPR(((self.code >> 16u8) & 0x1f) as _)),
                             Argument::Simm(Simm(
@@ -6029,6 +7785,14 @@ impl Ins {
         ((self.code >> 12u8) & 0xf) as _
     }
     #[inline(always)]
+    pub fn field_spr_SPRG(&self) -> usize {
+        ((self.code >> 16u8) & 0x3) as _
+    }
+    #[inline(always)]
+    pub fn field_spr_BAT(&self) -> usize {
+        ((self.code >> 17u8) & 0x3) as _
+    }
+    #[inline(always)]
     pub fn field_TO(&self) -> usize {
         ((self.code >> 21u8) & 0x1f) as _
     }
@@ -6051,5 +7815,20 @@ impl Ins {
     #[inline(always)]
     pub fn field_AA(&self) -> bool {
         self.bit(30usize)
+    }
+    #[inline(always)]
+    pub fn field_BP(&self) -> bool {
+        ((self.code >> 21u8) & 0x1f) & 1 == 1
+            && ((((((self.code >> 2u8) & 0x3fff) ^ 0x2000).wrapping_sub(0x2000)) as i32) << 2u8)
+                >= 0
+    }
+    #[inline(always)]
+    pub fn field_BNP(&self) -> bool {
+        ((self.code >> 21u8) & 0x1f) & 1 == 1
+            && ((((((self.code >> 2u8) & 0x3fff) ^ 0x2000).wrapping_sub(0x2000)) as i32) << 2u8) < 0
+    }
+    #[inline(always)]
+    pub fn field_BP_ND(&self) -> bool {
+        ((self.code >> 21u8) & 0x1f) & 1 == 1
     }
 }
