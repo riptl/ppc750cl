@@ -74,8 +74,8 @@ pub(crate) struct BitRange(Range<u8>);
 
 impl<'de> Deserialize<'de> for BitRange {
     fn deserialize<D>(deserializer: D) -> std::result::Result<Self, D::Error>
-        where
-            D: Deserializer<'de>,
+    where
+        D: Deserializer<'de>,
     {
         let range_str: String = Deserialize::deserialize(deserializer)?;
         if let Some((start_str, stop_str)) = range_str.split_once("..") {
@@ -253,10 +253,7 @@ impl Modifier {
             let modifier_bit = self.bit as usize;
             Ok(quote!(self.bit(#modifier_bit)))
         } else {
-            compile_mnemonic_condition(
-                field_by_name,
-                &self.condition,
-            )
+            compile_mnemonic_condition(field_by_name, &self.condition)
         }
     }
 
@@ -576,10 +573,7 @@ impl Isa {
                             .get(field_name)
                             .unwrap_or_else(|| panic!("field not found: {}", arg));
                         let variant = Ident::new(field.arg.as_ref().unwrap(), Span::call_site());
-                        let value = compile_mnemonic_condition(
-                            &field_by_name,
-                            expression,
-                        )?;
+                        let value = compile_mnemonic_condition(&field_by_name, expression)?;
                         args.push(quote!(Argument::#variant(#variant((#value) as _)),));
                     }
                     let args = token_stream!(args);
@@ -609,9 +603,11 @@ impl Isa {
         let simplified_ins_match_arms = token_stream!(simplified_ins_match_arms);
         let field_accessors =
             TokenStream::from_iter(self.fields.iter().map(|field| field.construct_accessor()));
-        let modifiers: Vec<TokenStream> = self.modifiers
+        let modifiers: Vec<TokenStream> = self
+            .modifiers
             .iter()
-            .map(|modifier| modifier.construct_accessor(&field_by_name)).try_collect()?;
+            .map(|modifier| modifier.construct_accessor(&field_by_name))
+            .try_collect()?;
         let modifier_accessors = TokenStream::from_iter(modifiers);
         // Generate final fields function.
         let ins_impl = quote! {
@@ -725,7 +721,10 @@ fn compile_mnemonic_condition(
                 }
             }
             TokenTree::Group(ref group) => {
-                let iter = group.stream().into_iter().flat_map(|token| map_ident(field_by_name, token));
+                let iter = group
+                    .stream()
+                    .into_iter()
+                    .flat_map(|token| map_ident(field_by_name, token));
                 let stream = TokenStream::from_iter(iter);
                 return TokenStream::from(TokenTree::Group(Group::new(group.delimiter(), stream)));
             }
@@ -733,7 +732,9 @@ fn compile_mnemonic_condition(
         }
         token.into()
     }
-    let token_iter = src_stream.into_iter().flat_map(|token| map_ident(field_by_name, token));
+    let token_iter = src_stream
+        .into_iter()
+        .flat_map(|token| map_ident(field_by_name, token));
     Ok(TokenStream::from_iter(token_iter))
 }
 

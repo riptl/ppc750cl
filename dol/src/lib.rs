@@ -205,9 +205,9 @@ impl From<&DolHeaderData> for DolHeader {
 
 impl DolHeader {
     pub fn section_at(&self, addr: u32) -> Option<&DolSection> {
-        self.sections.iter()
-            .find(|&section| (section.target..(section.target + section.size))
-                .contains(&addr))
+        self.sections
+            .iter()
+            .find(|&section| (section.target..(section.target + section.size)).contains(&addr))
     }
 }
 
